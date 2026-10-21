@@ -1,7 +1,11 @@
 import { execFileSync } from "node:child_process";
 
 const gitIn = (dir: string, ...args: string[]) =>
-  execFileSync("git", args, { cwd: dir, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
+  execFileSync("git", args, {
+    cwd: dir,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "ignore"],
+  });
 
 export function findRoot(cwd: string): string {
   return gitIn(cwd, "rev-parse", "--show-toplevel").trim();

@@ -1,7 +1,10 @@
 import { execFileSync } from "node:child_process";
 
 const git = (...args: string[]) =>
-  execFileSync("git", args, { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+  execFileSync("git", args, {
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "ignore"],
+  }).trim();
 
 export function currentBranch(): string {
   return git("branch", "--show-current");
