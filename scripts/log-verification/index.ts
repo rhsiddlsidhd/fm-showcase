@@ -5,7 +5,12 @@ import { isVerificationCommand } from "./command.ts";
 import { currentBranch, findRoot, headCommit } from "./git.ts";
 import { readCommand, readOutcome, readSession } from "./payload.ts";
 import { buildRecord } from "./record.ts";
-import { appendRecord, findSessionFile, prepareDirs, writeOutput } from "./storage.ts";
+import {
+  appendRecord,
+  findSessionFile,
+  prepareDirs,
+  writeOutput,
+} from "./storage.ts";
 
 try {
   const payload = JSON.parse(readFileSync(0, "utf8"));
@@ -23,10 +28,19 @@ try {
   const sessionFile = findSessionFile(dir, session, iso);
   const outName = writeOutput(outDir, session, output);
 
-  const record = buildRecord(payload, { iso, branch, command, exitCode, head: headCommit(root), outName });
+  const record = buildRecord(payload, {
+    iso,
+    branch,
+    command,
+    exitCode,
+    head: headCommit(root),
+    outName,
+  });
   appendRecord(dir, sessionFile, record);
 } catch (e) {
   // 훅 실패가 세션을 막으면 안 된다.
-  console.error(`[log-verification] ${e instanceof Error ? e.message : String(e)}`);
+  console.error(
+    `[log-verification] ${e instanceof Error ? e.message : String(e)}`,
+  );
 }
 process.exit(0);

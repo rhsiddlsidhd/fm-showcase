@@ -2,7 +2,16 @@
 export const DEFAULT_BRANCH = "main";
 
 export const PREFIXES = [
-  "feat", "fix", "docs", "refactor", "perf", "test", "build", "ci", "chore", "revert",
+  "feat",
+  "fix",
+  "docs",
+  "refactor",
+  "perf",
+  "test",
+  "build",
+  "ci",
+  "chore",
+  "revert",
 ] as const;
 
 export const PREFIX_PATTERN = PREFIXES.join("|");
