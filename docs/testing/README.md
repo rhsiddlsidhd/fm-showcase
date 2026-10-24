@@ -43,7 +43,7 @@ Frontend Mentor 챌린지를 TDD로 구현할 때의 테스트 전략이다. 이
 
 | 항목 | 규칙 |
 | ---- | ---- |
-| 파일 위치 | 대상 파일 옆에 둔다. `Foo.tsx` → `Foo.test.tsx` (현재 `src/App.test.tsx`와 같다) |
+| 파일 위치 | 단위·통합은 대상 파일 옆에 둔다. `Foo.tsx` → `Foo.test.tsx` (현재 `src/App.test.tsx`와 같다). E2E는 루트 `tests/`에 둔다 ([`e2e.md`](./e2e.md)) |
 | 파일 이름 | 단위·통합은 `*.test.ts(x)`. E2E는 `*.spec.ts`로 구분한다 (Vitest가 E2E를 줍지 않도록) |
 | 이름 | `describe`는 대상, `it`은 동작을 문장으로 쓴다. 구현 방식이 아니라 관찰 가능한 결과를 쓴다 |
 | 구조 | Arrange → Act → Assert. 한 `it`에 하나의 동작 |
