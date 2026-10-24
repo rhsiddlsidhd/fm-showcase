@@ -13,6 +13,7 @@ AI가 작성한 코드를 신뢰할 근거를 구조로 갖추는 프로젝트. 
 | 로컬 git 훅 (커밋 메시지·이름 규칙과 AI 관여 선언, `main` 직접 커밋·push 차단) | 구현됨                                                                       |
 | 에이전트 안내 (`AGENTS.md`)                                                    | 문서 인덱스(Context)만 있음                                                  |
 | 테스트                                                                         | 단위 테스트만 있다. 통합·E2E는 전략 문서만 있고 E2E는 도구를 도입하지 않았다 |
+| 디렉토리 구조 (FSD)                                                            | 문서와 Steiger 설정만 있음. 코드는 아직 이전하지 않았고 CI에 넣지 않았다     |
 | 같은 PR에서 3회 연속 실패하면 루프를 멈추는 제어                               | 미구현                                                                       |
 | 증거 모델                                                                      | 정의함([증거](#증거)). 일부 증거는 아직 없다. 검증 로그 훅은 폐기했다        |
 
@@ -90,6 +91,7 @@ Frontend Mentor 챌린지 구현물의 목록·상세 쇼케이스.
 | 라우팅        | React Router                                                                    |
 | 테스트        | Vitest, React Testing Library (jsdom, user-event, jest-dom)                     |
 | 린트·포맷     | ESLint (typescript-eslint, react-hooks, jsx-a11y), Prettier (Tailwind 플러그인) |
+| 아키텍처 린터 | Steiger (`@feature-sliced/steiger-plugin`) — FSD 디렉토리 구조 검사             |
 | 런타임        | Node.js 24.17.0 (`.nvmrc`로 고정)                                               |
 | 배포          | Vercel                                                                          |
 | AI 개발 도구  | OMC (외부 도구, `ralplan`, `tdd`, `verify`)                                     |
