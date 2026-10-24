@@ -65,8 +65,9 @@ npx steiger ./src --watch # 감시 모드
 
 | 상황 | 결과 |
 | ---- | ---- |
-| 현재 `src/` (FSD 이전 구조) | 에러 1개. `src/lib`가 `fsd/typo-in-layer-name`에 걸린다 (`app`의 오타로 의심) |
-| `src/components/`, `src/test/` | **걸리지 않는다.** 레이어 이름과 닮지 않은 최상위 폴더는 FSD 구조로 보지 않는다 |
+| 이전 전 `src/` (`components/`, `lib/`, `test/`) | 에러 1개. `src/lib`가 `fsd/typo-in-layer-name`에 걸렸다 (`app`의 오타로 의심) |
+| 이전 후 `src/` (`app/`, `shared/`) | **위반 0** |
+| 레이어 이름과 닮지 않은 `src/` 최상위 폴더 | **걸리지 않는다.** FSD 구조로 보지 않는다. 이전 전의 `src/components/`, `src/test/`가 그랬다 |
 | 빈 레이어 디렉토리 (`widgets/`, `features/`) | **걸리지 않는다.** git도 빈 디렉토리를 추적하지 않는다 |
 | `processes/`에 코드를 둠 | `fsd/no-processes` 에러 |
 | `widgets`·`features` 슬라이스를 한 페이지만 참조 | `fsd/insignificant-slice` 에러 ("only one reference... Consider merging them") |

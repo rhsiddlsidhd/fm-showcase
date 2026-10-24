@@ -40,7 +40,7 @@
 
 ### 렌더 헬퍼
 
-- 라우터 등 공통 감싸기는 `src/test/`에 `renderWithRouter` 같은 헬퍼 하나로 모은다. 테스트마다 같은 감싸기를 반복하지 않는다.
+- 라우터 등 공통 감싸기는 `src/shared/test/`에 `renderWithRouter` 같은 헬퍼 하나로 모은다. 테스트마다 같은 감싸기를 반복하지 않는다.
 - 헬퍼는 처음 두 번째 쓰임이 생길 때 만든다. 쓰임이 하나뿐일 때 미리 만들지 않는다.
 
 ### 행동 중심
@@ -79,7 +79,7 @@ it("이메일이 잘못되면 오류를 보이고, 고치면 제출된다", asyn
 
 ### 브라우저 API
 
-- jsdom이 지원하지 않는 API(`matchMedia`, `IntersectionObserver`, `ResizeObserver` 등)는 `src/test/setup.ts`에서 최소 대체를 등록한다. 테스트마다 따로 만들지 않는다.
+- jsdom이 지원하지 않는 API(`matchMedia`, `IntersectionObserver`, `ResizeObserver` 등)는 `src/shared/test/setup.ts`에서 최소 대체를 등록한다. 테스트마다 따로 만들지 않는다.
 - 대체가 필요해지는 시점에 추가한다. 쓰지 않는 대체를 미리 넣지 않는다.
 
 ## 챌린지 하나의 TDD 순서
