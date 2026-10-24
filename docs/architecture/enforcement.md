@@ -11,7 +11,7 @@
 | 설정 | `eslint.config.js` | `steiger.config.js` |
 | 실행 | `npm run lint` | `npm run lint:fsd` |
 
-`npm run lint`가 이것을 덮지 않는다. 별도 스크립트이고 CI에 별도 스텝으로 들어간다.
+`npm run lint`가 이것을 덮지 않는다. 별도 스크립트이고 `verify` 잡의 `lint` 다음 스텝으로 들어간다.
 
 import은 읽지만 코드 품질은 보지 않는다. 그리고 **파일시스템의 현재 상태만 본다.** diff도 커밋 이력도 보지 않는다. 그래서 "테스트를 구현보다 먼저 썼는가" 같은 시간 축 규칙은 Steiger로 판정할 수 없다. 그건 git 훅과 CI의 몫이다.
 
