@@ -120,11 +120,12 @@ src/pages/weather-app/
 
 이 저장소에 들어가는 것:
 
-| 세그먼트 | 내용 | 현재 위치 |
-| -------- | ---- | --------- |
-| `ui` | shadcn 복사본 | `src/components/ui/` |
-| `lib` | `cn` 등 | `src/lib/utils.ts` |
-| `routes` | 라우트 상수·패턴 | 없음 |
+| 세그먼트 | 내용 | 위치 |
+| -------- | ---- | ---- |
+| `ui` | shadcn 복사본 | `src/shared/ui/` |
+| `lib` | `cn` 재export | `src/shared/lib/cn.ts` |
+| `test` | 테스트 준비 코드 | `src/shared/test/` |
+| `routes` | 라우트 상수·패턴 | 아직 없음 |
 
 - `shared`는 슬라이스가 없다. 세그먼트가 바로 온다. 내부 파일끼리 자유롭게 import한다.
 - `shared/ui`와 `shared/lib`는 컴포넌트·모듈마다 index를 두는 쪽이 낫다. 버튼 하나를 쓸 때 쓰지 않는 의존까지 번들에 들어가는 것을 막기 위해서다.

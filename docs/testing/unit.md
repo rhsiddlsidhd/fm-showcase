@@ -18,7 +18,8 @@
 | 여러 컴포넌트가 묶인 화면의 흐름 | [통합](./integration.md) |
 | 라우팅, 페이지 이동 | [통합](./integration.md) |
 | 실제 브라우저에서만 드러나는 것 (레이아웃, 반응형, 포커스 이동) | [E2E](./e2e.md) |
-| `src/components/ui/`의 shadcn 컴포넌트 자체 | 하지 않는다. 라이브러리가 보장한다. 우리가 얹은 조합만 통합에서 본다 |
+| `src/shared/ui/`의 shadcn 컴포넌트 자체 | 하지 않는다. 라이브러리가 보장한다. 우리가 얹은 조합만 통합에서 본다 |
+| `src/pages/**/ui/`의 마크업 조각 | 하지 않는다. 로직이 없다. 로직이 생기면 그 슬라이스의 통합 또는 단위로 내린다 |
 | 스타일(Tailwind 클래스) | 하지 않는다 |
 
 ## 도구
@@ -28,7 +29,7 @@
 | Vitest | 실행기, 단언, 대역 (`vi.fn`, `vi.useFakeTimers`) |
 | `@testing-library/react` | 컴포넌트 렌더, `renderHook` |
 | `@testing-library/user-event` | 사용자 입력 (`fireEvent`보다 우선) |
-| `@testing-library/jest-dom` | `toBeInTheDocument` 등 DOM 단언 (`src/test/setup.ts`에서 등록됨) |
+| `@testing-library/jest-dom` | `toBeInTheDocument` 등 DOM 단언 (`src/shared/test/setup.ts`에서 등록됨) |
 
 ## 작성 규칙
 

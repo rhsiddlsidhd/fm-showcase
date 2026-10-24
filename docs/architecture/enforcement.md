@@ -11,7 +11,7 @@
 | 설정 | `eslint.config.js` | `steiger.config.js` |
 | 실행 | `npm run lint` | `npm run lint:fsd` |
 
-`npm run lint`가 이것을 덮지 않는다. 별도 스크립트이고 CI에 별도 스텝으로 들어간다.
+`npm run lint`가 이것을 덮지 않는다. 별도 스크립트이고 `verify` 잡의 `lint` 다음 스텝으로 들어간다.
 
 import은 읽지만 코드 품질은 보지 않는다. 그리고 **파일시스템의 현재 상태만 본다.** diff도 커밋 이력도 보지 않는다. 그래서 "테스트를 구현보다 먼저 썼는가" 같은 시간 축 규칙은 Steiger로 판정할 수 없다. 그건 git 훅과 CI의 몫이다.
 
@@ -65,8 +65,9 @@ npx steiger ./src --watch # 감시 모드
 
 | 상황 | 결과 |
 | ---- | ---- |
-| 현재 `src/` (FSD 이전 구조) | 에러 1개. `src/lib`가 `fsd/typo-in-layer-name`에 걸린다 (`app`의 오타로 의심) |
-| `src/components/`, `src/test/` | **걸리지 않는다.** 레이어 이름과 닮지 않은 최상위 폴더는 FSD 구조로 보지 않는다 |
+| 이전 전 `src/` (`components/`, `lib/`, `test/`) | 에러 1개. `src/lib`가 `fsd/typo-in-layer-name`에 걸렸다 (`app`의 오타로 의심) |
+| 이전 후 `src/` (`app/`, `shared/`) | **위반 0** |
+| 레이어 이름과 닮지 않은 `src/` 최상위 폴더 | **걸리지 않는다.** FSD 구조로 보지 않는다. 이전 전의 `src/components/`, `src/test/`가 그랬다 |
 | 빈 레이어 디렉토리 (`widgets/`, `features/`) | **걸리지 않는다.** git도 빈 디렉토리를 추적하지 않는다 |
 | `processes/`에 코드를 둠 | `fsd/no-processes` 에러 |
 | `widgets`·`features` 슬라이스를 한 페이지만 참조 | `fsd/insignificant-slice` 에러 ("only one reference... Consider merging them") |

@@ -8,12 +8,12 @@ AI가 작성한 코드를 신뢰할 근거를 구조로 갖추는 프로젝트. 
 | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
 | 앱 골격 (Vite, React, TypeScript, Tailwind, shadcn/ui, React Router)           | 구현됨. 화면은 제목 하나뿐이다                                               |
 | 쇼케이스 사이트 (챌린지 목록·상세)                                             | 설계만 있음                                                                  |
-| CI (`verify`: typecheck, lint, format:check, test, build)                      | 구현됨                                                                       |
+| CI (`verify`: typecheck, lint, lint:fsd, format:check, test, build)            | 구현됨                                                                       |
 | `main` 보호 (PR 필수, `verify` 통과 필수), merge commit만 허용                 | 적용됨                                                                       |
 | 로컬 git 훅 (커밋 메시지·이름 규칙과 AI 관여 선언, `main` 직접 커밋·push 차단) | 구현됨                                                                       |
 | 에이전트 안내 (`AGENTS.md`)                                                    | 문서 인덱스(Context)만 있음                                                  |
 | 테스트                                                                         | 단위 테스트만 있다. 통합·E2E는 전략 문서만 있고 E2E는 도구를 도입하지 않았다 |
-| 디렉토리 구조 (FSD)                                                            | 문서와 Steiger 설정만 있음. 코드는 아직 이전하지 않았고 CI에 넣지 않았다     |
+| 디렉토리 구조 (FSD, Steiger 검사)                                              | `src/`를 `app`/`shared`로 이전했다. `verify`가 Steiger를 돌린다              |
 | 같은 PR에서 3회 연속 실패하면 루프를 멈추는 제어                               | 미구현                                                                       |
 | 증거 모델                                                                      | 정의함([증거](#증거)). 일부 증거는 아직 없다. 검증 로그 훅은 폐기했다        |
 
@@ -108,16 +108,17 @@ npm run dev
 
 ### 스크립트
 
-| 명령                   | 용도                                                                          |
-| ---------------------- | ----------------------------------------------------------------------------- |
-| `npm run dev`          | 개발 서버                                                                     |
-| `npm run build`        | 타입 검사 후 프로덕션 빌드                                                    |
-| `npm run preview`      | 빌드 결과 미리 보기                                                           |
-| `npm run test`         | 테스트를 한 번 실행. 실행 방법은 [테스트 전략](docs/testing/README.md)을 본다 |
-| `npm run typecheck`    | 앱과 스크립트의 타입 검사                                                     |
-| `npm run lint`         | ESLint                                                                        |
-| `npm run format`       | Prettier로 파일을 고친다                                                      |
-| `npm run format:check` | Prettier 검사. 파일을 고치지 않는다 (CI가 쓴다)                               |
+| 명령                   | 용도                                                                           |
+| ---------------------- | ------------------------------------------------------------------------------ |
+| `npm run dev`          | 개발 서버                                                                      |
+| `npm run build`        | 타입 검사 후 프로덕션 빌드                                                     |
+| `npm run preview`      | 빌드 결과 미리 보기                                                            |
+| `npm run test`         | 테스트를 한 번 실행. 실행 방법은 [테스트 전략](docs/testing/README.md)을 본다  |
+| `npm run typecheck`    | 앱과 스크립트의 타입 검사                                                      |
+| `npm run lint`         | ESLint                                                                         |
+| `npm run lint:fsd`     | Steiger. FSD 디렉토리 구조 검사 ([아키텍처](docs/architecture/enforcement.md)) |
+| `npm run format`       | Prettier로 파일을 고친다                                                       |
+| `npm run format:check` | Prettier 검사. 파일을 고치지 않는다 (CI가 쓴다)                                |
 
 ## 문서
 
