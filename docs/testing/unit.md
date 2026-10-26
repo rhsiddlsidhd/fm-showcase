@@ -22,15 +22,6 @@
 | `src/pages/**/ui/`의 마크업 조각 | 하지 않는다. 로직이 없다. 로직이 생기면 그 슬라이스의 통합 또는 단위로 내린다 |
 | 스타일(Tailwind 클래스) | 하지 않는다 |
 
-## 도구
-
-| 도구 | 용도 |
-| ---- | ---- |
-| Vitest | 실행기, 단언, 대역 (`vi.fn`, `vi.useFakeTimers`) |
-| `@testing-library/react` | 컴포넌트 렌더, `renderHook` |
-| `@testing-library/user-event` | 사용자 입력 (`fireEvent`보다 우선) |
-| `@testing-library/jest-dom` | `toBeInTheDocument` 등 DOM 단언 (`src/shared/test/setup.ts`에서 등록됨) |
-
 ## 작성 규칙
 
 ### 순수 함수
@@ -60,7 +51,7 @@ describe("isValidEmail", () => {
 
 - 내부 state를 보지 않고 **렌더된 결과와 호출된 콜백**을 본다.
 - 콜백은 `vi.fn()`으로 받아 호출 인자를 확인한다.
-- 사용자 입력은 `userEvent.setup()`으로 만든 인스턴스를 쓴다.
+- 사용자 입력은 `fireEvent`보다 `userEvent.setup()`으로 만든 인스턴스를 우선한다.
 
 ```tsx
 it("눌렀을 때 onSelect를 호출한다", async () => {
@@ -83,13 +74,9 @@ it("눌렀을 때 onSelect를 호출한다", async () => {
 
 ## TDD 적용
 
-1. 함수 시그니처(이름, 입출력)만 정하고, 빈 구현 또는 `throw new Error("not implemented")`를 둔다.
-2. 대표 입력 하나의 테스트를 쓰고 실패 이유가 "기대값 불일치"인지 확인한다.
-3. 통과시키는 가장 단순한 구현을 쓴다. 입력을 하나씩 늘리며 반복한다.
-4. 반복이 끝나 로직이 확정되면 경계값·오류 입력을 `it.each`로 정리한다.
+공통 순서는 [README](./README.md#tdd-순서)를 따른다. 순수 함수는 시그니처(이름, 입출력)만 정하고 빈 구현 또는 `throw new Error("not implemented")`로 시작한다. 대표 입력을 하나씩 늘리며 반복하고, 로직이 확정되면 경계값·오류 입력을 `it.each`로 정리한다. Red의 실패 이유는 "기대값 불일치"여야 한다.
 
 ## 완료 기준
 
 - 새 순수 로직은 정상 입력, 경계값, 잘못된 입력을 각각 하나 이상 가진다.
 - 훅·컴포넌트는 관찰 가능한 동작마다 테스트가 있고, 구현을 바꿔도(동작이 같으면) 테스트가 깨지지 않는다.
-- `npm run test`가 통과한다.
