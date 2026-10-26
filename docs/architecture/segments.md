@@ -7,8 +7,7 @@
 > Slices are the second level in the organizational hierarchy of Feature-Sliced Design. Their main purpose is to group code by its meaning for the product, business, or just the application.
 
 - 이름은 FSD가 표준화하지 않는다("The names of slices are not standardized"). 도메인이 정한다.
-- 이 저장소는 **kebab-case 소문자**로 쓴다. 공식 예시가 그 형태다 (`article-reader`, `sign-in`, `home`). Steiger에 대소문자 규칙이 없으므로 이건 **안내**다.
-- 같은 레이어의 슬라이스끼리 import하지 않는다. 합성이 필요하면 위 레이어에서 한다.
+- 이 저장소는 **kebab-case 소문자**로 쓴다. 공식 예시가 그 형태다 (`article-reader`, `sign-in`, `home`). Steiger에 대소문자 규칙이 없다.
 - `app`과 `shared`는 슬라이스가 없다.
 
 ## 세그먼트
@@ -84,6 +83,4 @@ export { WeatherAppPage } from "./ui/WeatherAppPage";
 | 같은 슬라이스 안 | 상대 경로, 전체 경로 | `./ui/WeatherAppPage` |
 | 다른 슬라이스 | 절대 경로 (alias) | `@/entities/challenge` |
 
-`@/` alias는 `tsconfig.app.json`의 `paths`와 `vite.config.ts`의 `resolve.alias`에 이미 있다. Steiger는 `tsconfig.json`의 `references`를 따라가 이 설정을 읽는다.
-
-이 규칙의 판정 규칙(`fsd/import-locality`)은 Steiger의 `recommended`에 없다. 따라서 **안내**다.
+이 규칙의 판정 규칙(`fsd/import-locality`)은 Steiger의 `recommended`에 없다.

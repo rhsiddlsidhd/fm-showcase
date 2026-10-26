@@ -2,7 +2,7 @@
 
 이 저장소의 디렉토리 구조는 [Feature-Sliced Design](https://feature-sliced.design/)(FSD)을 따른다. 이 README는 인덱스이자 공통 원칙이고, 상세는 아래 문서에 둔다.
 
-FSD를 고른 이유는 취향이 아니다. 이 저장소는 경로를 기계가 읽어 규칙을 판정하려 한다([강제와 안내](../../README.md#강제와-안내)). 그러려면 경로 규약이 **외부에 명세되어 있고 린터가 검사할 수 있어야** 한다. FSD는 둘 다 갖췄다.
+FSD를 고른 이유는 취향이 아니다. 이 저장소는 경로를 기계가 읽어 규칙을 판정하려 한다([기준과 검증](../../README.md#기준과-검증)). 그러려면 경로 규약이 **외부에 명세되어 있고 린터가 검사할 수 있어야** 한다. FSD는 둘 다 갖췄다.
 
 ## 문서
 
@@ -43,35 +43,21 @@ FSD가 정의한 레이어는 **7개**다. 공식 문서 원문:
 
 ## 이 저장소의 적용
 
-| 레이어 | 상태 | 들어가는 것 |
-| ------ | ---- | ----------- |
-| `app` | 쓴다 | 라우터 설정, 전역 스타일, 프로바이더 |
-| `processes` | **쓰지 않는다** | 폐기된 레이어 |
-| `pages` | 쓴다 | 챌린지 하나 = 슬라이스 하나. 쇼케이스 목록·상세 |
-| `widgets` | 조건부 | 여러 페이지가 재사용하는 UI 블록이 생길 때 |
-| `features` | 조건부 | 여러 페이지가 재사용하는 사용자 동작이 생길 때 |
-| `entities` | 조건부 | 두 번째 소비자가 생길 때. 후보는 `challenge` 하나 |
-| `shared` | 쓴다 | shadcn 복사본, `cn`, 라우트 상수 |
+레이어별 적용(쓰는 레이어, 조건부 레이어와 만드는 시점, 들어가는 것)은 [`layers.md`](./layers.md)에 있다. 재사용이 없는 상태에서 조건부 레이어를 만들면 `fsd/insignificant-slice`가 실패로 판정한다.
 
-조건부 레이어를 미리 만들지 않는 이유는 [`layers.md`](./layers.md)에 있다. 요약하면 재사용이 없는 상태에서 만들면 `fsd/insignificant-slice`가 실패로 판정한다.
+## 설정과 문서
 
-## 강제와 안내
+[프로젝트 README](../../README.md#기준과-검증)의 구분을 따른다.
 
-[프로젝트 README](../../README.md#강제와-안내)의 구분을 따른다.
+설정으로 판정되는 규칙은 `steiger.config.js`가 정하고, 판정 방식은 [`enforcement.md`](./enforcement.md)에 있다. 여기에 다시 쓰지 않는다. 아래는 설정으로 판정되지 않고 문서에만 있는 기준이다. 리뷰가 확인한다.
 
-| 등급 | 규칙 | 판정 |
-| ---- | ---- | ---- |
-| 강제 | 레이어 이름이 FSD 어휘와 같다 | `fsd/typo-in-layer-name` |
-| 강제 | import 방향이 아래로만 간다 | `fsd/forbidden-imports` |
-| 강제 | 슬라이스에 public API가 있고, 바깥이 내부 파일을 직접 import하지 않는다 | `fsd/public-api`, `fsd/no-public-api-sidestep` |
-| 강제 | 세그먼트 이름이 내용의 성질이 아니라 목적을 가리킨다 | `fsd/segments-by-purpose` |
-| 강제 | 참조가 하나뿐인 슬라이스를 만들지 않는다 (`pages` 제외) | `fsd/insignificant-slice` |
-| 안내 | 슬라이스 디렉토리 이름은 kebab-case 소문자 | 리뷰 |
-| 안내 | 무엇을 한 슬라이스로 볼지 | 리뷰 |
-| 안내 | 조건부 레이어를 만들 시점의 판단 | 리뷰 |
-
-- 강제 항목의 전체 목록과 실행 방식은 [`enforcement.md`](./enforcement.md)에 있다.
-- 슬라이스 이름은 FSD가 표준화하지 않았다("The names of slices are not standardized"). 대소문자 규칙을 검사하는 Steiger 규칙이 없으므로 안내다.
+| 기준 | 정의한 곳 | 판정되지 않는 이유 |
+| ---- | --------- | ------------------ |
+| 슬라이스 디렉토리 이름은 kebab-case 소문자 | [`segments.md`](./segments.md) | 대소문자를 검사하는 Steiger 규칙이 없다. FSD가 슬라이스 이름을 표준화하지 않았다("The names of slices are not standardized") |
+| 무엇을 한 슬라이스로 볼지 | [`layers.md`](./layers.md) | 의미 판단이다 |
+| 조건부 레이어를 만들 시점 | [`layers.md`](./layers.md) | 의미 판단이다 |
+| 같은 슬라이스는 상대 경로, 다른 슬라이스는 절대 경로 | [`segments.md`](./segments.md) | `fsd/import-locality`가 `recommended`에 없다 |
+| public API의 와일드카드 재export 금지 | [`segments.md`](./segments.md) | `fsd/no-wildcard-exports`가 `recommended`에 없다 |
 
 ## 미결정
 

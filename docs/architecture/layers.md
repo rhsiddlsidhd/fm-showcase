@@ -38,9 +38,7 @@ FSD의 레이어 6개와 이 저장소에서의 적용이다. 공통 원칙은 [
 
 ## `processes`
 
-폐기된 레이어다. 만들지 않는다.
-
-> This layer has been deprecated. The current version of the spec recommends avoiding it and moving its contents to `features` and `app` instead.
+폐기된 레이어다. 만들지 않는다. 폐기 사유는 [`README.md`](./README.md#레이어-어휘)에 있다.
 
 여러 페이지에 걸친 시나리오가 생기면 `features`와 `app`으로 나눈다. 판정은 `fsd/no-processes`가 한다.
 
@@ -120,12 +118,12 @@ src/pages/weather-app/
 
 이 저장소에 들어가는 것:
 
-| 세그먼트 | 내용 | 위치 |
-| -------- | ---- | ---- |
-| `ui` | shadcn 복사본 | `src/shared/ui/` |
-| `lib` | `cn` 재export | `src/shared/lib/cn.ts` |
-| `test` | 테스트 준비 코드 | `src/shared/test/` |
-| `routes` | 라우트 상수·패턴 | 아직 없음 |
+| 세그먼트 | 내용 |
+| -------- | ---- |
+| `ui` | shadcn 복사본 |
+| `lib` | `cn` 재export |
+| `test` | 테스트 준비 코드 |
+| `routes` | 라우트 상수·패턴 |
 
 - `shared`는 슬라이스가 없다. 세그먼트가 바로 온다. 내부 파일끼리 자유롭게 import한다.
 - `shared/ui`와 `shared/lib`는 컴포넌트·모듈마다 index를 두는 쪽이 낫다. 버튼 하나를 쓸 때 쓰지 않는 의존까지 번들에 들어가는 것을 막기 위해서다.
