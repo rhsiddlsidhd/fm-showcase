@@ -70,7 +70,7 @@ OMC는 외부 도구이며, 이 프로젝트의 작업물은 그 위에 얹는 �
 - 증거는 신뢰를 증명하지 않고 판단의 근거를 준다. CI 통과는 테스트의 품질을 보장하지 않는다.
 - 사람이 쓰는 증거는 결정론적이지 않다. 원본 실행 결과를 링크해 확인할 수 있게 한다.
 - 한계: 차단이 한 번도 없었던 챌린지는 통과 기록만 남는다.
-- 증거가 외부 기준에 답하는지는 [면접 문항지](docs/assurance/questions.md)와 [문항 대응표](docs/assurance/answers.md)로 채점한다. 문항지는 목표가 아니라 채점표다.
+- 증거는 [면접 문항지](docs/interview/questions.md) 가운데 산출물로 답할 수 있는 문항을 채점한다. 문항지는 목표가 아니라 채점표다.
 
 ## 사이트 소개
 
@@ -110,17 +110,17 @@ npm run dev
 
 ### 스크립트
 
-| 명령                   | 용도                                                                           |
-| ---------------------- | ------------------------------------------------------------------------------ |
-| `npm run dev`          | 개발 서버                                                                      |
-| `npm run build`        | 타입 검사 후 프로덕션 빌드                                                     |
-| `npm run preview`      | 빌드 결과 미리 보기                                                            |
-| `npm run test`         | 테스트를 한 번 실행. 실행 방법은 [테스트 전략](docs/testing/README.md)을 본다  |
-| `npm run typecheck`    | 앱과 스크립트의 타입 검사                                                      |
-| `npm run lint`         | ESLint                                                                         |
-| `npm run lint:fsd`     | Steiger. FSD 디렉토리 구조 검사 ([아키텍처](docs/architecture/enforcement.md)) |
-| `npm run format`       | Prettier로 파일을 고친다                                                       |
-| `npm run format:check` | Prettier 검사. 파일을 고치지 않는다 (CI가 쓴다)                                |
+| 명령                   | 용도                                                                          |
+| ---------------------- | ----------------------------------------------------------------------------- |
+| `npm run dev`          | 개발 서버                                                                     |
+| `npm run build`        | 타입 검사 후 프로덕션 빌드                                                    |
+| `npm run preview`      | 빌드 결과 미리 보기                                                           |
+| `npm run test`         | 테스트를 한 번 실행. 실행 방법은 [테스트 전략](docs/testing/README.md)을 본다 |
+| `npm run typecheck`    | 앱과 스크립트의 타입 검사                                                     |
+| `npm run lint`         | ESLint                                                                        |
+| `npm run lint:fsd`     | Steiger. FSD 디렉토리 구조 검사 ([아키텍처](docs/architecture/README.md))     |
+| `npm run format`       | Prettier로 파일을 고친다                                                      |
+| `npm run format:check` | Prettier 검사. 파일을 고치지 않는다 (CI가 쓴다)                               |
 
 ## 문서
 

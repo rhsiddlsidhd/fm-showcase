@@ -2,7 +2,7 @@
 
 FSD의 레이어 6개와 이 저장소에서의 적용이다. 공통 원칙은 [`README.md`](./README.md)를 따른다.
 
-레이어는 `src/` 바로 아래의 디렉토리이고, 이름은 소문자다. 이름은 표준화되어 있어 바꾸거나 추가하지 않는다.
+레이어는 `src/` 바로 아래의 디렉토리이고, 이름은 소문자다.
 
 ## 순서
 
@@ -18,7 +18,7 @@ FSD의 레이어 6개와 이 저장소에서의 적용이다. 공통 원칙은 [
 | 6 | `entities` | 있음 | 조건부 |
 | 7 | `shared` | 없음 (세그먼트 직접) | 쓴다 |
 
-`app`과 `shared`는 슬라이스가 없고 세그먼트가 바로 온다. 둘은 import 규칙의 예외이며, 내부 파일끼리 자유롭게 import한다.
+`app`과 `shared`는 슬라이스가 없고 세그먼트가 바로 온다. import 규칙의 예외는 [`README.md`](./README.md#import-규칙)에 있다.
 
 ## `app`
 
@@ -33,15 +33,13 @@ FSD의 레이어 6개와 이 저장소에서의 적용이다. 공통 원칙은 [
 | `routes` | React Router 설정. 페이지 슬라이스의 public API만 import한다 |
 | `styles` | 전역 스타일 (`index.css`) |
 
-- `ui` 세그먼트를 두지 않는다. `fsd/no-ui-in-app`이 막는다.
 - 앱 전체 레이아웃은 여기 둔다. 특정 페이지의 레이아웃은 그 페이지 슬라이스에 둔다.
 
 ## `processes`
 
 폐기된 레이어다. 만들지 않는다. 폐기 사유는 [`README.md`](./README.md#레이어-어휘)에 있다.
 
-여러 페이지에 걸친 시나리오가 생기면 `features`와 `app`으로 나눈다. 판정은 `fsd/no-processes`가 한다.
-
+여러 페이지에 걸친 시나리오가 생기면 `features`와 `app`으로 나눈다.
 ## `pages`
 
 > Pages are what makes up websites and applications (also known as screens or activities).
@@ -52,27 +50,32 @@ FSD의 레이어 6개와 이 저장소에서의 적용이다. 공통 원칙은 [
 
 > There's no limit to how much code you can place in a page slice... If a UI block on a page is not reused, it's perfectly fine to keep it inside the page slice.
 
-이게 Frontend Mentor 챌린지에 중요하다. 챌린지의 마크업은 재사용되지 않고 페이지 내용의 대부분이다. 그러므로 **챌린지의 UI 조각을 `widgets`로 올리지 않고 페이지 안에 둔다.**
+이게 Frontend Mentor 챌린지에 중요하다. 챌린지의 UI 컴포넌트는 재사용되지 않고 페이지 내용의 대부분이다. 그러므로 **챌린지의 UI 컴포넌트를 `widgets`로 올리지 않고 페이지 안에 둔다.**
 
-페이지에 상태를 두는 것도 허용된다.
+작은 상태를 컴포넌트가 직접 갖는 것은 공식 문서가 허용한다.
 
 > It's not common for a page to have a dedicated data model, and tiny bits of state can be kept in the components themselves.
 
-따라서 토글 하나를 위해 `model` 세그먼트를 만들지 않는다. 분기가 늘어나면 그때 내린다.
+이 저장소는 그 컴포넌트를 `ui/`의 [컨테이너 컴포넌트](../testing/test-boundaries.md#컴포넌트-분류)로 한정한다. 따라서 토글 하나를 위해 `model` 세그먼트를 만들지 않고 그 상태를 컨테이너 컴포넌트에 둔다. 분기가 늘어나면 그때 그 로직을 함수나 훅으로 떼어 `model`이나 `lib`로 내린다.
+페이지 컴포넌트는 `index.tsx`에 직접 정의하고 `ui/`의 컴포넌트를 배치만 한다.
+
+- 정적 값(상수, import한 데이터)을 props로 넘기는 것은 배치다.
+- 상태, 이벤트, 조건부 표시, 값 가공을 두지 않는다. 필요해지면 `ui/`의 컨테이너 컴포넌트로 내린다.
 
 예:
 
 ```
 src/pages/weather-app/
-  index.ts          public API. app/routes가 여기만 본다
-  ui/               페이지와 그 조각
+  index.tsx         페이지 컴포넌트이자 public API. app/routes가 여기만 본다
+  ui/               UI 컴포넌트 (표현·컨테이너)
   api/              네트워크 (있을 때)
   model/            상태·검증·변환 (있을 때)
 ```
 
-- 슬라이스 디렉토리 이름은 kebab-case 소문자로 쓴다 (공식 예시가 `article-reader`, `sign-in`). 컴포넌트 이름은 PascalCase 그대로 쓴다.
+- 슬라이스 디렉토리 이름은 [`segments.md`](./segments.md#슬라이스)를 따른다.
+- 컴포넌트 이름은 PascalCase 그대로 쓴다.
 - 페이지끼리 import하지 않는다. 챌린지 간 독립이 규칙으로 강제된다.
-- `fsd/insignificant-slice`는 페이지를 면제한다. 참조가 라우터 하나뿐이어도 정상이다.
+- 참조가 라우터 하나뿐인 페이지 슬라이스도 정상이다.
 
 ## `widgets`
 
@@ -84,7 +87,7 @@ src/pages/weather-app/
 
 챌린지 UI는 이 문장에 그대로 걸린다. 재사용되지 않고, 페이지 내용의 대부분이다. 그래서 **챌린지를 widget으로 만들지 않는다.**
 
-만들 수 있는 경우는 쇼케이스 쪽이다. 목록 페이지와 상세 페이지가 같은 UI 블록(챌린지 카드, 헤더)을 쓰게 되면 그때 올린다. 소비자가 하나뿐인 상태에서 만들면 `fsd/insignificant-slice`가 실패로 판정한다.
+만들 수 있는 경우는 쇼케이스 쪽이다. 목록 페이지와 상세 페이지가 같은 UI 블록(챌린지 카드, 헤더)을 쓰게 되면 그때 올린다.
 
 ## `features`
 
@@ -104,7 +107,7 @@ src/pages/weather-app/
 
 이 저장소의 후보는 **`challenge` 하나**다. 챌린지 메타데이터(제목, 난이도, 스택, 링크, 증거 문서 링크)는 쇼케이스 목록과 상세가 함께 쓴다.
 
-만드는 시점은 **두 번째 소비자가 생길 때**다. 목록 페이지만 있는 동안은 참조가 하나여서 `fsd/insignificant-slice`가 실패로 판정한다. 이 기준은 [`docs/testing/integration.md`](../testing/integration.md)의 헬퍼 규칙과 같다. 쓰임이 하나뿐일 때 미리 만들지 않는다.
+만드는 시점은 **두 번째 소비자가 생길 때**다. 쓰임이 하나뿐일 때 미리 만들지 않는다.
 
 엔티티끼리는 서로 모른다.
 
@@ -125,8 +128,7 @@ src/pages/weather-app/
 | `test` | 테스트 준비 코드 |
 | `routes` | 라우트 상수·패턴 |
 
-- `shared`는 슬라이스가 없다. 세그먼트가 바로 온다. 내부 파일끼리 자유롭게 import한다.
-- `shared/ui`와 `shared/lib`는 컴포넌트·모듈마다 index를 두는 쪽이 낫다. 버튼 하나를 쓸 때 쓰지 않는 의존까지 번들에 들어가는 것을 막기 위해서다.
+- `shared/ui`와 `shared/lib`의 index 규칙은 [public API](./segments.md#public-api)에 있다.
 - `lib`는 잡동사니가 아니다. 각 폴더는 하나의 관심사를 가진다.
 
 ## 레이어를 고르는 순서
