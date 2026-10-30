@@ -14,7 +14,7 @@
 | 수정 가능 경로 | `없음`                                                                                      |
 | 참조 파일      | `_workspace/00_input/spec.md`, 가장 최근 test-engineer·executor·code-simplifier 보고서 경로 |
 | 테스트 대응    | `없음` (test-engineer 보고서를 읽는다)                                                      |
-| 재호출 사유    | 판정 줄이 없거나 명령 결과가 달라 재호출할 때만                                             |
+| 재호출 사유    | 보고서 형식 오류나 명령 결과 불일치로 재호출할 때만                                         |
 
 프롬프트에는 `git diff HEAD --stat` 결과와 테스트 커밋 해시를 함께 적는다.
 
