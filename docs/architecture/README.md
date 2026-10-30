@@ -8,9 +8,8 @@ FSD를 고른 이유는 취향이 아니다. 이 저장소는 경로를 기계�
 
 | 문서 | 읽는 조건 | 다루는 내용 |
 | ---- | --------- | ----------- |
-| [`layers.md`](./layers.md) | 새 디렉토리를 만들 때. 코드를 어느 레이어에 둘지 정할 때 | 6개 레이어의 정의, 이 저장소에 들어가는 것, 만드는 시점 |
-| [`segments.md`](./segments.md) | 레이어 안에 폴더를 만들 때. public API를 쓸 때 | 세그먼트 규약, 동결한 이름 집합, public API 규칙 |
-| [`enforcement.md`](./enforcement.md) | 구조 규칙의 판정 방식을 확인할 때. Steiger가 막았을 때 | Steiger의 역할과 한계, 규칙 목록, CI에서의 위치 |
+| [`layers.md`](./layers.md) | 새 디렉토리를 만들 때. 코드를 어느 레이어에 둘지 정할 때 | 6개 레이어의 정의, 이 저장소에 들어가는 것, 만드는 시점, 페이지 컴포넌트의 정의 |
+| [`segments.md`](./segments.md) | 레이어 안에 폴더를 만들 때. public API를 쓸 때 | 세그먼트 규약, 동결한 이름 집합, public API 규칙(`pages`의 `index.tsx` 예외 포함) |
 
 ## 레이어 어휘
 
@@ -39,17 +38,15 @@ FSD가 정의한 레이어는 **7개**다. 공식 문서 원문:
 
 > Layers App and Shared are exceptions to this rule... they are both a layer and a slice at the same time.
 
-판정은 `fsd/forbidden-imports`가 한다.
-
 ## 이 저장소의 적용
 
-레이어별 적용(쓰는 레이어, 조건부 레이어와 만드는 시점, 들어가는 것)은 [`layers.md`](./layers.md)에 있다. 재사용이 없는 상태에서 조건부 레이어를 만들면 `fsd/insignificant-slice`가 실패로 판정한다.
+레이어별 적용(쓰는 레이어, 조건부 레이어와 만드는 시점, 들어가는 것)은 [`layers.md`](./layers.md)에 있다.
 
 ## 설정과 문서
 
 [프로젝트 README](../../README.md#기준과-검증)의 구분을 따른다.
 
-설정으로 판정되는 규칙은 `steiger.config.js`가 정하고, 판정 방식은 [`enforcement.md`](./enforcement.md)에 있다. 여기에 다시 쓰지 않는다. 아래는 설정으로 판정되지 않고 문서에만 있는 기준이다. 리뷰가 확인한다.
+설정으로 판정되는 규칙은 `steiger.config.js`가 정한다. 여기에 다시 쓰지 않는다. 아래는 설정으로 판정되지 않고 문서에만 있는 기준이다. 리뷰가 확인한다.
 
 | 기준 | 정의한 곳 | 판정되지 않는 이유 |
 | ---- | --------- | ------------------ |
@@ -58,10 +55,11 @@ FSD가 정의한 레이어는 **7개**다. 공식 문서 원문:
 | 조건부 레이어를 만들 시점 | [`layers.md`](./layers.md) | 의미 판단이다 |
 | 같은 슬라이스는 상대 경로, 다른 슬라이스는 절대 경로 | [`segments.md`](./segments.md) | `fsd/import-locality`가 `recommended`에 없다 |
 | public API의 와일드카드 재export 금지 | [`segments.md`](./segments.md) | `fsd/no-wildcard-exports`가 `recommended`에 없다 |
+| 페이지 컴포넌트에 값 가공 로직을 두지 않는다 | [`layers.md`](./layers.md) | 코드의 의미 판단이다 |
 
 ## 미결정
 
 | 항목 | 현재 | 결정이 필요한 시점 |
 | ---- | ---- | ------------------ |
-| 테스트 파일의 배치 | FSD에 규약이 없다. 대상 파일 옆에 둔다 ([테스트 전략](../testing/README.md)) | TDD 게이트를 설계할 때 |
+| 테스트 파일의 배치 | FSD에 규약이 없다. 대상 파일 옆에 둔다 | TDD 게이트를 설계할 때 |
 | 슬라이스 20개 초과 시 그룹화 | 정하지 않았다. `fsd/excessive-slicing`이 20개에서 실패한다 | 챌린지가 20개에 가까워질 때 |

@@ -48,31 +48,36 @@ ui  model  api  lib
 
 > components, hooks, and types are bad segment names because they aren't that helpful when you're looking for code.
 
-내용의 **성질**이 아니라 **목적**을 가리키는 이름을 쓴다. `components`, `hooks`, `types`, `utils`, `helpers`, `constants` 같은 이름은 `fsd/segments-by-purpose`가 막는다.
-
-- 마크업 조각은 `components/`가 아니라 `ui/`에 둔다.
+내용의 **성질**이 아니라 **목적**을 가리키는 이름을 쓴다.
+- UI 컴포넌트는 `components/`가 아니라 `ui/`에 둔다.
 - 훅은 `hooks/`가 아니라 그 훅이 다루는 대상에 따라 `model/`이나 `lib/`에 둔다.
-
-### 세그먼트를 레이어 바로 아래 두지 않는다
-
-슬라이스가 있는 레이어(`pages`, `widgets`, `features`, `entities`)에서 세그먼트는 슬라이스 안에만 온다. `src/pages/ui/`는 틀렸다. `fsd/no-segments-on-sliced-layers`가 막는다.
 
 ## public API
 
 > Every slice (and segment on layers that don't have slices) must contain a public API definition. Modules outside of this slice/segment can only reference the public API, not the internal file structure.
 
-슬라이스마다 `index.ts`를 둔다. 바깥은 그것만 import한다.
+슬라이스마다 index 파일을 둔다. 바깥은 그것만 import한다. `pages`를 제외한 레이어의 index는 세그먼트 안의 것을 골라 내보내기만 한다.
 
 ```ts
-// src/pages/weather-app/index.ts
-export { WeatherAppPage } from "./ui/WeatherAppPage";
+// src/entities/challenge/index.ts
+export { ChallengeCard } from "./ui/ChallengeCard";
+```
+
+`pages` 슬라이스의 index는 [`layers.md`](./layers.md#pages)가 정의한다. 내보내는 이름은 `<슬라이스>Page`의 named export다. `app/routes`가 여러 페이지 슬라이스를 한 파일에서 import하므로 이름이 겹치지 않게 하기 위해서다.
+
+```tsx
+// src/pages/weather-app/index.tsx
+import { WeatherSearch } from "./ui/WeatherSearch";
+
+export const WeatherAppPage = () => (
+  <main>
+    <WeatherSearch />
+  </main>
+);
 ```
 
 - 와일드카드 재export(`export * from "./ui/Comment"`)를 쓰지 않는다. 슬라이스의 탐색성을 해치고 내부 구현을 노출한다.
 - 세그먼트마다 index를 또 만들지 않는다. 슬라이스 index 하나면 된다. `shared/ui`와 `shared/lib`는 예외로, 모듈마다 index를 둬서 번들에 쓰지 않는 의존이 들어가는 것을 막는다.
-- 레이어 수준에는 index를 두지 않는다. `src/pages/index.ts`는 틀렸다. `fsd/no-layer-public-api`가 막는다.
-
-판정은 `fsd/public-api`와 `fsd/no-public-api-sidestep`이 한다.
 
 ## import 경로
 
@@ -80,7 +85,7 @@ export { WeatherAppPage } from "./ui/WeatherAppPage";
 
 | 범위 | 형태 | 예 |
 | ---- | ---- | -- |
-| 같은 슬라이스 안 | 상대 경로, 전체 경로 | `./ui/WeatherAppPage` |
+| 같은 슬라이스 안 | 상대 경로, 전체 경로 | `./ui/WeatherSearch` |
 | 다른 슬라이스 | 절대 경로 (alias) | `@/entities/challenge` |
 
 이 규칙의 판정 규칙(`fsd/import-locality`)은 Steiger의 `recommended`에 없다.
