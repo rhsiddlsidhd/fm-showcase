@@ -42,13 +42,13 @@ _workspace/
 
 ## 작업 절차
 
-`G`는 `bash .claude/skills/implement-orchestrator/scripts/guard.sh`를 뜻한다.
+`G`는 `bash .claude/skills/implement-orchestrator/scripts/guard.sh`를, `C`는 `bash .claude/skills/implement-orchestrator/scripts/checks.sh`를 뜻한다. `C`의 규칙은 `references/io-common.md`의 「검사 명령」에 있다.
 
 ### 0단계: 실행 조건과 기존 작업 확인
 
 1. `git branch --show-current`가 `main`이거나 비어 있으면(분리된 HEAD) 멈추고 브랜치를 어떻게 할지 묻는다. 테스트 커밋을 만들기 때문이며, `main`에는 훅이 커밋을 막는다.
 2. `_workspace/`가 있는지 보고 분기한다.
-   - **없음**: `git status --porcelain`이 비어 있어야 한다. 비어 있지 않으면 멈추고 사용자에게 묻는다. 시작 상태가 깨끗해야 소유권 검사가 이번 실행의 변경만 본다. 그다음 1단계부터 실행한다.
+   - **없음**: `git status --porcelain`이 비어 있어야 한다. 비어 있지 않으면 멈추고 사용자에게 묻는다. 시작 상태가 깨끗해야 소유권 검사가 이번 실행의 변경만 본다. 이어서 `C verifier --log-dir _workspace/checks/00`이 통과해야 한다. 실패하면 멈추고, 실패한 명령을 보여 주며 묻는다. 트리가 깨끗해도 검사가 통과한다는 보장은 없고, 시작부터 실패하면 에이전트가 자기와 상관없는 실패를 떠안는다. 그다음 1단계부터 실행한다.
    - **있고 같은 기능의 후속 요청**(일부 재실행·보완): `G snapshot _workspace/resume_now.tsv`로 현재 상태를 기록하고, `_workspace/snap/`에서 가장 최근 파일(`ls -t | head -1`)과 `G diff`로 비교한다. 결과가 비어 있으면 요청한 단계부터 다시 실행한다. 결과가 있으면 실행 뒤에 누군가 파일을 고친 것이므로, 바뀐 경로를 보여 주고 어떻게 할지 묻는다.
    - **있고 새 기능 요청**: 기존 디렉터리를 `_workspace_{YYYYMMDD-HHMMSS}/`로 옮기고, "없음"과 같이 처리한다.
 
@@ -75,7 +75,7 @@ _workspace/
 7. 위반 파일이 비어 있지 않으면 다음과 같이 처리한다.
    - `#GIT` 줄이 있으면 에이전트가 커밋하거나 스테이징했다는 뜻이다. 자동으로 되돌리지 않고 멈춰서 보고한다. 커밋을 되돌리는 것은 기록을 고치는 일이라 사용자가 정한다.
    - 그 밖의 경우: `G restore …_before.tsv < …_violations.txt`로 위반 경로만 실행 전 상태로 되돌린다. 재시도를 1회 쓰고, 위반 경로를 `재호출 사유`에 넣어 같은 에이전트를 다시 호출한다.
-8. 판정에 따라 다음 단계로 간다(3단계 표). 다음으로 넘어가기 전에 오케스트레이터가 `npm test`를 직접 실행해, 보고서가 주장한 결과(실패 또는 통과)와 맞는지 확인한다.
+8. 판정에 따라 다음 단계로 간다(3단계 표). 다음으로 넘어가기 전에 오케스트레이터가 `C {agent} --log-dir _workspace/checks/{NN}`을 직접 실행해 보고서의 `실행한 명령`과 종료 코드를 대조한다. test-engineer 뒤에는 `npm test`가 실패하는지도 확인한다.
 9. `run_log.md`에 한 줄 추가한다.
 
 #### 프롬프트 공통 블록 + 입출력 프로토콜
@@ -114,7 +114,7 @@ test-engineer(RED) → [테스트 커밋] → executor(DONE) → code-simplifier
 | verifier `FAIL_IMPL`                                        | executor(**opus**, verifier 보고서 전달) → code-simplifier → verifier                                                                                                                                                                                                                                         | 1           |
 | executor·code-simplifier `PLAN_ISSUE`, verifier `FAIL_PLAN` | 오케스트레이터가 근거를 `docs/architecture/`와 대조해 배치 표를 고치고 변경 기록을 남긴다(1단계 4~5번). 그다음 executor(현재 모델)부터 다시 실행한다. 제안이 규약에 맞지 않으면 표는 그대로 두고, 거절 이유를 넣어 같은 에이전트를 다시 호출한다. 새 파일에 요구사항이 걸리면 test-engineer부터 다시 실행한다 | 1           |
 | 소유권 위반                                                 | 되돌린 뒤 같은 에이전트 재호출                                                                                                                                                                                                                                                                                | 1           |
-| 보고서 판정과 `npm test` 결과가 다름                        | 같은 에이전트 재호출(실제 결과 전달)                                                                                                                                                                                                                                                                          | 1           |
+| 보고서와 `C` 결과가 다름                                    | 같은 에이전트 재호출(실제 결과 전달)                                                                                                                                                                                                                                                                          | 1           |
 
 재시도는 경로와 상관없이 **합쳐서 최대 2회**다. 2회를 다 쓴 뒤에도 실패하면 멈추고 4단계로 보고한다. opus로도 풀리지 않으면 대개 스펙이나 테스트 쪽 문제라, 계속 돌려도 비용만 든다.
 

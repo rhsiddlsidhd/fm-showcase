@@ -20,7 +20,7 @@
 
 - `수정 가능 경로`의 파일만 정리한다. 테스트가 확인하는 동작은 바꾸지 않는다.
 - 새 파일로 분리하는 편이 낫다고 판단하면 분리하지 말고 `PLAN_ISSUE`로 제안한다.
-- 정리한 뒤 `npm test`, `npm run typecheck`, `npm run lint`를 실행한다.
+- 정리한 뒤 `checks.sh code-simplifier`가 통과해야 한다.
 
 ## 에이전트별 출력 섹션
 

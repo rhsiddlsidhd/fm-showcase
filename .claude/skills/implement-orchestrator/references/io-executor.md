@@ -18,7 +18,7 @@
 
 ## 작업 지시
 
-- 테스트가 통과하도록 구현한다. `npm test`, `npm run typecheck`, `npm run lint`, `npm run lint:fsd`를 실행한다.
+- 테스트가 통과하도록 구현한다. `checks.sh executor`가 통과해야 한다.
 - 테스트가 틀렸거나 요구사항과 맞지 않으면 테스트를 고치지 말고 `TEST_ISSUE`로 끝낸다. 요구사항 문구와 테스트 코드를 비교해 판단한다.
 - `수정 가능 경로`에 없는 파일이 필요하면 만들지 말고 `PLAN_ISSUE`로 끝낸다.
 
