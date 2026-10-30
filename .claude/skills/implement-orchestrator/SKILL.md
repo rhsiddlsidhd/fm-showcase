@@ -11,12 +11,12 @@ description: "기능 하나를 테스트 작성 → 구현 → 코드 정리 →
 
 ## 에이전트 구성
 
-| 단계 | `subagent_type` | `model` | 모델 선택 이유 | 수정 가능 경로 (`guard.sh check` 역할) |
-| --- | --- | --- | --- | --- |
-| 테스트 | `oh-my-claudecode:test-engineer` | `opus` | 테스트가 곧 스펙이라 품질이 여기서 결정된다 | 배치 표의 `test` 행 (`test`) |
-| 구현 | `oh-my-claudecode:executor` | `sonnet`, 구현 문제로 재시도할 때 `opus` | 범위가 테스트와 배치 표로 정해진 구현이다. sonnet으로 풀리지 않을 때만 비용을 올린다 | 배치 표의 `impl` 행 (`impl`) |
-| 정리 | `oh-my-claudecode:code-simplifier` | `opus` | 구조·설계 판단이 필요하다 | 배치 표의 `impl` 행 (`impl`) |
-| 검증 | `oh-my-claudecode:verifier` | `opus` | 교차 검증과 테스트 우회 탐지 | 없음 (`none`) |
+| 단계   | `subagent_type`                    | `model`                                  | 모델 선택 이유                                                                       | 수정 가능 경로 (`guard.sh check` 역할) |
+| ------ | ---------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------ | -------------------------------------- |
+| 테스트 | `oh-my-claudecode:test-engineer`   | `opus`                                   | 테스트가 곧 스펙이라 품질이 여기서 결정된다                                          | 배치 표의 `test` 행 (`test`)           |
+| 구현   | `oh-my-claudecode:executor`        | `sonnet`, 구현 문제로 재시도할 때 `opus` | 범위가 테스트와 배치 표로 정해진 구현이다. sonnet으로 풀리지 않을 때만 비용을 올린다 | 배치 표의 `impl` 행 (`impl`)           |
+| 정리   | `oh-my-claudecode:code-simplifier` | `opus`                                   | 구조·설계 판단이 필요하다                                                            | 배치 표의 `impl` 행 (`impl`)           |
+| 검증   | `oh-my-claudecode:verifier`        | `opus`                                   | 교차 검증과 테스트 우회 탐지                                                         | 없음 (`none`)                          |
 
 `test` 행은 테스트 파일(`*.test.*`, `*.spec.*`, `e2e/**`, `src/shared/test/**`)이어야 하고, `impl` 행은 테스트 파일을 뺀 `src/**`여야 한다. 설정 파일, `docs/`, `AGENTS.md`, `package.json`은 어느 에이전트도 고치지 않는다. 바꿔야 하면 멈추고 사용자에게 보고한다.
 
@@ -82,22 +82,22 @@ _workspace/
 
 프롬프트와 보고서 형식은 `references/`에만 둔다. 이 스킬 본문에 다시 쓰지 않는다.
 
-| 파일 | 담는 것 |
-| --- | --- |
-| `references/io-common.md` | 입력 최소화 원칙, 전용 입력 파일 형식, 프롬프트 공통 블록, 공통 출력 섹션, 판정 줄 규칙 |
-| `references/io-test-engineer.md` | test-engineer의 입력 파일 내용, 작업 지시, 출력 섹션 |
-| `references/io-executor.md` | executor의 입력 파일 내용, 작업 지시, 출력 섹션 |
-| `references/io-code-simplifier.md` | code-simplifier의 입력 파일 내용, 작업 지시, 출력 섹션 |
-| `references/io-verifier.md` | verifier의 입력 파일 내용(입력 최소화의 예외), 작업 지시, 출력 섹션, 판정 규칙 |
+| 파일                               | 담는 것                                                                                 |
+| ---------------------------------- | --------------------------------------------------------------------------------------- |
+| `references/io-common.md`          | 입력 최소화 원칙, 전용 입력 파일 형식, 프롬프트 공통 블록, 공통 출력 섹션, 판정 줄 규칙 |
+| `references/io-test-engineer.md`   | test-engineer의 입력 파일 내용, 작업 지시, 출력 섹션                                    |
+| `references/io-executor.md`        | executor의 입력 파일 내용, 작업 지시, 출력 섹션                                         |
+| `references/io-code-simplifier.md` | code-simplifier의 입력 파일 내용, 작업 지시, 출력 섹션                                  |
+| `references/io-verifier.md`        | verifier의 입력 파일 내용(입력 최소화의 예외), 작업 지시, 출력 섹션, 판정 규칙          |
 
 호출마다 `io-common.md`의 공통 블록에 해당 `io-{agent}.md`의 내용을 채워 프롬프트를 만든다. 공통 블록은 `AGENTS.md`의 위임 규칙(문서 인덱스 경로와 우선순위 전달)을 따른다.
 
-| 에이전트 | 판정 값 |
-| --- | --- |
-| test-engineer | `RED` |
-| executor | `DONE`, `TEST_ISSUE`, `PLAN_ISSUE` |
-| code-simplifier | `DONE`, `PLAN_ISSUE` |
-| verifier | `PASS`, `FAIL_IMPL`, `FAIL_TEST`, `FAIL_PLAN` |
+| 에이전트        | 판정 값                                       |
+| --------------- | --------------------------------------------- |
+| test-engineer   | `RED`                                         |
+| executor        | `DONE`, `TEST_ISSUE`, `PLAN_ISSUE`            |
+| code-simplifier | `DONE`, `PLAN_ISSUE`                          |
+| verifier        | `PASS`, `FAIL_IMPL`, `FAIL_TEST`, `FAIL_PLAN` |
 
 보고서 마지막 줄이 `판정: {값}` 형식이 아니거나 허용 값이 아니면 판정이 없는 것으로 본다(오류 처리 표).
 
@@ -107,14 +107,14 @@ _workspace/
 test-engineer(RED) → [테스트 커밋] → executor(DONE) → code-simplifier(DONE) → verifier(PASS) → 4단계
 ```
 
-| 결과 | 다음 호출 | 재시도 사용 |
-| --- | --- | --- |
-| executor `TEST_ISSUE` | test-engineer(근거 보고서 전달) → 테스트 커밋 → executor(sonnet) | 1 |
-| verifier `FAIL_TEST` | 위와 같음 | 1 |
-| verifier `FAIL_IMPL` | executor(**opus**, verifier 보고서 전달) → code-simplifier → verifier | 1 |
-| executor·code-simplifier `PLAN_ISSUE`, verifier `FAIL_PLAN` | 오케스트레이터가 근거를 `docs/architecture/`와 대조해 배치 표를 고치고 변경 기록을 남긴다(1단계 4~5번). 그다음 executor(현재 모델)부터 다시 실행한다. 제안이 규약에 맞지 않으면 표는 그대로 두고, 거절 이유를 넣어 같은 에이전트를 다시 호출한다. 새 파일에 요구사항이 걸리면 test-engineer부터 다시 실행한다 | 1 |
-| 소유권 위반 | 되돌린 뒤 같은 에이전트 재호출 | 1 |
-| 보고서 판정과 `npm test` 결과가 다름 | 같은 에이전트 재호출(실제 결과 전달) | 1 |
+| 결과                                                        | 다음 호출                                                                                                                                                                                                                                                                                                     | 재시도 사용 |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| executor `TEST_ISSUE`                                       | test-engineer(근거 보고서 전달) → 테스트 커밋 → executor(sonnet)                                                                                                                                                                                                                                              | 1           |
+| verifier `FAIL_TEST`                                        | 위와 같음                                                                                                                                                                                                                                                                                                     | 1           |
+| verifier `FAIL_IMPL`                                        | executor(**opus**, verifier 보고서 전달) → code-simplifier → verifier                                                                                                                                                                                                                                         | 1           |
+| executor·code-simplifier `PLAN_ISSUE`, verifier `FAIL_PLAN` | 오케스트레이터가 근거를 `docs/architecture/`와 대조해 배치 표를 고치고 변경 기록을 남긴다(1단계 4~5번). 그다음 executor(현재 모델)부터 다시 실행한다. 제안이 규약에 맞지 않으면 표는 그대로 두고, 거절 이유를 넣어 같은 에이전트를 다시 호출한다. 새 파일에 요구사항이 걸리면 test-engineer부터 다시 실행한다 | 1           |
+| 소유권 위반                                                 | 되돌린 뒤 같은 에이전트 재호출                                                                                                                                                                                                                                                                                | 1           |
+| 보고서 판정과 `npm test` 결과가 다름                        | 같은 에이전트 재호출(실제 결과 전달)                                                                                                                                                                                                                                                                          | 1           |
 
 재시도는 경로와 상관없이 **합쳐서 최대 2회**다. 2회를 다 쓴 뒤에도 실패하면 멈추고 4단계로 보고한다. opus로도 풀리지 않으면 대개 스펙이나 테스트 쪽 문제라, 계속 돌려도 비용만 든다.
 
@@ -144,30 +144,34 @@ test-engineer가 `RED`로 끝나고 위반이 없으면, 오케스트레이터�
 
 ## 오류 처리
 
-| 상황 | 처리 |
-| --- | --- |
+| 상황                                   | 처리                                                                                                                                                        |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 사용량 한도 소진, 인증 만료, 권한 거부 | 재시도하지 않는다. 남은 한도만 쓴다. 부분 산출물과 `G diff` 결과로 실제 진행 상황을 확인해 `run_log.md`에 적고 보고한다. 사용량 한도면 풀리는 시각도 알린다 |
-| 에이전트 응답에 판정 줄이 없음 | 1회 재호출해 판정만 받는다. 이 호출은 재시도에 포함한다 |
-| `#GIT` 위반 (에이전트가 커밋·스테이징) | 멈추고 보고한다. 자동으로 되돌리지 않는다 |
-| 설정 파일·문서 변경이 필요하다는 보고 | 멈추고 사용자에게 보고한다. 소유자가 없는 경로다 |
-| 에이전트가 남긴 빈 곳 | 오케스트레이터는 직접 확인한 사실(명령 출력, 파일 내용)만 기록한다. 에이전트의 판단은 추측해 채우지 않는다. 사후 검증 기록을 위조하는 셈이기 때문이다 |
+| 에이전트 응답에 판정 줄이 없음         | 1회 재호출해 판정만 받는다. 이 호출은 재시도에 포함한다                                                                                                     |
+| `#GIT` 위반 (에이전트가 커밋·스테이징) | 멈추고 보고한다. 자동으로 되돌리지 않는다                                                                                                                   |
+| 설정 파일·문서 변경이 필요하다는 보고  | 멈추고 사용자에게 보고한다. 소유자가 없는 경로다                                                                                                            |
+| 에이전트가 남긴 빈 곳                  | 오케스트레이터는 직접 확인한 사실(명령 출력, 파일 내용)만 기록한다. 에이전트의 판단은 추측해 채우지 않는다. 사후 검증 기록을 위조하는 셈이기 때문이다       |
 
 ## 테스트 시나리오
 
 ### 정상 흐름
+
 1. 작업 브랜치, 깨끗한 트리, `_workspace/` 없음 상태에서 "가격 표시 컴포넌트 구현해줘"
 2. spec 작성 → test-engineer `RED` → 테스트 커밋 1개 → executor(sonnet) `DONE` → code-simplifier `DONE` → verifier `PASS`
 3. 결과: 재시도 0, `run_log.md` 4줄, 구현 파일은 커밋되지 않은 상태로 보고
 
 ### 오류 흐름: 구현 에이전트가 테스트를 고침
+
 1. executor가 테스트 파일의 기대값을 바꾸고 `DONE`
 2. `G check impl`이 해당 테스트 파일을 출력 → `G restore`로 커밋 상태로 되돌림 → 재시도 1 → executor 재호출
 3. 다시 위반하면 재시도 2 → 멈추고, 위반 경로와 함께 보고
 
 ### 오류 흐름: 계획에 없는 파일
+
 1. executor가 `src/shared/lib/format.ts`를 계획 없이 만들면 `G check impl spec.md`가 이를 출력 → 삭제 → 재시도 1
 2. executor가 대신 `PLAN_ISSUE`로 보고하면, 오케스트레이터가 `docs/architecture/segments.md`와 대조해 배치 표에 행을 추가하고 변경 기록을 남긴 뒤 executor를 다시 호출한다. 재시도 1
 
 ### 오류 흐름: 테스트 문제
+
 1. verifier가 "요구사항 3의 테스트가 없다"며 `FAIL_TEST`
 2. test-engineer 재호출(verifier 보고서 전달) → `test: update tests for <기능>` 커밋 → executor(sonnet)부터 다시 실행. 재시도 1
