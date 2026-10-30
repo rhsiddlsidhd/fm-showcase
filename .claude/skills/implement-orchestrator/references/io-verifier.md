@@ -1,0 +1,53 @@
+# verifier 입출력
+
+- 역할: 요구사항·테스트·구현·배치를 근거로 독립 검증한다 (읽기 전용)
+- 문서 인덱스: `docs/testing/README.md`, `docs/architecture/README.md`
+- 판정 값: `PASS`, `FAIL_IMPL`, `FAIL_TEST`, `FAIL_PLAN`
+
+## 입력 파일 내용
+
+입력 최소화의 예외다. 다른 에이전트의 판단을 검증하려면 그 판단의 근거까지 봐야 하므로 원본을 그대로 넘긴다. 전용 입력 파일에는 아래 경로와 값만 적는다.
+
+| 섹션 | 채우는 내용 |
+| --- | --- |
+| 요구사항 | `없음` (원본 spec.md를 읽는다) |
+| 수정 가능 경로 | `없음` |
+| 참조 파일 | `_workspace/00_input/spec.md`, 가장 최근 test-engineer·executor·code-simplifier 보고서 경로 |
+| 테스트 대응 | `없음` (test-engineer 보고서를 읽는다) |
+| 재호출 사유 | 판정 줄이 없거나 명령 결과가 달라 재호출할 때만 |
+
+프롬프트에는 `git diff HEAD --stat` 결과와 테스트 커밋 해시를 함께 적는다.
+
+## 작업 지시
+
+- `npm test`, `npm run typecheck`, `npm run lint`, `npm run lint:fsd`를 실행한다. e2e 테스트가 바뀌었으면 `npm run test:e2e`도 실행한다.
+- 요구사항마다 테스트가 있고, 그 테스트가 실제로 그 동작을 확인하는지 본다.
+- 구현이 테스트 입력을 하드코딩하거나 특별 처리해서 통과하지 않는지 본다.
+- 배치 표가 `docs/architecture/` 규약과 맞는지 본다.
+
+## 에이전트별 출력 섹션
+
+`변경 파일`은 항상 `없음`이다. 각 행의 근거는 오케스트레이터가 재호출 사유로 옮길 수 있게 `파일:줄`로 쓴다. 문서 근거는 `FAIL_PLAN` 행에만 쓴다.
+
+```markdown
+## 요구사항 검증
+| 요구사항 | 테스트 | 결과 | 근거 |
+| --- | --- | --- | --- |
+| R1 | `R1: {name}` | OK / MISSING / WRONG | `{path}:{line}` |
+
+## 검사 항목
+| 항목 | 결과 | 근거 |
+| --- | --- | --- |
+| 명령 4개 통과 | OK / FAIL | {실패한 명령과 출력} |
+| 테스트 우회 없음 | OK / FAIL | `{path}:{line}` |
+| 배치 규약 준수 | OK / FAIL | {docs 경로#앵커} |
+```
+
+## 판정 규칙
+
+해당하는 것을 위에서부터 고른다. 원인을 고치는 쪽으로 보내기 위한 순서다.
+
+1. 배치 규약이 `FAIL`이면 `FAIL_PLAN`
+2. 요구사항 중 `MISSING`이나 `WRONG`이 있으면 `FAIL_TEST`
+3. 명령 실패나 테스트 우회가 있으면 `FAIL_IMPL`
+4. 모두 `OK`면 `PASS`

@@ -1,0 +1,173 @@
+---
+name: implement-orchestrator
+description: "기능 하나를 테스트 작성 → 구현 → 코드 정리 → 검증 순서로 끝내는 구현 오케스트레이터. omc의 test-engineer, executor, code-simplifier, verifier를 차례로 위임하고 파일 소유권을 스크립트로 검사한다. '기능 구현해줘', '이 기능 만들어줘', 'TDD로 구현', '테스트부터 짜고 구현', '챌린지 구현' 같은 구현 요청에 사용한다. '다시 실행', '검증만 다시', '구현만 다시', '테스트 고쳐서 다시', '이전 결과를 바탕으로 수정', '결과 보완' 같은 후속 요청에도 사용한다. 질문·설명, 리뷰만 요청(code-review 사용), 테스트만 작성 요청, 문서·설정 파일 수정, 커밋·PR 작업에는 사용하지 않는다."
+---
+
+# 구현 오케스트레이터
+
+## 실행 모드: 서브에이전트 위임
+
+에이전트를 한 명씩 차례로 호출한다. 앞 단계 산출물이 다음 단계 입력이라 병렬 호출은 없다. 에이전트끼리 통신하지 않으며, 단계 사이 데이터는 모두 `_workspace/`의 파일 경로로 넘긴다.
+
+## 에이전트 구성
+
+| 단계 | `subagent_type` | `model` | 모델 선택 이유 | 수정 가능 경로 (`guard.sh check` 역할) |
+| --- | --- | --- | --- | --- |
+| 테스트 | `oh-my-claudecode:test-engineer` | `opus` | 테스트가 곧 스펙이라 품질이 여기서 결정된다 | 배치 표의 `test` 행 (`test`) |
+| 구현 | `oh-my-claudecode:executor` | `sonnet`, 구현 문제로 재시도할 때 `opus` | 범위가 테스트와 배치 표로 정해진 구현이다. sonnet으로 풀리지 않을 때만 비용을 올린다 | 배치 표의 `impl` 행 (`impl`) |
+| 정리 | `oh-my-claudecode:code-simplifier` | `opus` | 구조·설계 판단이 필요하다 | 배치 표의 `impl` 행 (`impl`) |
+| 검증 | `oh-my-claudecode:verifier` | `opus` | 교차 검증과 테스트 우회 탐지 | 없음 (`none`) |
+
+`test` 행은 테스트 파일(`*.test.*`, `*.spec.*`, `e2e/**`, `src/shared/test/**`)이어야 하고, `impl` 행은 테스트 파일을 뺀 `src/**`여야 한다. 설정 파일, `docs/`, `AGENTS.md`, `package.json`은 어느 에이전트도 고치지 않는다. 바꿔야 하면 멈추고 사용자에게 보고한다.
+
+**소유권을 나누는 이유:** 구현 에이전트가 테스트를 고칠 수 있으면 구현을 고치기보다 테스트를 고치는 쉬운 길을 고를 수 있다. 정리 에이전트도 같은 이유로 테스트를 건드리지 않는다. 테스트를 "단순화"하는 것도 스펙을 바꾸는 일이다.
+
+**배치를 오케스트레이터가 정하는 이유:** 어느 레이어·세그먼트에 무엇을 둘지는 테스트로 표현되지 않는 설계 판단이다. 구현 에이전트에 맡기면 테스트 통과만 보고 아무 곳에나 둘 수 있다. 배치를 1단계에서 표로 확정하면 스크립트가 계획 밖 파일을 잡아낸다.
+
+## 파일 구성
+
+모든 `_workspace/` 파일은 오케스트레이터(메인)만 쓴다. 에이전트는 보고서를 최종 응답으로 돌려주고, 오케스트레이터가 그 내용을 그대로 저장한다. verifier는 쓰기 도구가 없고, 나머지도 소유권 경로 밖에 쓰지 않게 하기 위해서다.
+
+```
+_workspace/
+├── 00_input/spec.md                 요구사항과 파일 배치 (1단계)
+├── run_log.md                       단계별 결과 기록 (호출마다 한 줄 추가)
+├── {NN}_{agent}_input.md            에이전트 전용 입력. NN은 호출 순번 01, 02, ...
+├── {NN}_{agent}_report.md           에이전트 보고서
+├── snap/{NN}_before.tsv, _after.tsv 호출 전후 상태 기록
+└── {NN}_violations.txt              소유권 위반 경로 (있을 때만)
+```
+
+`run_log.md`의 한 줄 형식은 `| NN | agent | model | 판정 | 재시도 사용 수 |`이다.
+
+## 작업 절차
+
+`G`는 `bash .claude/skills/implement-orchestrator/scripts/guard.sh`를 뜻한다.
+
+### 0단계: 실행 조건과 기존 작업 확인
+
+1. `git branch --show-current`가 `main`이거나 비어 있으면(분리된 HEAD) 멈추고 브랜치를 어떻게 할지 묻는다. 테스트 커밋을 만들기 때문이며, `main`에는 훅이 커밋을 막는다.
+2. `_workspace/`가 있는지 보고 분기한다.
+   - **없음**: `git status --porcelain`이 비어 있어야 한다. 비어 있지 않으면 멈추고 사용자에게 묻는다. 시작 상태가 깨끗해야 소유권 검사가 이번 실행의 변경만 본다. 그다음 1단계부터 실행한다.
+   - **있고 같은 기능의 후속 요청**(일부 재실행·보완): `G snapshot _workspace/resume_now.tsv`로 현재 상태를 기록하고, `_workspace/snap/`에서 가장 최근 파일(`ls -t | head -1`)과 `G diff`로 비교한다. 결과가 비어 있으면 요청한 단계부터 다시 실행한다. 결과가 있으면 실행 뒤에 누군가 파일을 고친 것이므로, 바뀐 경로를 보여 주고 어떻게 할지 묻는다.
+   - **있고 새 기능 요청**: 기존 디렉터리를 `_workspace_{YYYYMMDD-HHMMSS}/`로 옮기고, "없음"과 같이 처리한다.
+
+### 1단계: 요구사항과 파일 배치 정리 (메인)
+
+`00_input/spec.md`는 `references/spec-template.md` 형식으로 쓴다.
+
+1. 사용자 요청과 관련 코드, 챌린지 자료를 읽고 `## 요구사항`을 쓴다. 요구사항이 모호하면 여기서 사용자에게 묻는다. 에이전트는 사용자에게 물을 수 없다.
+2. `docs/architecture/README.md`와 `docs/testing/README.md`를 읽고, 그 인덱스가 가리키는 문서 중 이번 배치에 필요한 것을 읽는다. 기존 `src/` 구조도 확인한다.
+3. `## 파일 배치`에 만들거나 고칠 파일을 한 행에 하나씩 적는다.
+4. `G plan _workspace/00_input/spec.md`가 아무것도 출력하지 않아야 한다. 출력된 행은 역할과 경로가 맞지 않거나 표가 비어 있다는 뜻이므로 고친다.
+5. 1단계 뒤에 배치를 바꿀 때는 표를 고치고 `## 배치 변경 기록`에 한 행을 추가한다. 나중에 "왜 여기에 뒀나"를 확인하는 근거가 된다.
+
+### 2단계: 에이전트 호출 (공통 절차)
+
+에이전트를 호출할 때마다 다음 순서를 지킨다.
+
+1. `_workspace/{NN}_{agent}_input.md`를 쓴다. `io-{agent}.md`의 「입력 파일 내용」 표에 적힌 항목만 옮긴다. 에이전트는 이 파일 말고 `spec.md`나 다른 보고서를 받지 않는다(verifier 제외). 이유는 `io-common.md`의 「입력 최소화」에 있다.
+2. `G snapshot _workspace/snap/{NN}_before.tsv`
+3. `Agent`를 호출한다(`name` 없음, 일회성). 프롬프트는 아래 「프롬프트 공통 블록 + 입출력 프로토콜」로 만든다. 완료 알림을 받을 때까지 다음 단계로 가지 않는다.
+4. 응답 전문을 `_workspace/{NN}_{agent}_report.md`에 저장한다. 보고서를 그대로 믿지 않는다. 마지막 줄의 판정을 읽고, 근거로 적힌 명령 결과는 8번에서 직접 다시 확인한다.
+5. `G snapshot _workspace/snap/{NN}_after.tsv`
+6. `G diff …_before.tsv …_after.tsv | G check {역할} _workspace/00_input/spec.md > _workspace/{NN}_violations.txt` (verifier는 `G check none`)
+7. 위반 파일이 비어 있지 않으면 다음과 같이 처리한다.
+   - `#GIT` 줄이 있으면 에이전트가 커밋하거나 스테이징했다는 뜻이다. 자동으로 되돌리지 않고 멈춰서 보고한다. 커밋을 되돌리는 것은 기록을 고치는 일이라 사용자가 정한다.
+   - 그 밖의 경우: `G restore …_before.tsv < …_violations.txt`로 위반 경로만 실행 전 상태로 되돌린다. 재시도를 1회 쓰고, 위반 경로를 `재호출 사유`에 넣어 같은 에이전트를 다시 호출한다.
+8. 판정에 따라 다음 단계로 간다(3단계 표). 다음으로 넘어가기 전에 오케스트레이터가 `npm test`를 직접 실행해, 보고서가 주장한 결과(실패 또는 통과)와 맞는지 확인한다.
+9. `run_log.md`에 한 줄 추가한다.
+
+#### 프롬프트 공통 블록 + 입출력 프로토콜
+
+프롬프트와 보고서 형식은 `references/`에만 둔다. 이 스킬 본문에 다시 쓰지 않는다.
+
+| 파일 | 담는 것 |
+| --- | --- |
+| `references/io-common.md` | 입력 최소화 원칙, 전용 입력 파일 형식, 프롬프트 공통 블록, 공통 출력 섹션, 판정 줄 규칙 |
+| `references/io-test-engineer.md` | test-engineer의 입력 파일 내용, 작업 지시, 출력 섹션 |
+| `references/io-executor.md` | executor의 입력 파일 내용, 작업 지시, 출력 섹션 |
+| `references/io-code-simplifier.md` | code-simplifier의 입력 파일 내용, 작업 지시, 출력 섹션 |
+| `references/io-verifier.md` | verifier의 입력 파일 내용(입력 최소화의 예외), 작업 지시, 출력 섹션, 판정 규칙 |
+
+호출마다 `io-common.md`의 공통 블록에 해당 `io-{agent}.md`의 내용을 채워 프롬프트를 만든다. 공통 블록은 `AGENTS.md`의 위임 규칙(문서 인덱스 경로와 우선순위 전달)을 따른다.
+
+| 에이전트 | 판정 값 |
+| --- | --- |
+| test-engineer | `RED` |
+| executor | `DONE`, `TEST_ISSUE`, `PLAN_ISSUE` |
+| code-simplifier | `DONE`, `PLAN_ISSUE` |
+| verifier | `PASS`, `FAIL_IMPL`, `FAIL_TEST`, `FAIL_PLAN` |
+
+보고서 마지막 줄이 `판정: {값}` 형식이 아니거나 허용 값이 아니면 판정이 없는 것으로 본다(오류 처리 표).
+
+### 3단계: 흐름과 재시도
+
+```
+test-engineer(RED) → [테스트 커밋] → executor(DONE) → code-simplifier(DONE) → verifier(PASS) → 4단계
+```
+
+| 결과 | 다음 호출 | 재시도 사용 |
+| --- | --- | --- |
+| executor `TEST_ISSUE` | test-engineer(근거 보고서 전달) → 테스트 커밋 → executor(sonnet) | 1 |
+| verifier `FAIL_TEST` | 위와 같음 | 1 |
+| verifier `FAIL_IMPL` | executor(**opus**, verifier 보고서 전달) → code-simplifier → verifier | 1 |
+| executor·code-simplifier `PLAN_ISSUE`, verifier `FAIL_PLAN` | 오케스트레이터가 근거를 `docs/architecture/`와 대조해 배치 표를 고치고 변경 기록을 남긴다(1단계 4~5번). 그다음 executor(현재 모델)부터 다시 실행한다. 제안이 규약에 맞지 않으면 표는 그대로 두고, 거절 이유를 넣어 같은 에이전트를 다시 호출한다. 새 파일에 요구사항이 걸리면 test-engineer부터 다시 실행한다 | 1 |
+| 소유권 위반 | 되돌린 뒤 같은 에이전트 재호출 | 1 |
+| 보고서 판정과 `npm test` 결과가 다름 | 같은 에이전트 재호출(실제 결과 전달) | 1 |
+
+재시도는 경로와 상관없이 **합쳐서 최대 2회**다. 2회를 다 쓴 뒤에도 실패하면 멈추고 4단계로 보고한다. opus로도 풀리지 않으면 대개 스펙이나 테스트 쪽 문제라, 계속 돌려도 비용만 든다.
+
+#### 테스트 커밋
+
+test-engineer가 `RED`로 끝나고 위반이 없으면, 오케스트레이터가 바로 테스트 파일을 커밋한다.
+
+1. 커밋할 경로는 `G diff`로 구한 `test` 역할 경로뿐이다. `git add -- <경로>`로 하나씩 지정한다(`git add .` 금지).
+2. `git diff --cached --stat`으로 스테이징된 파일이 테스트 파일뿐인지 확인한다.
+3. 커밋 메시지는 `test: add failing tests for <기능>`이다. 테스트를 다시 고쳤을 때는 `test: update tests for <기능>`을 쓴다. 제목은 소문자 영어 명령형, 72자 이하로 쓰고, 마지막 문단에 `Co-Authored-By:` 트레일러를 넣는다(`docs/git/commit.md`).
+4. 커밋 뒤 `G snapshot _workspace/snap/{NN}_post-commit.tsv`를 남긴다. 다음 실행의 0단계가 이 기록을 기준으로 삼는다.
+5. push는 하지 않는다. 구현 코드는 커밋하지 않는다.
+
+**테스트를 커밋하는 이유:** 커밋한 뒤에는 테스트 파일이 `git status`에 나타나는 것만으로 위반이 확정되고, 되돌릴 기준점이 생긴다. "실패하는 테스트가 먼저 정해졌다"는 기록도 히스토리에 남는다. 이 커밋은 사용자가 이 스킬에 한해 승인한 자동 커밋이다. 다른 커밋에 이 근거를 넓혀 쓰지 않는다.
+
+### 4단계: 보고
+
+사용자에게 다음을 보고한다.
+
+- 최종 판정과 재시도 사용 수 (`run_log.md` 요약)
+- 만든 테스트 커밋 해시
+- 커밋하지 않은 구현 변경 파일 목록. 구현을 커밋할지는 사용자가 정한다.
+- 실패로 멈췄다면 마지막 verifier 또는 executor 보고서의 핵심 근거와 파일 경로
+- 되돌린 소유권 위반이 있었으면 그 경로
+
+`_workspace/`는 사후 검증을 위해 지우지 않는다.
+
+## 오류 처리
+
+| 상황 | 처리 |
+| --- | --- |
+| 사용량 한도 소진, 인증 만료, 권한 거부 | 재시도하지 않는다. 남은 한도만 쓴다. 부분 산출물과 `G diff` 결과로 실제 진행 상황을 확인해 `run_log.md`에 적고 보고한다. 사용량 한도면 풀리는 시각도 알린다 |
+| 에이전트 응답에 판정 줄이 없음 | 1회 재호출해 판정만 받는다. 이 호출은 재시도에 포함한다 |
+| `#GIT` 위반 (에이전트가 커밋·스테이징) | 멈추고 보고한다. 자동으로 되돌리지 않는다 |
+| 설정 파일·문서 변경이 필요하다는 보고 | 멈추고 사용자에게 보고한다. 소유자가 없는 경로다 |
+| 에이전트가 남긴 빈 곳 | 오케스트레이터는 직접 확인한 사실(명령 출력, 파일 내용)만 기록한다. 에이전트의 판단은 추측해 채우지 않는다. 사후 검증 기록을 위조하는 셈이기 때문이다 |
+
+## 테스트 시나리오
+
+### 정상 흐름
+1. 작업 브랜치, 깨끗한 트리, `_workspace/` 없음 상태에서 "가격 표시 컴포넌트 구현해줘"
+2. spec 작성 → test-engineer `RED` → 테스트 커밋 1개 → executor(sonnet) `DONE` → code-simplifier `DONE` → verifier `PASS`
+3. 결과: 재시도 0, `run_log.md` 4줄, 구현 파일은 커밋되지 않은 상태로 보고
+
+### 오류 흐름: 구현 에이전트가 테스트를 고침
+1. executor가 테스트 파일의 기대값을 바꾸고 `DONE`
+2. `G check impl`이 해당 테스트 파일을 출력 → `G restore`로 커밋 상태로 되돌림 → 재시도 1 → executor 재호출
+3. 다시 위반하면 재시도 2 → 멈추고, 위반 경로와 함께 보고
+
+### 오류 흐름: 계획에 없는 파일
+1. executor가 `src/shared/lib/format.ts`를 계획 없이 만들면 `G check impl spec.md`가 이를 출력 → 삭제 → 재시도 1
+2. executor가 대신 `PLAN_ISSUE`로 보고하면, 오케스트레이터가 `docs/architecture/segments.md`와 대조해 배치 표에 행을 추가하고 변경 기록을 남긴 뒤 executor를 다시 호출한다. 재시도 1
+
+### 오류 흐름: 테스트 문제
+1. verifier가 "요구사항 3의 테스트가 없다"며 `FAIL_TEST`
+2. test-engineer 재호출(verifier 보고서 전달) → `test: update tests for <기능>` 커밋 → executor(sonnet)부터 다시 실행. 재시도 1

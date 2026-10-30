@@ -5,3 +5,4 @@ test-results/
 playwright-report/
 .sdd/
 .env.local
+_workspace*/
