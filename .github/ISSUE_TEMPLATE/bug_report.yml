@@ -1,0 +1,29 @@
+name: Bug report
+description: 기대와 다르게 동작하는 문제를 제보한다
+title: "fix: "
+labels: [bug]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: 실제 동작과 기대 동작을 쓴다.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduce
+      description: 재현 절차와 환경(브라우저, Node 버전)을 쓴다.
+      placeholder: |
+        1.
+        2.
+        환경:
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: 에러 메시지를 원문 그대로 붙인다.
+      render: shell
