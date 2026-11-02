@@ -1,0 +1,32 @@
+name: Feature request
+description: 새 기능이나 동작 변경을 제안한다
+title: "feat: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: 왜 필요한지, 지금 무엇이 불편한지 쓴다.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: 제안하는 동작을 쓴다.
+    validations:
+      required: true
+  - type: textarea
+    id: done-when
+    attributes:
+      label: Done when
+      description: 완료 조건을 검증 가능한 문장으로 쓴다.
+      placeholder: "- [ ] "
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+      description: 고려한 대안과 고르지 않은 이유를 쓴다.
