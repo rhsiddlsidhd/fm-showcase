@@ -11,19 +11,15 @@ body:
     validations:
       required: true
   - type: textarea
-    id: proposal
-    attributes:
-      label: Proposal
-      description: 고칠 문서 경로와 바꿀 내용을 쓴다.
-      placeholder: |
-        - `docs/...`:
-    validations:
-      required: true
-  - type: textarea
     id: done-when
     attributes:
       label: Done when
-      description: 완료 조건을 검증 가능한 문장으로 쓴다.
+      description: 끝났을 때 문서에서 확인할 상태를 검증 가능한 문장으로 쓴다. 문안은 쓰지 않는다. 문서 위치가 이미 정해졌으면 확인할 수 있는 조건으로 쓴다.
       placeholder: "- "
     validations:
       required: true
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: 이 Issue에서 하지 않는 것을 쓴다. 다른 Issue와의 관계는 Relationships로 건다.
