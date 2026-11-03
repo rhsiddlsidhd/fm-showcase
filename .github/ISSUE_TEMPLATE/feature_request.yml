@@ -11,22 +11,15 @@ body:
     validations:
       required: true
   - type: textarea
-    id: proposal
-    attributes:
-      label: Proposal
-      description: 제안하는 동작을 쓴다.
-    validations:
-      required: true
-  - type: textarea
     id: done-when
     attributes:
       label: Done when
-      description: 완료 조건을 검증 가능한 문장으로 쓴다.
-      placeholder: "- [ ] "
+      description: 사용자가 보는 결과를 검증 가능한 문장으로 쓴다. 컴포넌트·파일·라이브러리 같은 구현 방식은 쓰지 않는다. 이미 정해진 제약은 확인할 수 있는 조건으로 쓴다.
+      placeholder: "- "
     validations:
       required: true
   - type: textarea
-    id: alternatives
+    id: out-of-scope
     attributes:
-      label: Alternatives
-      description: 고려한 대안과 고르지 않은 이유를 쓴다.
+      label: Out of scope
+      description: 이 Issue에서 하지 않는 것을 쓴다. 다른 Issue와의 관계는 Relationships로 건다.
