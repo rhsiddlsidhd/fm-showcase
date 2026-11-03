@@ -1,0 +1,32 @@
+name: Chore
+description: 개발 환경과 작업 도구(CI, git 훅, 스킬, 의존성)를 바꾼다. 앱 코드 구조를 위한 변경은 Refactor를 쓴다
+title: "chore: "
+labels: [chore]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: 지금 개발 환경이나 작업 흐름에서 무엇이 불편하거나 빠졌는지 쓴다.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: 바꿀 도구·설정과 바뀐 뒤의 동작을 쓴다.
+    validations:
+      required: true
+  - type: textarea
+    id: done-when
+    attributes:
+      label: Done when
+      description: 완료 조건을 검증 가능한 문장으로 쓴다.
+      placeholder: "- [ ] "
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+      description: 고려한 대안과 고르지 않은 이유를 쓴다.

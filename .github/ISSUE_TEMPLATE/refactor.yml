@@ -1,0 +1,32 @@
+name: Refactor
+description: 동작은 그대로 두고 코드 구조·규약·성능을 고친다. 사용자가 보는 결과는 바뀌지 않는다
+title: "refactor: "
+labels: [refactor]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: 지금 구조의 무엇이 문제인지 쓴다.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: 바꿀 구조를 쓴다.
+    validations:
+      required: true
+  - type: textarea
+    id: done-when
+    attributes:
+      label: Done when
+      description: 완료 조건을 검증 가능한 문장으로 쓴다. 동작이 바뀌지 않았음을 판정할 조건을 포함한다.
+      placeholder: "- [ ] "
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+      description: 고려한 대안과 고르지 않은 이유를 쓴다.
