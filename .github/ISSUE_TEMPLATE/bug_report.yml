@@ -22,6 +22,14 @@ body:
     validations:
       required: true
   - type: textarea
+    id: done-when
+    attributes:
+      label: Done when
+      description: 완료 조건을 검증 가능한 문장으로 쓴다. 위 재현 절차에서 기대 동작이 나오는지 포함한다.
+      placeholder: "- [ ] "
+    validations:
+      required: true
+  - type: textarea
     id: logs
     attributes:
       label: Logs

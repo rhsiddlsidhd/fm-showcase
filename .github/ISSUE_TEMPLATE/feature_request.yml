@@ -1,7 +1,7 @@
 name: Feature request
-description: 새 기능이나 동작 변경을 제안한다
+description: 쇼케이스 사이트에 새 기능이나 기존 기능 개선을 제안한다. 사용자가 보는 결과가 바뀐다
 title: "feat: "
-labels: [enhancement]
+labels: [feature]
 body:
   - type: textarea
     id: problem

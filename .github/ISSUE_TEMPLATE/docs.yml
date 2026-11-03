@@ -1,0 +1,29 @@
+name: Docs
+description: 문서가 결과물인 일을 제안한다. 코드 변경이 함께 있으면 그 코드의 템플릿을 쓴다
+title: "docs: "
+labels: [docs]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: 문서에 무엇이 빠졌거나 틀렸는지 쓴다.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: 고칠 문서 경로와 바꿀 내용을 쓴다.
+      placeholder: |
+        - `docs/...`:
+    validations:
+      required: true
+  - type: textarea
+    id: done-when
+    attributes:
+      label: Done when
+      description: 완료 조건을 검증 가능한 문장으로 쓴다.
+      placeholder: "- [ ] "
+    validations:
+      required: true
