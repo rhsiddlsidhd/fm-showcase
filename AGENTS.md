@@ -13,6 +13,7 @@
 | [`docs/git/README.md`](docs/git/README.md)                   | 브랜치, 커밋, push, PR, Issue를 만들거나 수정할 때. 커밋 메시지나 PR·Issue 내용을 작성할 때   | 이 저장소의 Git 규칙 인덱스. 전역 `GIT.md`를 덮어쓰는 항목   |
 | [`docs/testing/README.md`](docs/testing/README.md)           | 테스트를 쓰거나 고칠 때. 테스트 층이나 대역 범위를 정할 때                                    | 테스트 경계(층별 검증 범위, 대역 범위), 테스트 정책의 인덱스 |
 | [`docs/interview/README.md`](docs/interview/README.md)       | AI를 써서 만든 코드를 외부 면접 문항으로 채점할 때                                            | 동결된 면접 문항지 하나의 인덱스                             |
+| [`docs/reports/README.md`](docs/reports/README.md)           | Discord로 보낼 보고서 본문을 만들거나 그 서식·통로를 고칠 때                                  | 보고서 서식과 전송 통로 규칙의 인덱스                        |
 
 ## 우선순위
 
