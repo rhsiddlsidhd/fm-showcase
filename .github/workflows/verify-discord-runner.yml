@@ -146,6 +146,25 @@ jobs:
             Do not modify files, GitHub Issues, labels or code. Do not ask questions.
             Do not call any other service tool or retry a failed or uncertain operation.
             If the plugin is unavailable, stop and report the missing connection without using another transport.
+      - name: Diagnose Claude failures without printing prompts or credentials
+        if: always()
+        env:
+          CLAUDE_EXECUTION_FILE: ${{ steps.discord.outputs.execution_file }}
+        run: |
+          node --input-type=module <<'JS'
+          import {existsSync, readFileSync} from 'node:fs';
+          const path = process.env.CLAUDE_EXECUTION_FILE;
+          if (path && existsSync(path)) {
+            const raw = readFileSync(path, 'utf8');
+            let records;
+            try { const data = JSON.parse(raw); records = Array.isArray(data) ? data : [data]; }
+            catch { records = raw.split('\n').filter(Boolean).map(line => {try {return JSON.parse(line);} catch {return {};}}); }
+            for (const record of records.filter(item => item.type === 'result' && item.is_error)) {
+              const detail = String(record.result ?? record.error ?? 'Unknown Claude execution error').slice(0,1200).replace(/sk-[A-Za-z0-9_-]+/g, '[REDACTED]');
+              console.log(JSON.stringify({subtype: record.subtype, is_error: true, error: detail}));
+            }
+          } else console.log('No execution file was returned');
+          JS
       - name: Confirm real MCP results and identical message IDs
         if: always()
         run: node scripts/verify-discord-runner.mjs verify
