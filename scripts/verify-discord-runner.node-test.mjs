@@ -4,7 +4,23 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import { Worker } from "node:worker_threads";
-import { claim, classify, preflight } from "./verify-discord-runner.mjs";
+import {
+  claim,
+  classify,
+  preflight,
+  validateAuthToken,
+} from "./verify-discord-runner.mjs";
+
+test("malformed authentication fails before starting a sender", () => {
+  validateAuthToken("synthetic-single-line-token");
+  for (const value of [
+    "",
+    undefined,
+    "synthetic\nwrapped",
+    "synthetic\rwrapped",
+  ])
+    assert.throws(() => validateAuthToken(value));
+});
 
 // Real response formats: installed Discord 0.0.4 server.ts:648,651-655,690,717.
 test("only exact successful MCP responses carry a message ID", () => {

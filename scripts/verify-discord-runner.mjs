@@ -9,6 +9,14 @@ import {
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
+export function validateAuthToken(value) {
+  if (!value) throw new Error("Claude authentication is missing");
+  if (/[\r\n]/.test(value))
+    throw new Error(
+      "Claude authentication must be a single line without CR or LF",
+    );
+}
+
 export function classify(response) {
   if (typeof response === "string") {
     try {
@@ -127,6 +135,7 @@ function main(mode) {
     ])
       if (!process.env[key])
         throw new Error(`Missing runner prerequisite: ${key}`);
+    validateAuthToken(process.env.CLAUDE_AUTH_PRESENT);
     if (!/^\d{17,20}$/.test(process.env.DISCORD_REPORT_CHANNEL_ID))
       throw new Error("Invalid report channel");
     mkdirSync(directory, { recursive: true, mode: 0o700 });
@@ -198,6 +207,7 @@ function main(mode) {
     return;
   }
   if (mode === "verify") {
+    mkdirSync(directory, { recursive: true, mode: 0o700 });
     const result = {};
     for (const operation of ["reply", "edit_message"])
       result[operation] = existsSync(
