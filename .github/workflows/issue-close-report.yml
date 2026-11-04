@@ -45,6 +45,8 @@ jobs:
       contents: read
       issues: read
       pull-requests: read
+      # claude-code-action 이 OIDC 토큰으로 GitHub App 토큰을 받는다. 저장소 쓰기 권한은 아니다.
+      id-token: write
     steps:
       - name: 날짜
         id: date
