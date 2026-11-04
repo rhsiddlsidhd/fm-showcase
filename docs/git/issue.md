@@ -7,7 +7,8 @@
 - Issue는 `.github/ISSUE_TEMPLATE/`의 템플릿 중 하나로 만든다. 템플릿마다 종류 라벨 하나와 제목 접두사가 정해져 있다.
 - 템플릿은 바뀌는 파일의 위치가 아니라 Issue가 해결하려는 것으로 고른다. 앱 코드 구조를 위한 변경은 설정 파일만 바꿔도 `refactor`다.
 - 기대 동작이 어디에도 정해져 있지 않으면 `bug`가 아니라 `feature`다.
-- 종류 라벨은 Issue마다 하나다. 저장소 라벨은 `bug`, `feature`, `refactor`, `docs`, `chore`이고, 이 목록은 GitHub 저장소 설정에 있다.
+- 종류 라벨은 Issue마다 하나다. 종류 라벨은 `bug`, `feature`, `refactor`, `docs`, `chore`이고, 이 목록은 GitHub 저장소 설정에 있다.
+- 상태 라벨(`SELECTED`, `IN_PROGRESS`)은 종류 라벨과 별개로 작업 선택 상태를 나타낸다. 진행 기록이 아니므로 아래 "본문 범위"의 금지에 해당하지 않는다. 뜻과 판정은 [`classification.md`](../../.claude/skills/todo-orchestrator/references/classification.md)에 있다.
 - 웹이 아닌 `gh`나 MCP로 Issue를 만들면 템플릿이 적용되지 않는다. 템플릿의 칸 구성, 제목 접두사, 라벨을 직접 맞춘다.
 
 ## 이유
