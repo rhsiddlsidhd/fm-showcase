@@ -28,7 +28,7 @@ export function classify(response) {
   const text =
     typeof response === "string"
       ? response
-      : (response?.content ?? [])
+      : (Array.isArray(response) ? response : (response?.content ?? []))
           .filter((x) => x.type === "text")
           .map((x) => x.text)
           .join("\n");
@@ -87,6 +87,8 @@ export function preflight(event, request, directory, cwd) {
     throw new Error(
       "Only the configured Discord channel and report tools are allowed",
     );
+  if (operation === "reply" && request.resume_message_id)
+    throw new Error("Receipt was already confirmed; new sends are blocked");
   if ((input.files?.length ?? 0) || input.reply_to)
     throw new Error(
       "Attachments and threaded replies are not part of this verification",
@@ -167,14 +169,31 @@ function main(mode) {
       timeZone: "Asia/Seoul",
     }).format(new Date());
     const base = `## 🧪 러너 연결 검증 · fm-showcase · ${date} KST\n\nClaude Code Action → 기존 Discord MCP 경로의 검증 메시지입니다.\n기능 작업의 완료 보고가 아닙니다.\n실행: https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+    const resumeId = process.env.DISCORD_VERIFY_MESSAGE_ID;
+    if (resumeId && !/^\d{17,20}$/.test(resumeId))
+      throw new Error("Invalid verified message ID");
     if (
       !claim(join(directory, "request.json"), {
         channel: process.env.DISCORD_REPORT_CHANNEL_ID,
         send_text: `${base}\n\n새 메시지 전송 검증`,
         edit_text: `${base}\n\n동일 메시지 수정 검증`,
+        ...(resumeId ? { resume_message_id: resumeId } : {}),
       })
     )
       throw new Error("Verification request already exists");
+    if (resumeId) {
+      if (
+        !claim(join(directory, "reply-result.json"), {
+          status: "success",
+          operation: "sent",
+          message_id: resumeId,
+          evidence_source:
+            "Existing receipt confirmed by the Discord MCP read tool",
+          original_run_id: "41772954919",
+        })
+      )
+        throw new Error("Receipt evidence already exists");
+    }
     console.log(
       "Runner prerequisites and private Discord configuration are ready",
     );

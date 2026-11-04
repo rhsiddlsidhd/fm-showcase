@@ -92,6 +92,7 @@ jobs:
       FM_VERIFY_DIR: /tmp/fm-discord-verification
       DISCORD_STATE_DIR: /tmp/fm-discord-verification/discord
       DISCORD_ACCESS_MODE: static
+      DISCORD_VERIFY_MESSAGE_ID: "1567394224310194229"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -139,6 +140,8 @@ jobs:
             Read .claude/skills/discord-message/SKILL.md and references/tools.md for the existing MCP transport rules.
             The user explicitly authorized one new verification message and editing only that new message.
             Read /tmp/fm-discord-verification/request.json.
+            If resume_message_id is present, receipt of that message was independently confirmed.
+            In that case do NOT call reply: call edit_message exactly once with channel, resume_message_id and edit_text, then stop.
             Call the existing Discord MCP reply tool exactly once with channel as chat_id and send_text as text.
             If the tool does not return exact single-message success, stop without retrying or editing.
             Otherwise take the ID from its actual response and call edit_message exactly once with the same chat_id, that message_id, and edit_text.

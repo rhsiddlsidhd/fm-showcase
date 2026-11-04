@@ -58,6 +58,54 @@ test("definite pre-send errors and ambiguous outcomes remain distinct", () => {
     assert.equal(classify(response).status, "uncertain");
 });
 
+// Observed with a real Claude Code MCP PostToolUse hook on 2026-11-04:
+// /tmp/fm-mcp-hook-shape-result.json. The hook receives a content-block array.
+test("real MCP hook content-block arrays preserve successful message IDs", () => {
+  for (const operation of ["sent", "edited"])
+    assert.deepEqual(
+      classify([
+        { type: "text", text: `${operation} (id: 123456789012345678)` },
+      ]),
+      {
+        status: "success",
+        operation,
+        message_id: "123456789012345678",
+      },
+    );
+  assert.equal(
+    classify([
+      {
+        type: "text",
+        text: "reply failed: reply failed after 0 of 1 chunk(s) sent: timeout",
+      },
+    ]).status,
+    "uncertain",
+  );
+});
+
+test("a confirmed receipt blocks new sends even without a prior attempt file", () => {
+  const directory = mkdtempSync(join(tmpdir(), "fm-resume-"));
+  const request = {
+    channel: "123",
+    send_text: "probe",
+    edit_text: "edited probe",
+    resume_message_id: "456",
+  };
+  assert.throws(
+    () =>
+      preflight(
+        {
+          tool_name: "mcp__plugin_discord_discord__reply",
+          tool_input: { chat_id: "123", text: "probe" },
+        },
+        request,
+        directory,
+        process.cwd(),
+      ),
+    /new sends are blocked/,
+  );
+});
+
 test("concurrent attempts have exactly one successful durable claim", async () => {
   const directory = mkdtempSync(join(tmpdir(), "fm-claim-"));
   const path = join(directory, "attempt.json");
