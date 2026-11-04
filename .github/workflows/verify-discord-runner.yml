@@ -1,8 +1,8 @@
 name: Verify Discord runner
 
 on:
-  push:
-    branches: [ci/verify-discord-runner]
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: read
@@ -14,6 +14,7 @@ concurrency:
 
 jobs:
   state_probe:
+    if: github.head_ref == 'ci/verify-discord-runner' && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 3
     permissions:
@@ -35,6 +36,7 @@ jobs:
           path: state-verification-evidence.json
 
   queue_probe:
+    if: github.head_ref == 'ci/verify-discord-runner' && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 3
     strategy:
