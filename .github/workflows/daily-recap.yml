@@ -13,6 +13,8 @@ jobs:
       contents: read
       issues: read
       pull-requests: read
+      # claude-code-action 이 OIDC 토큰으로 GitHub App 토큰을 받는다. 저장소 쓰기 권한은 아니다.
+      id-token: write
     steps:
       # 04:00 실행이라 달력 날짜로 자르면 전날 밤 작업이 빠진다. 실행 시각 기준 24시간을 센다.
       - name: 창구 계산
