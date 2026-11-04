@@ -1,0 +1,155 @@
+name: Verify Discord runner
+
+on:
+  push:
+    branches: [ci/verify-discord-runner]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-discord-runner
+  queue: max
+  cancel-in-progress: false
+
+jobs:
+  state_probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Verify real remote claims on an isolated state branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/verify-discord-state.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: state-verification-evidence
+          path: state-verification-evidence.json
+
+  queue_probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    strategy:
+      fail-fast: false
+      matrix:
+        event: [one, two, three]
+    concurrency:
+      group: verify-discord-runner-queue-probe
+      queue: max
+      cancel-in-progress: false
+    steps:
+      - name: Record an independently queued execution
+        env:
+          VERIFY_EVENT: ${{ matrix.event }}
+        run: |
+          node --input-type=module <<'JS'
+          import {writeFileSync} from 'node:fs';
+          const start = Date.now();
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          writeFileSync(`queue-${process.env.VERIFY_EVENT}.json`, JSON.stringify({event: process.env.VERIFY_EVENT, start, end: Date.now()}));
+          JS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: queue-${{ matrix.event }}
+          path: queue-*.json
+
+  queue_evidence:
+    needs: queue_probe
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: queue-*
+          merge-multiple: true
+      - name: Confirm all queued executions ran without overlap
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import {readdirSync, readFileSync} from 'node:fs';
+          const rows = readdirSync('.').filter(name => /^queue-.*\.json$/.test(name)).map(name => JSON.parse(readFileSync(name, 'utf8'))).sort((a,b) => a.start-b.start);
+          assert.equal(rows.length, 3);
+          for (let i=1; i<rows.length; i++) assert.ok(rows[i-1].end <= rows[i].start);
+          console.log(JSON.stringify({all_three_executed: true, no_overlap: true, rows}, null, 2));
+          JS
+
+  verify:
+    needs: [state_probe, queue_evidence]
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      FM_VERIFY_DIR: /tmp/fm-discord-verification
+      DISCORD_STATE_DIR: /tmp/fm-discord-verification/discord
+      DISCORD_ACCESS_MODE: static
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Verify result classification, failure recovery guards and concurrent claims
+        run: node scripts/verify-discord-runner.node-test.mjs
+      - name: Prepare private runner configuration
+        env:
+          CLAUDE_AUTH_PRESENT: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN || secrets.ANTHROPIC_API_KEY }}
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          DISCORD_REPORT_CHANNEL_ID: ${{ secrets.DISCORD_REPORT_CHANNEL_ID }}
+        run: node scripts/verify-discord-runner.mjs init
+      - name: Verify Claude Code Action and the existing Discord plugin
+        id: discord
+        uses: anthropics/claude-code-action@v1
+        with:
+          github_token: ${{ github.token }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          plugin_marketplaces: https://github.com/anthropics/claude-plugins-official.git
+          plugins: discord@claude-plugins-official
+          settings: |
+            {
+              "env": {
+                "FM_VERIFY_DIR": "/tmp/fm-discord-verification",
+                "DISCORD_STATE_DIR": "/tmp/fm-discord-verification/discord",
+                "DISCORD_ACCESS_MODE": "static"
+              },
+              "hooks": {
+                "PreToolUse": [{"matcher": ".*", "hooks": [{"type": "command", "command": "node scripts/verify-discord-runner.mjs pre"}]}],
+                "PostToolUse": [{"matcher": "mcp__.*discord.*", "hooks": [{"type": "command", "command": "node scripts/verify-discord-runner.mjs post"}]}],
+                "PostToolUseFailure": [{"matcher": "mcp__.*discord.*", "hooks": [{"type": "command", "command": "node scripts/verify-discord-runner.mjs failure"}]}]
+              }
+            }
+          claude_args: >-
+            --tools Read
+            --allowedTools Read,mcp__plugin_discord_discord__reply,mcp__plugin_discord_discord__edit_message
+            --permission-mode dontAsk
+            --max-turns 12
+          prompt: |
+            This is a user-authorized integration verification, not feature implementation.
+            Read .claude/skills/discord-message/SKILL.md and references/tools.md for the existing MCP transport rules.
+            The user explicitly authorized one new verification message and editing only that new message.
+            Read /tmp/fm-discord-verification/request.json.
+            Call the existing Discord MCP reply tool exactly once with channel as chat_id and send_text as text.
+            If the tool does not return exact single-message success, stop without retrying or editing.
+            Otherwise take the ID from its actual response and call edit_message exactly once with the same chat_id, that message_id, and edit_text.
+            Never use another channel, never alter existing messages, never send attachments or threaded replies.
+            Do not modify files, GitHub Issues, labels or code. Do not ask questions.
+            Do not call any other service tool or retry a failed or uncertain operation.
+            If the plugin is unavailable, stop and report the missing connection without using another transport.
+      - name: Confirm real MCP results and identical message IDs
+        if: always()
+        run: node scripts/verify-discord-runner.mjs verify
+      - name: Save verification evidence without credentials or channel ID
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: discord-runner-evidence
+          path: /tmp/fm-discord-verification/evidence.json
+          if-no-files-found: error
