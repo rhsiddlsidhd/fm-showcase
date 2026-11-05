@@ -2,7 +2,7 @@ import { PREFIX_PATTERN } from "../git-hooks/naming.ts";
 
 // Discord가 한 메시지에 허용하는 길이다.
 const MAX_LENGTH = 2000;
-const TITLE_PREFIX = new RegExp(
+export const TITLE_PREFIX = new RegExp(
   `^(?:${PREFIX_PATTERN})(?:\\([^)]*\\))?!?:\\s*`,
 );
 
