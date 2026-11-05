@@ -74,7 +74,7 @@ type ReportInput = {
   webhookUrl: string;
 };
 
-async function queryGitHub<Data>(
+export async function queryGitHub<Data>(
   token: string,
   query: string,
   variables: Record<string, unknown>,
