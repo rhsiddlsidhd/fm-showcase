@@ -1,0 +1,21 @@
+name: Issue start label
+
+on: create
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  label:
+    if: github.event.ref_type == 'branch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - run: node scripts/issue-start-label/index.ts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ github.event.ref }}
