@@ -101,7 +101,7 @@ export async function queryGitHub<Data>(
   return data;
 }
 
-async function sendToDiscord(webhookUrl: string, content: string) {
+export async function sendToDiscord(webhookUrl: string, content: string) {
   // wait 없이 보내면 저장되지 않은 메시지도 오류 없이 성공으로 끝난다.
   const url = new URL(webhookUrl);
   url.searchParams.set("wait", "true");

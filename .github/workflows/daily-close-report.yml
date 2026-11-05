@@ -1,0 +1,31 @@
+name: Daily close report
+
+on:
+  schedule:
+    # 04:07 KST. 범위는 코드가 04:00 KST로 고정하고, 붐비는 정각만 피한다.
+    - cron: "7 19 * * *"
+  workflow_dispatch:
+    inputs:
+      date:
+        description: 다시 기록할 날짜 (YYYY-MM-DD). 비우면 가장 최근에 끝난 하루
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - run: node scripts/daily-close-report/index.ts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          REPORT_DATE: ${{ inputs.date }}
