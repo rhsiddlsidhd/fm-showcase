@@ -8,7 +8,8 @@
 
 | 문서 | 읽는 조건 | 다루는 내용 |
 | ---- | --------- | ----------- |
-| [`commit.md`](./commit.md) | 커밋을 만들거나 커밋 메시지를 쓸 때 | 커밋의 AI 관여 선언 방식과 이유 |
+| [`branch.md`](./branch.md) | 브랜치를 만들 때. Issue 작업을 시작하거나 Issue를 닫을 때 | Issue 브랜치와 작업 브랜치 구조, Issue 닫는 방식과 이유 |
+| [`commit.md`](./commit.md) | 커밋을 만들거나 커밋 메시지를 쓸 때 | 커밋의 AI 관여 선언 방식과 이유, Issue 닫기 키워드 금지 |
 | [`pullRequest.md`](./pullRequest.md) | PR 제목·본문을 작성하거나 PR을 만들 때 | PR 제목·본문의 언어, 내용 범위, 작성 방식 |
 | [`merge.md`](./merge.md) | PR을 merge하거나 merge 방식을 설정할 때 | 작업 브랜치 PR의 merge 방식과 이유 |
 | [`issue.md`](./issue.md) | Issue를 만들거나 고칠 때. Issue 사이 관계를 걸 때 | Issue 템플릿·라벨 선택 기준, 제목, 본문 범위, 관계 표현 방식 |
