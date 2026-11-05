@@ -27,4 +27,4 @@ README의 증거 표는 "AI와 사람의 기여가 구분된다"를 커밋 트�
 
 ## Issue 닫기
 
-- 커밋 메시지에 Issue를 닫는 키워드를 쓰지 않는다. 작업 브랜치 커밋은 merge commit으로 기본 브랜치에 그대로 들어가므로, PR의 `Refs #N` 판단과 달리 Issue가 닫힐 수 있다. 닫기 판단은 [`pullRequest.md`](./pullRequest.md)의 `Issue` 칸에서만 한다.
+- 커밋 메시지에 Issue를 닫는 키워드를 쓰지 않는다. 작업 브랜치 커밋은 merge commit으로 기본 브랜치에 그대로 들어가므로, 완료 조건을 다 채우기 전에 Issue가 닫힐 수 있다. Issue는 [`branch.md`](./branch.md)의 Issue 브랜치로 닫는다.
