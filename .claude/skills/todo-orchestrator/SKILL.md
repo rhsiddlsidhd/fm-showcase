@@ -10,7 +10,7 @@ argument-hint: "[owner/repo ...] [선택할 Issue 번호]"
 todo-orchestrator ──(완성된 본문)──▶ discord-message ──▶ MCP ──▶ Discord
         │                                   │
    classification.md                    tools.md
-   docs/reports/formats.md
+   formats.md
 ```
 
 Issue 본문은 읽지 않는다. 제목·라벨·GitHub Relationships만으로 분류한다. 관계는 Relationships에만 있으므로(`docs/git/issue.md` "관계") 본문 없이 막힘을 판정할 수 있고, 같은 Issue 상태면 같은 후보가 나온다.
@@ -20,7 +20,7 @@ Issue 본문은 읽지 않는다. 제목·라벨·GitHub Relationships만으로 
 | 문서                                                           | 읽는 조건                                                            |
 | -------------------------------------------------------------- | -------------------------------------------------------------------- |
 | [`references/classification.md`](references/classification.md) | 상태 라벨, 상태·카테고리·관계 판정, 결과 순서, 표시 어휘가 필요할 때 |
-| [`docs/reports/formats.md`](../../../docs/reports/formats.md)  | 5단계에서 Discord 본문을 만들 때만                                   |
+| [`references/formats.md`](references/formats.md)               | 5단계에서 Discord 본문을 만들 때만                                   |
 
 두 문서의 항목을 이 파일에 옮겨 적지 않는다.
 
@@ -79,7 +79,7 @@ query($owner:String!,$repo:String!,$after:String){ repository(owner:$owner,name:
 
 ## 3단계: 사용자 선택 (체크박스)
 
-1. 터미널에 조회 범위, 현재 오늘 목록(`SELECTED`·`IN_PROGRESS`), 카테고리별 후보 목록을 먼저 보여준다. 카테고리는 `classification.md` "카테고리" 순서로 묶고, 항목은 `#번호 제목`에 같은 파일 "표시 어휘"를 붙인다. 제목은 GitHub 제목 그대로 쓴다. 고를 때 라벨과 접두사가 어긋난 Issue를 알아볼 수 있어야 한다. 넘친 후보(아래 3), 상위 묶음, 상태 라벨 중복은 번호와 제목만 따로 쓴다. 이 목록은 터미널 표시이므로 `docs/reports/formats.md`를 쓰지 않는다.
+1. 터미널에 조회 범위, 현재 오늘 목록(`SELECTED`·`IN_PROGRESS`), 카테고리별 후보 목록을 먼저 보여준다. 카테고리는 `classification.md` "카테고리" 순서로 묶고, 항목은 `#번호 제목`에 같은 파일 "표시 어휘"를 붙인다. 제목은 GitHub 제목 그대로 쓴다. 고를 때 라벨과 접두사가 어긋난 Issue를 알아볼 수 있어야 한다. 넘친 후보(아래 3), 상위 묶음, 상태 라벨 중복은 번호와 제목만 따로 쓴다. 이 목록은 터미널 표시이므로 `formats.md`를 쓰지 않는다.
 2. "후보만" 요청이면 여기서 끝낸다. 오늘 목록에 넣으려면 "오늘 계획 세워줘"로 다시 요청하라고 한 줄로 안내한다.
 3. 후보가 없으면 체크박스를 띄우지 않고 그렇다고 알린 뒤 끝낸다.
 4. `AskUserQuestion`을 `multiSelect: true`로 한 번 호출한다. 도구 상한은 질문 4개, 질문당 선택지 4개다.
@@ -110,7 +110,7 @@ query($owner:String!,$repo:String!,$after:String){ repository(owner:$owner,name:
 
 4단계에서 라벨이 하나라도 바뀌었을 때만 보낸다.
 
-1. 재조회한 오늘 목록을 `classification.md` "결과 순서"로 정렬하고, `docs/reports/formats.md`의 공통 규칙과 "📋 오늘 목록" 절로 본문을 만든다. 날짜는 한국 시간(`TZ=Asia/Seoul date +%F`)으로 구한다. 재조회 결과에 없는 항목을 넣지 않는다.
+1. 재조회한 오늘 목록을 `classification.md` "결과 순서"로 정렬하고, `references/formats.md`로 본문을 만든다. 날짜는 한국 시간(`TZ=Asia/Seoul date +%F`)으로 구한다. 재조회 결과에 없는 항목을 넣지 않는다.
 2. 이 세션에서 이미 알림을 보냈으면 그 메시지를 고치고, 처음이면 새로 보낸다. 둘 다 완성한 본문을 `discord-message`에 넘긴다. 채널 해석, 도구 호출, 실패 처리는 그 스킬이 맡는다. 전송 도구를 직접 부르지 않고, 채널 ID를 넘기지도 않는다.
 3. 메시지 ID는 이 세션에서 `discord-message`가 돌려준 값만 쓴다. 채널을 조회해 찾지 않고 어디에도 저장하지 않는다. 세션이 바뀌어 ID를 모르면 새로 보낸다. 그래서 같은 날 알림이 세션마다 하나씩 생길 수 있다. 원본은 상태 라벨이고 메시지는 알림이라 그대로 둔다.
 4. 수정은 Discord 푸시 알림을 보내지 않는다. 같은 세션의 두 번째 이후 변경은 알림 없이 반영된다.
