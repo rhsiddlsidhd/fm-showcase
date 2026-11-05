@@ -20,9 +20,9 @@ Issue 브랜치는 Issue에 연결된 브랜치다. Issue 하나의 작업을 �
 
 ## Issue 닫기
 
-- Issue 브랜치의 `main` PR은 Issue당 하나이고, merge되면 Issue가 닫힌다. PR 본문에 아무것도 쓰지 않아도 닫히고, 막을 수 없다.
+- Issue 브랜치의 `main` PR은 브랜치당 하나이고, merge되면 Issue가 닫힌다. PR 본문에 아무것도 쓰지 않아도 닫힌다.
 - 이 PR은 merge되면 Issue의 완료 조건이 전부 충족될 때만 연다.
-- merge 뒤에야 확인할 수 있는 조건이 있으면 merge 후 확인하고, 실패하면 Issue를 다시 연다.
+- merge 뒤에야 확인할 수 있는 조건이 있으면 merge 후 확인한다. 실패하면 Issue를 다시 열고 새 Issue 브랜치로 고친다.
 
 ## 이유
 
