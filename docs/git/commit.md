@@ -24,3 +24,7 @@ README의 증거 표는 "AI와 사람의 기여가 구분된다"를 커밋 트�
 
 - 한계: 자기 선언이라 위조를 막지 못한다. AI가 관여했는데 `AI-Assisted: none`을 쓴 경우도 잡지 못한다.
 - GitHub에서 만드는 merge commit은 로컬 훅이 돌지 않아 검사하지 않는다.
+
+## Issue 닫기
+
+- 커밋 메시지에 Issue를 닫는 키워드를 쓰지 않는다. 작업 브랜치 커밋은 merge commit으로 기본 브랜치에 그대로 들어가므로, PR의 `Refs #N` 판단과 달리 Issue가 닫힐 수 있다. 닫기 판단은 [`pullRequest.md`](./pullRequest.md)의 `Issue` 칸에서만 한다.
