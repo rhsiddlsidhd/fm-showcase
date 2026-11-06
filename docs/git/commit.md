@@ -20,7 +20,7 @@ README의 증거 표는 "AI와 사람의 기여가 구분된다"를 커밋 트�
 
 ## 판정
 
-`scripts/git-hooks`의 `commit-msg` 훅이 로컬 커밋에서 검사한다.
+`scripts/features/git-hooks`의 `commit-msg` 훅이 로컬 커밋에서 검사한다.
 
 - 한계: 자기 선언이라 위조를 막지 못한다. AI가 관여했는데 `AI-Assisted: none`을 쓴 경우도 잡지 못한다.
 - GitHub에서 만드는 merge commit은 로컬 훅이 돌지 않아 검사하지 않는다.

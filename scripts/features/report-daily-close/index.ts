@@ -1,11 +1,6 @@
-// `.github/workflows/daily-close-report.yml`이 호출한다.
+// `.github/workflows/report-daily-close.yml`이 호출한다.
+import { requireEnv } from "../../shared/utils/env.ts";
 import { reportDailyClose } from "./report.ts";
-
-function requireEnv(name: string): string {
-  const value = process.env[name];
-  if (!value) throw new Error(`환경변수가 없다: ${name}`);
-  return value;
-}
 
 await reportDailyClose({
   repository: requireEnv("GITHUB_REPOSITORY"),

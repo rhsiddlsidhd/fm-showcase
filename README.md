@@ -106,7 +106,7 @@ npm ci
 npm run dev
 ```
 
-`npm ci`가 끝나면 `prepare` 스크립트가 `core.hooksPath`를 `scripts/git-hooks`로 설정한다.
+`npm ci`가 끝나면 `prepare` 스크립트가 `core.hooksPath`를 `scripts/features/git-hooks`로 설정한다.
 
 ### 스크립트
 

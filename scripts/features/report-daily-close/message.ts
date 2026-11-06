@@ -1,9 +1,7 @@
-import { TITLE_PREFIX } from "../issue-closed-report/message.ts";
+import { IN_PROGRESS, SELECTED } from "../../shared/constants/labels.ts";
+import { MAX_LENGTH, TITLE_PREFIX } from "../../shared/constants/message.ts";
 import type { AttentionItem } from "./attention.ts";
 import type { DailyData, WorkItem } from "./query.ts";
-
-// Discord가 한 메시지에 허용하는 길이다.
-const MAX_LENGTH = 2000;
 
 type DailyMessageInput = DailyData & {
   date: string;
@@ -50,8 +48,7 @@ export function buildDailyMessage({
   attentionItems,
 }: DailyMessageInput): string {
   const unfinished = openIssues.filter(
-    ({ labels }) =>
-      labels.includes("SELECTED") || labels.includes("IN_PROGRESS"),
+    ({ labels }) => labels.includes(SELECTED) || labels.includes(IN_PROGRESS),
   );
 
   const completedSection = section(
@@ -66,7 +63,7 @@ export function buildDailyMessage({
       .map(
         (issue) =>
           issueLine(issue) +
-          (issue.labels.includes("IN_PROGRESS") ? " · 🔄 진행 중" : ""),
+          (issue.labels.includes(IN_PROGRESS) ? " · 🔄 진행 중" : ""),
       ),
     true,
   );

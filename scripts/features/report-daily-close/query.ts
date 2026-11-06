@@ -1,7 +1,6 @@
-import { queryGitHub } from "../issue-closed-report/report.ts";
+import { DEFAULT_BRANCH } from "../../shared/constants/git.ts";
+import { queryGitHub } from "../../shared/services/github.ts";
 import type { DayRange } from "./range.ts";
-
-const DEFAULT_BRANCH = "main";
 
 const DAILY_QUERY = `
   query ($owner: String!, $name: String!, $closedQuery: String!, $mergedQuery: String!) {

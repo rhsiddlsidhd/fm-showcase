@@ -1,11 +1,6 @@
-// `.github/workflows/issue-closed-report.yml`이 호출한다.
+// `.github/workflows/report-closed-issue.yml`이 호출한다.
+import { requireEnv } from "../../shared/utils/env.ts";
 import { reportClosedIssue } from "./report.ts";
-
-function requireEnv(name: string): string {
-  const value = process.env[name];
-  if (!value) throw new Error(`환경변수가 없다: ${name}`);
-  return value;
-}
 
 await reportClosedIssue({
   repository: requireEnv("GITHUB_REPOSITORY"),
