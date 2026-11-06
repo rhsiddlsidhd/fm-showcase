@@ -1,4 +1,5 @@
-import { DEFAULT_BRANCH, validateBranchName } from "./naming.ts";
+import { DEFAULT_BRANCH } from "../../shared/constants/git.ts";
+import { validateBranchName } from "./naming.ts";
 
 // 첫 커밋 전의 main 만 직접 커밋을 허용한다. 분리된 HEAD(브랜치 이름 없음, 리베이스 중 등)는 검사하지 않는다.
 export function validateCommitBranch(

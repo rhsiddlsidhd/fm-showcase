@@ -1,4 +1,8 @@
-import { KEBAB_PATTERN, PREFIXES, PREFIX_PATTERN } from "./naming.ts";
+import {
+  KEBAB_PATTERN,
+  PREFIXES,
+  PREFIX_PATTERN,
+} from "../../shared/constants/git.ts";
 
 const MAX_SUBJECT = 72;
 const SUBJECT = new RegExp(

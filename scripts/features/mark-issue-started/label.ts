@@ -1,4 +1,5 @@
-import { queryGitHub } from "../issue-closed-report/report.ts";
+import { IN_PROGRESS, SELECTED } from "../../shared/constants/labels.ts";
+import { queryGitHub } from "../../shared/services/github.ts";
 
 const OPEN_ISSUES_QUERY = `
   query ($owner: String!, $name: String!) {
@@ -80,9 +81,9 @@ export async function markIssueStarted({
   // 먼저 붙인다. 떼기가 실패해도 상태가 사라지지 않고 라벨 중복으로 드러난다.
   const labelsPath = `${repository}/issues/${issue.number}/labels`;
   await requestLabels(githubToken, labelsPath, "POST", {
-    labels: ["IN_PROGRESS"],
+    labels: [IN_PROGRESS],
   });
-  if (issue.labels.nodes.some((label) => label.name === "SELECTED")) {
-    await requestLabels(githubToken, `${labelsPath}/SELECTED`, "DELETE");
+  if (issue.labels.nodes.some((label) => label.name === SELECTED)) {
+    await requestLabels(githubToken, `${labelsPath}/${SELECTED}`, "DELETE");
   }
 }

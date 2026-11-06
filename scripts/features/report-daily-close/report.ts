@@ -1,4 +1,4 @@
-import { sendToDiscord } from "../issue-closed-report/report.ts";
+import { sendToDiscord } from "../../shared/services/discord.ts";
 import { findAttentionItems } from "./attention.ts";
 import { buildDailyMessage } from "./message.ts";
 import { fetchDailyData } from "./query.ts";
