@@ -17,6 +17,22 @@ export default tseslint.config(
     languageOptions: { globals: { ...globals.browser, ...globals.node } },
   },
   {
+    files: ["src/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              regex: "^@/shared/(ui|lib)(/index(\\.tsx?)?)?$",
+              message: "Import the module path, e.g. @/shared/ui/button.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     files: ["scripts/**/*.ts"],
     rules: { "@typescript-eslint/no-explicit-any": "off" },
   },

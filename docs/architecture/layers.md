@@ -124,7 +124,6 @@ src/pages/weather-app/
 | 세그먼트 | 내용 |
 | -------- | ---- |
 | `ui` | shadcn 복사본 |
-| `lib` | `cn` 재export |
 | `test` | 테스트 준비 코드 |
 | `routes` | 라우트 상수·패턴 |
 

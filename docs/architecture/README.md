@@ -46,15 +46,13 @@ FSD가 정의한 레이어는 **7개**다. 공식 문서 원문:
 
 [프로젝트 README](../../README.md#기준과-검증)의 구분을 따른다.
 
-설정으로 판정되는 규칙은 `steiger.config.js`가 정한다. 여기에 다시 쓰지 않는다. 아래는 설정으로 판정되지 않고 문서에만 있는 기준이다. 리뷰가 확인한다.
+설정으로 판정되는 규칙은 `steiger.config.js`와 `eslint.config.js`가 정한다. 여기에 다시 쓰지 않는다. 아래는 설정으로 판정되지 않고 문서에만 있는 기준이다. 리뷰가 확인한다.
 
 | 기준 | 정의한 곳 | 판정되지 않는 이유 |
 | ---- | --------- | ------------------ |
 | 슬라이스 디렉토리 이름은 kebab-case 소문자 | [`segments.md`](./segments.md) | 대소문자를 검사하는 Steiger 규칙이 없다. FSD가 슬라이스 이름을 표준화하지 않았다("The names of slices are not standardized") |
 | 무엇을 한 슬라이스로 볼지 | [`layers.md`](./layers.md) | 의미 판단이다 |
 | 조건부 레이어를 만들 시점 | [`layers.md`](./layers.md) | 의미 판단이다 |
-| 같은 슬라이스는 상대 경로, 다른 슬라이스는 절대 경로 | [`segments.md`](./segments.md) | `fsd/import-locality`가 `recommended`에 없다 |
-| public API의 와일드카드 재export 금지 | [`segments.md`](./segments.md) | `fsd/no-wildcard-exports`가 `recommended`에 없다 |
 | 페이지 컴포넌트에 값 가공 로직을 두지 않는다 | [`layers.md`](./layers.md) | 코드의 의미 판단이다 |
 
 ## 미결정
