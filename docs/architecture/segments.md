@@ -76,16 +76,5 @@ export const WeatherAppPage = () => (
 );
 ```
 
-- 와일드카드 재export(`export * from "./ui/Comment"`)를 쓰지 않는다. 슬라이스의 탐색성을 해치고 내부 구현을 노출한다.
-- 세그먼트마다 index를 또 만들지 않는다. 슬라이스 index 하나면 된다. `shared/ui`와 `shared/lib`는 예외로, 모듈마다 index를 둬서 번들에 쓰지 않는 의존이 들어가는 것을 막는다.
-
-## import 경로
-
-> When they are in the same slice, always use _relative_ imports and write the full import path. When they are in different slices, always use _absolute_ imports.
-
-| 범위 | 형태 | 예 |
-| ---- | ---- | -- |
-| 같은 슬라이스 안 | 상대 경로, 전체 경로 | `./ui/WeatherSearch` |
-| 다른 슬라이스 | 절대 경로 (alias) | `@/entities/challenge` |
-
-이 규칙의 판정 규칙(`fsd/import-locality`)은 Steiger의 `recommended`에 없다.
+- 세그먼트마다 index를 또 만들지 않는다. 슬라이스 index 하나면 된다.
+- `shared/ui`와 `shared/lib`는 예외로, index 없이 모듈 파일을 평면으로 둔다.
