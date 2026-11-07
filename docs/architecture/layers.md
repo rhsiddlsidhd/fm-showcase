@@ -131,7 +131,7 @@ src/pages/weather-app/
 | 세그먼트 | 내용 |
 | -------- | ---- |
 | `ui` | shadcn 복사본 |
-| `test` | 테스트 준비 코드 |
+| `test` | 전역 테스트 준비 코드 |
 | `routes` | 라우트 상수·패턴 |
 
 - `shared/ui`와 `shared/lib`의 index 규칙은 [public API](./segments.md#public-api)에 있다.
