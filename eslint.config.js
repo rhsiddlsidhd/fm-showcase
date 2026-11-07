@@ -41,6 +41,13 @@ export default tseslint.config(
       "testing-library/no-node-access": "error",
       "testing-library/prefer-screen-queries": "error",
       "testing-library/prefer-user-event": "error",
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "CallExpression[callee.property.name='dispatchEvent']",
+          message: "Use user-event instead of dispatching events directly.",
+        },
+      ],
     },
   },
   {
