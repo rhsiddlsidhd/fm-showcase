@@ -37,6 +37,8 @@ export default tseslint.config(
     files: ["src/**/*.test.{ts,tsx}"],
     plugins: { "testing-library": testingLibrary },
     rules: {
+      "testing-library/no-container": "error",
+      "testing-library/no-node-access": "error",
       "testing-library/prefer-screen-queries": "error",
       "testing-library/prefer-user-event": "error",
     },
