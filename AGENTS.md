@@ -12,7 +12,7 @@
 | [`docs/architecture/README.md`](docs/architecture/README.md) | `src/`에 디렉토리를 만들거나 코드를 어디 둘지 정할 때                                         | Feature-Sliced Design 레이어·세그먼트 규약의 인덱스          |
 | [`docs/git/README.md`](docs/git/README.md)                   | 브랜치, 커밋, push, PR, Issue를 만들거나 수정할 때. 커밋 메시지나 PR·Issue 내용을 작성할 때   | 이 저장소의 Git 규칙 인덱스. 전역 `GIT.md`를 덮어쓰는 항목   |
 | [`docs/testing/README.md`](docs/testing/README.md)           | 테스트를 쓰거나 고칠 때. 테스트 층이나 대역 범위를 정할 때                                    | 테스트 경계(층별 검증 범위, 대역 범위), 테스트 정책의 인덱스 |
-| [`docs/design/README.md`](docs/design/README.md)             | 도메인 설계 문서(`.sdd/`)를 만들거나 고칠 때. 화면 컴포넌트나 테마를 구현할 때                | 설계 문서 양식과 작성 규칙, 컴포넌트·테마 규칙의 인덱스      |
+| [`docs/design/README.md`](docs/design/README.md)             | 도메인 설계 문서(`.sdd/`)를 만들거나 고칠 때. 화면 컴포넌트나 테마를 구현할 때                | 설계 문서 구성과 작성 규칙, 컴포넌트·테마 규칙의 인덱스      |
 | [`docs/interview/README.md`](docs/interview/README.md)       | AI를 써서 만든 코드를 외부 면접 문항으로 채점할 때                                            | 동결된 면접 문항지 하나의 인덱스                             |
 
 ## 우선순위
