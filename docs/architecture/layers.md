@@ -63,18 +63,18 @@ FSD의 레이어 6개와 이 저장소에서의 적용이다. 공통 원칙은 [
 
 > It's not common for a page to have a dedicated data model, and tiny bits of state can be kept in the components themselves.
 
-이 저장소는 그 컴포넌트를 `ui/`의 [컨테이너 컴포넌트](../testing/test-boundaries.md#컴포넌트-분류)로 한정한다. 따라서 토글 하나를 위해 `model` 세그먼트를 만들지 않고 그 상태를 컨테이너 컴포넌트에 둔다. 분기가 늘어나면 그때 그 로직을 함수나 훅으로 떼어 `model`이나 `lib`로 내린다.
+이 저장소는 그 컴포넌트를 `ui/`의 [동작 컴포넌트](../testing/test-boundaries.md#컴포넌트-분류)로 한정한다. 따라서 토글 하나를 위해 `model` 세그먼트를 만들지 않고 그 상태를 동작 컴포넌트에 둔다. 분기가 늘어나면 그때 그 로직을 함수나 훅으로 떼어 `model`이나 `lib`로 내린다.
 페이지 컴포넌트는 `index.tsx`에 직접 정의하고 `ui/`의 컴포넌트를 배치만 한다.
 
 - 정적 값(상수, import한 데이터)을 props로 넘기는 것은 배치다.
-- 상태, 이벤트, 조건부 표시, 값 가공을 두지 않는다. 필요해지면 `ui/`의 컨테이너 컴포넌트로 내린다.
+- 상태, 이벤트, 조건부 표시, 값 가공을 두지 않는다. 필요해지면 `ui/`의 동작 컴포넌트로 내린다.
 
 예:
 
 ```
 src/pages/weather-app/
   index.tsx         페이지 컴포넌트이자 public API. app/routes가 여기만 본다
-  ui/               UI 컴포넌트 (표현·컨테이너)
+  ui/               UI 컴포넌트 (표시·동작)
   api/              네트워크 (있을 때)
   model/            상태·검증·변환 (있을 때)
 ```
