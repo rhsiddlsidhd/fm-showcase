@@ -2,14 +2,6 @@
 
 테스트 층마다 무엇을 진짜로 쓰고 무엇을 대역으로 바꾸는지, 어떤 동작을 어느 층에서 검증하는지 정한다.
 
-## 목차
-
-- [Unit 경계](#unit-경계)
-- [Component 경계](#component-경계)
-- [Integration 경계](#integration-경계)
-- [E2E 경계](#e2e-경계)
-- [의존성 격리 원칙](#의존성-격리-원칙)
-
 층을 가르는 기준은 **무엇을 진짜로 쓰는가**다. 같은 동작을 여러 층에서 검증할지는 [`test-policy.md`](./test-policy.md#중복-검증-금지)를 따른다.
 
 ## Unit 경계
@@ -21,6 +13,7 @@
 | 순수 함수 (검증, 변환, 계산, 정렬) | 입력과 출력만으로 판정된다                |
 | 상태 전이에 분기가 있는 훅         | 화면 없이 상태 전이를 확인한다            |
 | reducer, 상태 기계                 | 상태와 이벤트의 조합이 많아 표로 검증한다 |
+| `api/` 모듈                        | 요청과 응답 변환을 화면 없이 확인한다     |
 
 - `lib/`·`model/`(훅 포함)의 로직은 여기서 검증한다.
 - 언제 그쪽으로 내리는지는 [`layers.md`](../architecture/layers.md#pages)를 따른다.
@@ -67,7 +60,7 @@
 | 페이지 컴포넌트                         | 배치만 한다 ([`layers.md`](../architecture/layers.md#pages))                      |
 | 표시 컴포넌트                           | 상태가 없고 그리기만 한다. 연결이 맞는지는 부모 동작 컴포넌트의 테스트가 확인한다 |
 | `src/shared/ui/`의 shadcn 컴포넌트 자체 | 라이브러리가 보장한다. 얹은 조합은 이를 쓰는 동작 컴포넌트의 테스트에서 본다      |
-| 스타일 (Tailwind 클래스)                | 검증하지 않는다                                                                   |
+| 스타일 (Tailwind 클래스)                | 시각 일치는 사용자가 원본과 비교해 PR `Test plan`에 남긴다 ([`design`](../design/README.md#작성-규칙)) |
 
 ## Integration 경계
 
@@ -94,12 +87,13 @@ jsdom이 잡지 못하는 것만 빌드된 앱을 실제 브라우저로 검증�
 | 빌드 산출물이 실제로 동작하는가                   | 개발 서버와 빌드 결과가 다를 수 있다  |
 | 브라우저 고유 동작 (`<dialog>`, 스크롤, 클립보드) | jsdom이 구현하지 않거나 다르다        |
 
-- 빌드 산출물 확인은 챌린지당 대표 흐름 하나로 한다.
+- 빌드 산출물 확인은 슬라이스당 대표 흐름 하나로 한다.
 - 픽셀 단위 시각 일치는 검증하지 않는다.
 
 ## 의존성 격리 원칙
 
-- 대역은 비결정적이거나 jsdom에 없는 것에만 쓴다: HTTP, 시간, 난수, jsdom이 구현하지 않는 브라우저 API(`IntersectionObserver` 등). 예외는 Component의 `api/` 모듈 하나다.
+- 대역은 비결정적이거나 jsdom에 없는 것에만 쓴다: HTTP, 시간, 난수, jsdom이 구현하지 않는 브라우저 API(`IntersectionObserver` 등).
+- 예외는 Component의 `api/` 모듈 하나다. Component는 화면 동작만 검증하고 요청과 응답은 Unit이 맡는다. 이 차이가 Component와 Integration의 경계다.
 - 그 밖의 협력 대상(`lib/`·`model/`의 함수, 같은 모듈 안의 함수)은 대역으로 바꾸지 않는다. 필요해 보이면 대상 분리를 먼저 검토한다.
 - HTTP는 MSW로 고정한다.
 - 모듈 대역(`vi.mock`)은 위 예외에만 쓴다.
@@ -115,3 +109,26 @@ jsdom이 잡지 못하는 것만 빌드된 앱을 실제 브라우저로 검증�
 | Component   | Unit의 범위, `api/` 모듈                      | 렌더 범위 안의 컴포넌트, 훅, 상태                   |
 | Integration | Unit의 범위                                   | 렌더 범위 안의 컴포넌트, 훅, 상태, 라우터, `api/`   |
 | E2E         | 제3자 외부 네트워크만 (경로를 가로채 고정)    | 브라우저, 라우터, 빌드 결과물                       |
+
+### `api/` 계약
+
+Component는 `api/`를 대역으로 바꾸므로, Unit과 Component가 서로 다른 가짜 값으로 각자 통과할 수 있다. 양쪽을 같은 값으로 묶어 이를 막는다.
+
+- `api/` 함수는 실패를 throw하지 않고 성공과 실패의 유니온으로 반환한다. 실패가 타입에 드러나야 `typecheck`가 호출부를 확인한다.
+- 반환값은 성공과 실패마다 fixture 하나로 둔다. Unit은 `api/`가 그 fixture를 반환하는지 확인하고, Component의 `vi.mock`은 그 fixture를 돌려준다.
+- 호출 인자도 양쪽이 같은 값을 쓴다. Component는 동작 컴포넌트가 그 인자로 호출하는지, Unit은 그 인자가 기대한 HTTP 요청이 되는지 확인한다.
+
+## 파일 배치
+
+- 테스트 파일은 대상 파일 옆에 둔다.
+- 슬라이스의 fixture와 MSW 핸들러는 그 슬라이스의 `api/`에 `fixtures.ts`, `handlers.ts`로 둔다. 슬라이스 공개 API로 내보내지 않는다.
+- 여러 슬라이스가 쓰는 전역 준비 코드만 `src/shared/test/`에 둔다. 슬라이스 전용 타입을 쓰는 코드를 두면 `shared`가 `pages`를 import하게 된다.
+
+## `scripts/` 적용 범위
+
+`scripts/`는 화면이 없어 층이 Unit 하나다.
+
+- [Unit 경계](#unit-경계)와 [의존성 격리 원칙](#의존성-격리-원칙)을 적용한다.
+- Component, Integration, E2E, 컴포넌트 분류, [`api/` 계약](#api-계약)은 적용하지 않는다.
+- [`test-policy.md`](./test-policy.md)는 그대로 적용한다.
+- `scripts/features/git-hooks/`의 판정 로직도 대상이다.
