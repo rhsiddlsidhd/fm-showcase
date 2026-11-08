@@ -60,7 +60,7 @@
 | 페이지 컴포넌트                         | 배치만 한다 ([`layers.md`](../architecture/layers.md#pages))                      |
 | 표시 컴포넌트                           | 상태가 없고 그리기만 한다. 연결이 맞는지는 부모 동작 컴포넌트의 테스트가 확인한다 |
 | `src/shared/ui/`의 shadcn 컴포넌트 자체 | 라이브러리가 보장한다. 얹은 조합은 이를 쓰는 동작 컴포넌트의 테스트에서 본다      |
-| 스타일 (Tailwind 클래스)                | 시각 일치는 사용자가 원본과 비교해 PR `Test plan`에 남긴다 ([`design`](../design/README.md#작성-규칙)) |
+| 스타일 (Tailwind 클래스)                | 시각 일치는 사용자가 원본과 비교해 PR `Test plan`에 남긴다 ([`ui`](../ui/README.md#작성-규칙)) |
 
 ## Integration 경계
 
