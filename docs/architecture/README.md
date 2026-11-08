@@ -1,6 +1,6 @@
 # 아키텍처
 
-`src/`의 디렉토리 구조는 [Feature-Sliced Design](https://feature-sliced.design/)(FSD)을 따른다. 이 README는 인덱스이자 공통 원칙이고, 상세는 아래 문서에 둔다.
+`src/`의 디렉토리 구조는 [Feature-Sliced Design](https://feature-sliced.design/)(FSD)을 따른다. 이 README는 인덱스이자 공통 원칙이고, 상세는 아래 문서에 둔다. 앱의 경계는 [`boundary.md`](./boundary.md)에 있다.
 
 FSD를 고른 이유는 취향이 아니다. 이 저장소는 경로를 기계가 읽어 규칙을 판정하려 한다([기준과 검증](../../README.md#기준과-검증)). 그러려면 경로 규약이 **외부에 명세되어 있고 린터가 검사할 수 있어야** 한다. FSD는 둘 다 갖췄다.
 
@@ -10,6 +10,7 @@ FSD를 고른 이유는 취향이 아니다. 이 저장소는 경로를 기계�
 | ---- | --------- | ----------- |
 | [`layers.md`](./layers.md) | 새 디렉토리를 만들 때. 코드를 어느 레이어에 둘지 정할 때 | 6개 레이어의 정의, 이 저장소에 들어가는 것, 만드는 시점, 페이지 컴포넌트의 정의 |
 | [`segments.md`](./segments.md) | 레이어 안에 폴더를 만들 때. public API를 쓸 때 | 세그먼트 규약, 동결한 이름 집합, public API 규칙(`pages`의 `index.tsx` 예외 포함) |
+| [`boundary.md`](./boundary.md) | 외부 API를 호출할 때. 서버, 저장, 인증, 외부에 여는 API, 비밀값이 필요한 변경을 검토할 때 | 앱의 경계, 외부 API 호출 방식과 Vercel Functions 규칙, 경계를 넘는 변경의 절차, 비밀값을 두는 곳 |
 
 ## 레이어 어휘
 
