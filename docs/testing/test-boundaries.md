@@ -108,7 +108,7 @@ jsdom이 잡지 못하는 것만 빌드된 앱을 실제 브라우저로 검증�
 | Unit        | HTTP, 시간, 난수, jsdom에 없는 브라우저 API   | 대상, `lib/`·`model/`의 협력 함수                   |
 | Component   | Unit의 범위, `api/` 모듈                      | 렌더 범위 안의 컴포넌트, 훅, 상태                   |
 | Integration | Unit의 범위                                   | 렌더 범위 안의 컴포넌트, 훅, 상태, 라우터, `api/`   |
-| E2E         | 제3자 외부 네트워크만 (경로를 가로채 고정)    | 브라우저, 라우터, 빌드 결과물                       |
+| E2E         | 제3자 외부 네트워크, 루트 `api/` 경로 (경로를 가로채 고정) | 브라우저, 라우터, 빌드 결과물                       |
 
 ### `api/` 계약
 
@@ -132,3 +132,14 @@ Component는 `api/`를 대역으로 바꾸므로, Unit과 Component가 서로 �
 - Component, Integration, E2E, 컴포넌트 분류, [`api/` 계약](#api-계약)은 적용하지 않는다.
 - [`test-policy.md`](./test-policy.md)는 그대로 적용한다.
 - `scripts/features/git-hooks/`의 판정 로직도 대상이다.
+
+## 루트 `api/` 적용 범위
+
+루트 `api/`는 외부 API를 중계하는 Vercel Functions다([시스템 경계](../architecture/boundary.md#vercel-functions)). 슬라이스의 `api/` 세그먼트와 다르다.
+
+- 화면이 없어 층이 Unit 하나다. 함수 핸들러를 직접 호출한다.
+- 외부 API는 MSW로 고정한다.
+- 요청받은 주소와 관계없이 정해 둔 외부 주소만 호출하는지 검증한다.
+- 키가 필요한 외부 API는 키를 붙여 호출하고, 응답에 키가 들어가지 않는지 검증한다.
+- 외부 API가 실패하면 실패 응답을 돌려주는지 검증한다.
+- E2E는 `vite preview`로 띄워 함수가 실행되지 않는다. 함수는 Unit이 검증하므로 E2E에서는 루트 `api/` 경로를 가로채 고정 응답을 준다.
