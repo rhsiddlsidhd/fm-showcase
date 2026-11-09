@@ -6,6 +6,7 @@ import { parseSelection, toSearchParams } from "../model/query";
 import { getStackOptions } from "../model/stack-options";
 import { ChallengeRail } from "./ChallengeRail";
 import { EmptyState } from "./EmptyState";
+import { ResultSummary } from "./ResultSummary";
 import { ChallengeFilters } from "./ChallengeFilters";
 
 interface ShowcaseControllerProps {
@@ -51,10 +52,7 @@ export const ShowcaseController = ({ challenges }: ShowcaseControllerProps) => {
         showReset={hasSelection && hasResults}
         onReset={handleReset}
       />
-      <p>{countText}</p>
-      <div role="status" className="sr-only">
-        {announcement}
-      </div>
+      <ResultSummary countText={countText} announcement={announcement} />
       {!hasResults && (
         <>
           <p>조건에 맞는 챌린지가 없습니다.</p>
