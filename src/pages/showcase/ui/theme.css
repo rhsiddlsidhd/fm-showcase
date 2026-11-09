@@ -1,0 +1,150 @@
+/* Showcase 설계 테마. 모션 값은 ui/의 JS 상수로 별도 관리한다. */
+.theme-showcase {
+  color-scheme: dark;
+  --font-sans: "Noto Sans KR Variable", sans-serif;
+  --font-heading: var(--font-sans);
+  --background: #15181d;
+  --foreground: #f1f4f8;
+  --card: #242b35;
+  --card-foreground: var(--foreground);
+  --popover: var(--card);
+  --popover-foreground: var(--foreground);
+  --primary: #a8c7fa;
+  --primary-foreground: #142135;
+  --secondary: #303a49;
+  --secondary-foreground: #e4ebf5;
+  --muted: #252e3b;
+  --muted-foreground: #b5c0cf;
+  --accent: #39475b;
+  --accent-foreground: var(--foreground);
+  --destructive: #ffb4ab;
+  --border: #70829a;
+  --input: var(--border);
+  --ring: var(--primary);
+  --radius: 1rem;
+
+  --showcase-background-end: #202936;
+  --showcase-background-image: linear-gradient(
+    145deg,
+    var(--background),
+    var(--showcase-background-end)
+  );
+  --showcase-content-max-width: 76rem;
+  --showcase-page-inline-padding: clamp(1rem, 4vw, 3rem);
+  --showcase-page-block-padding: clamp(2rem, 6vw, 4rem);
+  --showcase-section-gap: 2rem;
+  --showcase-filter-group-gap: 1rem;
+  --showcase-option-gap: 0.625rem;
+  --showcase-rail-gap: 1.25rem;
+  --showcase-rail-inset: 0.375rem;
+  --showcase-rail-viewport-inset: 1rem;
+  --showcase-rail-visible-count: 1;
+  --showcase-card-height-ratio: 1.61803398875;
+  --showcase-card-max-width: calc(
+    (100svh - 2 * var(--showcase-rail-viewport-inset)) /
+      var(--showcase-card-height-ratio)
+  );
+  --showcase-rail-max-width: calc(
+    var(--showcase-rail-visible-count) * var(--showcase-card-max-width) +
+      (var(--showcase-rail-visible-count) - 1) * var(--showcase-rail-gap) + 2 *
+      var(--showcase-rail-inset)
+  );
+  --showcase-card-width: 100%;
+  --showcase-card-width-md: calc((100% - var(--showcase-rail-gap)) / 2);
+  --showcase-card-width-lg: calc((100% - 2 * var(--showcase-rail-gap)) / 3);
+  --showcase-card-aspect-ratio: 1 / var(--showcase-card-height-ratio);
+  --showcase-card-padding: clamp(1.25rem, 2vw, 1.75rem);
+  --showcase-card-content-gap: 1rem;
+  --showcase-card-radius: 1.25rem;
+  --showcase-card-shadow: 0 12px 32px rgb(0 0 0 / 0.18);
+  --showcase-border-width: 1px;
+  --showcase-focus-width: 2px;
+  --showcase-focus-offset: 3px;
+
+  --showcase-heading-size: clamp(1.75rem, 4vw, 2.75rem);
+  --showcase-heading-weight: 700;
+  --showcase-heading-leading: 1.3;
+  --showcase-heading-tracking: -0.025em;
+  --showcase-card-title-size: 1.25rem;
+  --showcase-card-title-weight: 600;
+  --showcase-card-title-leading: 1.5;
+  --showcase-body-size: 0.9375rem;
+  --showcase-body-weight: 400;
+  --showcase-body-leading: 1.75;
+  --showcase-label-size: 0.875rem;
+  --showcase-label-weight: 500;
+  --showcase-label-leading: 1.5;
+  --showcase-badge-size: 0.8125rem;
+  --showcase-badge-leading: 1.5;
+
+  --showcase-chip-radius: 999px;
+  --showcase-control-min-height: 2.75rem;
+  --showcase-chip-inline-padding: 0.875rem;
+  --showcase-chip-block-padding: 0.625rem;
+  --showcase-check-size: 1rem;
+  --showcase-check-gap: 0.5rem;
+  --showcase-button-radius: 0.75rem;
+  --showcase-badge-inline-padding: 0.625rem;
+  --showcase-badge-block-padding: 0.25rem;
+
+  --showcase-glass-tint: rgb(36 43 53 / 0.78);
+  --showcase-glass-highlight-tint: rgb(45 55 69 / 0.86);
+  --showcase-glass-blur: 14px;
+  --showcase-card-highlight: #2d3745;
+  /* 기본은 불투명. 효과 지원과 사용자 설정을 확인한 경우에만 비친다. */
+  --showcase-card-surface: var(--card);
+  --showcase-card-highlight-surface: var(--showcase-card-highlight);
+  --showcase-card-backdrop-filter: none;
+  --showcase-card-title-lines: 2;
+  --showcase-card-description-lines: 3;
+
+  font-family: var(--font-sans);
+  font-size: var(--showcase-body-size);
+  font-weight: var(--showcase-body-weight);
+  line-height: var(--showcase-body-leading);
+  background-color: var(--background);
+  background-image: var(--showcase-background-image);
+  background-attachment: fixed;
+}
+
+@media (width >= 48rem) {
+  .theme-showcase {
+    --showcase-rail-visible-count: 2;
+  }
+}
+
+@media (width >= 64rem) {
+  .theme-showcase {
+    --showcase-rail-visible-count: 3;
+  }
+}
+
+.theme-showcase .showcase-rail .showcase-card {
+  scroll-margin-block: var(--showcase-rail-inset);
+}
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .theme-showcase {
+    --showcase-card-surface: var(--showcase-glass-tint);
+    --showcase-card-highlight-surface: var(--showcase-glass-highlight-tint);
+    --showcase-card-backdrop-filter: blur(var(--showcase-glass-blur));
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .theme-showcase {
+    --showcase-card-surface: var(--card);
+    --showcase-card-highlight-surface: var(--showcase-card-highlight);
+    --showcase-card-backdrop-filter: none;
+  }
+}
+
+.theme-showcase .showcase-card {
+  background-color: var(--showcase-card-surface);
+  -webkit-backdrop-filter: var(--showcase-card-backdrop-filter);
+  backdrop-filter: var(--showcase-card-backdrop-filter);
+}
+
+.theme-showcase .showcase-card:is(:hover, :focus-visible) {
+  background-color: var(--showcase-card-highlight-surface);
+}

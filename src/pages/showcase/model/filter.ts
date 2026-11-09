@@ -1,7 +1,7 @@
 import type { Challenge, FilterSelection } from "./challenge";
 
 export function filterChallenges(
-  challenges: Challenge[],
+  challenges: readonly Challenge[],
   selection: FilterSelection,
 ): Challenge[] {
   return challenges.filter((challenge) => {

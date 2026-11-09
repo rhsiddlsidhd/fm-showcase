@@ -4,9 +4,11 @@ import type { Challenge, FilterSelection } from "../model/challenge";
 import { filterChallenges } from "../model/filter";
 import { parseSelection, toSearchParams } from "../model/query";
 import { getStackOptions } from "../model/stack-options";
+import { ChallengeFilters } from "./ChallengeFilters";
+import type { ToggleHandler } from "./ChallengeFilters";
 import { ChallengeRail } from "./ChallengeRail";
 import { EmptyState } from "./EmptyState";
-import { FilterPanel } from "./FilterPanel";
+import { ResultSummary } from "./ResultSummary";
 
 interface ShowcaseControllerProps {
   challenges: readonly Challenge[];
@@ -15,51 +17,64 @@ interface ShowcaseControllerProps {
 export const ShowcaseController = ({ challenges }: ShowcaseControllerProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [announcement, setAnnouncement] = useState("");
-  const isFirstRender = useRef(true);
+  const newbieButtonRef = useRef<HTMLButtonElement | null>(null);
+  const restoreFocus = useRef(false);
   const query = searchParams.toString();
+  const previousQuery = useRef(query);
   const selection = parseSelection(searchParams);
-  const filtered = filterChallenges([...challenges], selection);
+  const filtered = filterChallenges(challenges, selection);
   const hasResults = filtered.length > 0;
   const countText = `${filtered.length}개의 챌린지`;
 
   useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
+    if (previousQuery.current === query) {
       return;
     }
+    previousQuery.current = query;
     setAnnouncement(countText);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
-  if (challenges.length === 0) return <EmptyState />;
+  useEffect(() => {
+    if (!restoreFocus.current || query) return;
+    restoreFocus.current = false;
+    newbieButtonRef.current?.focus();
+  }, [query]);
 
-  const handleChange = (next: FilterSelection) =>
+  if (challenges.length === 0) return <EmptyState kind="unregistered" />;
+
+  const handleToggle: ToggleHandler = (group, value, checked) => {
+    const current: readonly string[] = selection[group];
+    const next: FilterSelection = {
+      ...selection,
+      [group]: checked
+        ? [...current, value]
+        : current.filter((item) => item !== value),
+    };
     setSearchParams(toSearchParams(next));
-  const handleReset = () => setSearchParams(new URLSearchParams());
+  };
+  const handleReset = () => {
+    restoreFocus.current = true;
+    setSearchParams(new URLSearchParams());
+  };
   const hasSelection = selection.difficulty.length + selection.stack.length > 0;
-  const resetButton = (
-    <button type="button" onClick={handleReset}>
-      필터 초기화
-    </button>
-  );
   return (
     <>
-      <FilterPanel
-        stackOptions={getStackOptions([...challenges])}
+      <ChallengeFilters
+        stackOptions={getStackOptions(challenges)}
         selection={selection}
-        onChange={handleChange}
+        onToggle={handleToggle}
+        showReset={hasSelection && hasResults}
+        onReset={handleReset}
+        newbieButtonRef={(element) => {
+          newbieButtonRef.current = element;
+        }}
       />
-      {hasSelection && hasResults && resetButton}
-      <p>{countText}</p>
-      <div role="status" className="sr-only">
-        {announcement}
-      </div>
-      {!hasResults && (
-        <>
-          <p>조건에 맞는 챌린지가 없습니다.</p>
-          {resetButton}
-        </>
-      )}
+      <ResultSummary
+        visibleCount={filtered.length}
+        announcement={announcement}
+      />
+      {!hasResults && <EmptyState kind="no-results" onReset={handleReset} />}
       <ChallengeRail challenges={filtered} />
     </>
   );
