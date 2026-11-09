@@ -1,5 +1,6 @@
 import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { StrictMode } from "react";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { Challenge } from "../model/challenge";
@@ -50,12 +51,13 @@ afterAll(() => {
   Element.prototype.scrollIntoView = originalScrollIntoView;
 });
 
-const renderAt = (url = "/") => {
+const renderAt = (url = "/", strictMode = false) => {
   const router = createMemoryRouter(
     [{ path: "/", element: <ShowcaseController challenges={challenges} /> }],
     { initialEntries: [url] },
   );
-  render(<RouterProvider router={router} />);
+  const page = <RouterProvider router={router} />;
+  render(strictMode ? <StrictMode>{page}</StrictMode> : page);
   return router;
 };
 
@@ -99,6 +101,25 @@ describe("ShowcaseController 결과 수와 낭독기 알림", () => {
 
     const status = screen.getByRole("status");
     expect(status.textContent).toBe("");
+  });
+
+  it("엄격 모드에서도 처음에는 결과 수를 알리지 않고 Newbie를 고른 뒤 같은 알림 영역에서 2개의 챌린지를 알린다", async () => {
+    const user = userEvent.setup();
+    renderAt("/", true);
+    const statusBefore = screen.getByRole("status");
+
+    const count = getVisibleCount();
+    expect(count).toBeVisible();
+    expect(count).toHaveTextContent(/^4개의 챌린지$/);
+    expect(screen.getByRole("status").textContent).toBe("");
+
+    await user.click(getNewbie());
+
+    await waitFor(() =>
+      expect(screen.getByRole("status")).toHaveTextContent(/^2개의 챌린지$/),
+    );
+    expect(getVisibleCount()).toHaveTextContent(/^2개의 챌린지$/);
+    expect(screen.getByRole("status")).toBe(statusBefore);
   });
 
   it("A~D 화면에서 Newbie를 고르면 보이는 결과 수가 2개의 챌린지로 바뀐다", async () => {
