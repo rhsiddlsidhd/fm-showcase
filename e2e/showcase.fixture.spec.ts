@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import { challenges } from "./fixtures/showcase-registry.ts";
 
 // Tailwind 기본 브레이크포인트: md = 48rem(768px), lg = 64rem(1024px).
@@ -16,6 +16,136 @@ const lastTitle = titles[titles.length - 1];
 function cardLink(page: Page, title: string) {
   return page.getByRole("link", { name: new RegExp(title) });
 }
+
+async function measureChipFocus(checkbox: Locator) {
+  return checkbox.evaluate((element) => {
+    const label = (element as HTMLButtonElement).labels?.[0];
+    if (!label) throw new Error("Checkbox에 연결된 레이블이 없다");
+    let chip: Element = label;
+    while (!chip.contains(element)) {
+      if (!chip.parentElement) throw new Error("Checkbox 칩을 찾을 수 없다");
+      chip = chip.parentElement;
+    }
+
+    const surface = chip.getBoundingClientRect();
+    const view = { left: 0, top: 0, right: innerWidth, bottom: innerHeight };
+    let ancestor = chip.parentElement;
+    while (ancestor) {
+      const style = getComputedStyle(ancestor);
+      const rect = ancestor.getBoundingClientRect();
+      if (style.overflowX !== "visible") {
+        view.left = Math.max(view.left, rect.left + ancestor.clientLeft);
+        view.right = Math.min(
+          view.right,
+          rect.left + ancestor.clientLeft + ancestor.clientWidth,
+        );
+      }
+      if (style.overflowY !== "visible") {
+        view.top = Math.max(view.top, rect.top + ancestor.clientTop);
+        view.bottom = Math.min(
+          view.bottom,
+          rect.top + ancestor.clientTop + ancestor.clientHeight,
+        );
+      }
+      ancestor = ancestor.parentElement;
+    }
+
+    // 작은 Checkbox의 링만으로 통과하지 않도록, 표시를 그리는 요소의
+    // 실제 사각형이 레이블과 체크 기호를 합성한 칩 전체를 덮는지 본다.
+    const indicators = [chip, ...chip.querySelectorAll("*")].flatMap((node) => {
+      const style = getComputedStyle(node);
+      const rect = node.getBoundingClientRect();
+      const width = parseFloat(style.outlineWidth) || 0;
+      if (
+        style.outlineStyle === "none" ||
+        style.outlineStyle === "hidden" ||
+        width <= 0 ||
+        style.outlineColor === "rgba(0, 0, 0, 0)" ||
+        style.visibility !== "visible" ||
+        Number(style.opacity) === 0 ||
+        rect.width <= 0 ||
+        rect.height <= 0
+      )
+        return [];
+      if (
+        rect.left > surface.left + 0.5 ||
+        rect.top > surface.top + 0.5 ||
+        rect.right < surface.right - 0.5 ||
+        rect.bottom < surface.bottom - 0.5
+      )
+        return [];
+
+      const spread = Math.max(
+        width + (parseFloat(style.outlineOffset) || 0),
+        0,
+      );
+      return [
+        {
+          left: rect.left - spread,
+          top: rect.top - spread,
+          right: rect.right + spread,
+          bottom: rect.bottom + spread,
+        },
+      ];
+    });
+    return {
+      focusedButton:
+        element instanceof HTMLButtonElement &&
+        document.activeElement === element,
+      wholeChipIndicator: indicators.length > 0,
+      indicatorUnclipped: indicators.some(
+        (rect) =>
+          rect.left >= view.left - 0.5 &&
+          rect.top >= view.top - 0.5 &&
+          rect.right <= view.right + 0.5 &&
+          rect.bottom <= view.bottom + 0.5,
+      ),
+    };
+  });
+}
+
+test("Tab과 Shift+Tab으로 Newbie·Junior Checkbox 버튼을 오가면 해당 칩 전체의 포커스 표시가 잘리지 않고 보인다", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const difficulty = page.getByRole("group", { name: "난이도", exact: true });
+  const newbie = difficulty.getByRole("checkbox", {
+    name: "Newbie",
+    exact: true,
+  });
+  const junior = difficulty.getByRole("checkbox", {
+    name: "Junior",
+    exact: true,
+  });
+  await expect(newbie).toBeVisible();
+  await page.evaluate(() => document.fonts.ready);
+  expect((await measureChipFocus(newbie)).wholeChipIndicator).toBe(false);
+  expect((await measureChipFocus(junior)).wholeChipIndicator).toBe(false);
+
+  for (let index = 0; index < 50; index += 1) {
+    await page.keyboard.press("Tab");
+    if (await newbie.evaluate((element) => element === document.activeElement))
+      break;
+  }
+  for (const [target, other, key] of [
+    [newbie, junior, null],
+    [junior, newbie, "Tab"],
+    [newbie, junior, "Shift+Tab"],
+  ] as const) {
+    if (key) await page.keyboard.press(key);
+    await expect(target).toBeFocused();
+    await expect
+      .poll(() => measureChipFocus(target))
+      .toEqual({
+        focusedButton: true,
+        wholeChipIndicator: true,
+        indicatorUnclipped: true,
+      });
+    await expect
+      .poll(async () => (await measureChipFocus(other)).wholeChipIndicator)
+      .toBe(false);
+  }
+});
 
 for (const area of [
   "체크 기호",
