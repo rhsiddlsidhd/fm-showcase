@@ -19,7 +19,9 @@ export const ShowcaseController = ({ challenges }: ShowcaseControllerProps) => {
   const query = searchParams.toString();
   const selection = parseSelection(searchParams);
   const filtered = filterChallenges([...challenges], selection);
+  const hasResults = filtered.length > 0;
   const countText = `${filtered.length}개의 챌린지`;
+
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
@@ -28,7 +30,9 @@ export const ShowcaseController = ({ challenges }: ShowcaseControllerProps) => {
     setAnnouncement(countText);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
+
   if (challenges.length === 0) return <EmptyState />;
+
   const handleChange = (next: FilterSelection) =>
     setSearchParams(toSearchParams(next));
   const handleReset = () => setSearchParams(new URLSearchParams());
@@ -45,12 +49,12 @@ export const ShowcaseController = ({ challenges }: ShowcaseControllerProps) => {
         selection={selection}
         onChange={handleChange}
       />
-      {hasSelection && filtered.length > 0 && resetButton}
+      {hasSelection && hasResults && resetButton}
       <p>{countText}</p>
       <div role="status" className="sr-only">
         {announcement}
       </div>
-      {filtered.length === 0 && (
+      {!hasResults && (
         <>
           <p>조건에 맞는 챌린지가 없습니다.</p>
           {resetButton}
