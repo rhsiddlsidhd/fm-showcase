@@ -1,3 +1,7 @@
+import { useId } from "react";
+
+import { Checkbox } from "@/shared/ui/checkbox";
+
 import { DIFFICULTIES } from "../model/challenge";
 import type { FilterSelection, Stack } from "../model/challenge";
 
@@ -15,6 +19,30 @@ interface ChallengeFiltersProps {
   onReset: () => void;
 }
 
+interface FilterChipProps {
+  label: string;
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
+}
+
+const FilterChip = ({ label, checked, onCheckedChange }: FilterChipProps) => {
+  const id = useId();
+  return (
+    <span className="relative inline-flex items-center gap-2 rounded-full border px-3 py-1">
+      <Checkbox
+        id={id}
+        nativeButton
+        render={<button type="button" />}
+        checked={checked}
+        onCheckedChange={onCheckedChange}
+      />
+      <label htmlFor={id} className="after:absolute after:inset-0">
+        {label}
+      </label>
+    </span>
+  );
+};
+
 export const ChallengeFilters = ({
   stackOptions,
   selection,
@@ -26,31 +54,25 @@ export const ChallengeFilters = ({
     <fieldset>
       <legend>난이도</legend>
       {DIFFICULTIES.map((difficulty) => (
-        <label key={difficulty}>
-          <input
-            type="checkbox"
-            value={difficulty}
-            checked={selection.difficulty.includes(difficulty)}
-            onChange={(event) =>
-              onToggle("difficulty", difficulty, event.target.checked)
-            }
-          />
-          {difficulty}
-        </label>
+        <FilterChip
+          key={difficulty}
+          label={difficulty}
+          checked={selection.difficulty.includes(difficulty)}
+          onCheckedChange={(checked) =>
+            onToggle("difficulty", difficulty, checked)
+          }
+        />
       ))}
     </fieldset>
     <fieldset>
       <legend>사용 기술</legend>
       {stackOptions.map((stack) => (
-        <label key={stack}>
-          <input
-            type="checkbox"
-            value={stack}
-            checked={selection.stack.includes(stack)}
-            onChange={(event) => onToggle("stack", stack, event.target.checked)}
-          />
-          {stack}
-        </label>
+        <FilterChip
+          key={stack}
+          label={stack}
+          checked={selection.stack.includes(stack)}
+          onCheckedChange={(checked) => onToggle("stack", stack, checked)}
+        />
       ))}
     </fieldset>
     {showReset && (
