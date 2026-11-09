@@ -115,6 +115,45 @@ async function measureFocusedCard(page: Page, title: string) {
   }, handle);
 }
 
+async function expectKeyboardCardExposure(page: Page) {
+  // 마지막 카드는 처음에 목록의 보이는 영역 밖에 있다.
+  await expect
+    .poll(async () =>
+      (await measureRail(page))?.fullyVisible.includes(
+        titles.indexOf(lastTitle!),
+      ),
+    )
+    .toBe(false);
+
+  const target = cardLink(page, lastTitle!);
+  const before = await target.boundingBox();
+  expect(before).not.toBeNull();
+  // 승인된 세로 황금비를 실제 링크 치수로 확인한다. 서브픽셀 반올림만 허용한다.
+  expect(
+    Math.abs(before!.height - before!.width * 1.61803398875),
+  ).toBeLessThanOrEqual(1);
+  for (let i = 0; i < 50; i += 1) {
+    await page.keyboard.press("Tab");
+    if (await target.evaluate((el) => el === document.activeElement)) break;
+  }
+  await expect(target).toBeFocused();
+  const after = await target.boundingBox();
+  expect(after).not.toBeNull();
+  expect(
+    Math.abs(after!.height - after!.width * 1.61803398875),
+  ).toBeLessThanOrEqual(1);
+  expect(Math.abs(after!.width - before!.width)).toBeLessThanOrEqual(0.5);
+  expect(Math.abs(after!.height - before!.height)).toBeLessThanOrEqual(0.5);
+
+  await expect
+    .poll(() => measureFocusedCard(page, lastTitle!))
+    .toEqual({
+      outlineShown: true,
+      linkVisible: true,
+      outlineVisible: true,
+    });
+}
+
 for (const { width, label, visible } of layouts) {
   test.describe(`화면 폭 ${width}px (${label})`, () => {
     test.use({ viewport: { width, height: 900 } });
@@ -167,29 +206,46 @@ for (const { width, label, visible } of layouts) {
     test("키보드로 화면 밖 카드에 포커스를 옮기면 카드 전체와 포커스 표시가 보인다", async ({
       page,
     }) => {
-      // 마지막 카드는 처음에 목록의 보이는 영역 밖에 있다.
+      await expectKeyboardCardExposure(page);
+    });
+  });
+}
+
+for (const { width, visible } of layouts.filter(
+  ({ width }) => width !== 1023,
+)) {
+  test.describe(`화면 ${width}×600px`, () => {
+    test.use({ viewport: { width, height: 600 } });
+
+    test(`낮은 화면에서도 카드 ${visible}개 노출과 황금비를 유지하며 키보드와 가로 스크롤로 탐색한다`, async ({
+      page,
+    }) => {
+      await page.goto("/");
+      await expect(cardLink(page, titles[0]!)).toBeVisible();
       await expect
-        .poll(async () =>
-          (await measureRail(page))?.fullyVisible.includes(
-            titles.indexOf(lastTitle!),
-          ),
+        .poll(
+          async () => (await measureRail(page))?.fullyVisible.length ?? null,
         )
-        .toBe(false);
-
-      const target = cardLink(page, lastTitle!);
-      for (let i = 0; i < 50; i += 1) {
-        await page.keyboard.press("Tab");
-        if (await target.evaluate((el) => el === document.activeElement)) break;
-      }
-      await expect(target).toBeFocused();
-
+        .toBe(visible);
       await expect
-        .poll(() => measureFocusedCard(page, lastTitle!))
-        .toEqual({
-          outlineShown: true,
-          linkVisible: true,
-          outlineVisible: true,
-        });
+        .poll(async () => {
+          const rail = await measureRail(page);
+          return rail ? new Set(rail.tops).size : null;
+        })
+        .toBe(1);
+      await expectKeyboardCardExposure(page);
+      const rail = await measureRail(page);
+      expect(rail?.scrollable).toBe(true);
+      await page.mouse.move(rail!.pointer.x, rail!.pointer.y);
+      await page.mouse.wheel(-2000, 0);
+      await expect
+        .poll(async () => (await measureRail(page))?.fullyVisible.includes(0))
+        .toBe(true);
+      await expect
+        .poll(
+          async () => (await measureRail(page))?.fullyVisible.length ?? null,
+        )
+        .toBe(visible);
     });
   });
 }
