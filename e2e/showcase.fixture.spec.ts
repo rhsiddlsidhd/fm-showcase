@@ -17,6 +17,101 @@ function cardLink(page: Page, title: string) {
   return page.getByRole("link", { name: new RegExp(title) });
 }
 
+for (const area of [
+  "체크 기호",
+  "레이블 글자",
+  "글자·체크 기호 밖 레이블 표면",
+] as const) {
+  test(`Newbie 칩의 ${area} 위치를 클릭하면 Newbie가 선택된다`, async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const checkbox = page
+      .getByRole("group", { name: "난이도", exact: true })
+      .getByRole("checkbox", { name: "Newbie", exact: true });
+    await expect(checkbox).toBeVisible();
+    await expect(checkbox).not.toBeChecked();
+    await page.evaluate(() => document.fonts.ready);
+    await checkbox.scrollIntoViewIfNeeded();
+
+    const point = await checkbox.evaluate((element, targetArea) => {
+      const control = element.getBoundingClientRect();
+      if (targetArea === "체크 기호") {
+        return {
+          x: control.x + control.width / 2,
+          y: control.y + control.height / 2,
+        };
+      }
+
+      const label = (element as HTMLButtonElement).labels?.[0];
+      if (!label) throw new Error("Newbie에 연결된 레이블이 없다");
+      const walker = document.createTreeWalker(label, NodeFilter.SHOW_TEXT);
+      let text = walker.nextNode();
+      while (text && !text.textContent?.includes("Newbie"))
+        text = walker.nextNode();
+      if (!text) throw new Error("레이블에 Newbie 글자가 없다");
+      const start = text.textContent!.indexOf("Newbie");
+      const range = document.createRange();
+      range.setStart(text, start);
+      range.setEnd(text, start + "Newbie".length);
+      const word = range.getBoundingClientRect();
+      if (targetArea === "레이블 글자") {
+        // 첫 글자 N의 실제 텍스트 영역 중앙을 누른다.
+        range.setEnd(text, start + 1);
+        const letter = range.getBoundingClientRect();
+        return {
+          x: letter.x + letter.width / 2,
+          y: letter.y + letter.height / 2,
+        };
+      }
+
+      // 레이블은 가상 요소로 칩 전체에 클릭 영역을 넓힐 수도 있다.
+      // 연결된 레이블과 체크박스를 함께 담은 칩의 실제 치수를 쓴다.
+      let chip: Element = label;
+      while (!chip.contains(element)) {
+        if (!chip.parentElement) throw new Error("Newbie 칩을 찾을 수 없다");
+        chip = chip.parentElement;
+      }
+      const surface = chip.getBoundingClientRect();
+      const left = Math.min(word.left, control.left);
+      const right = Math.max(word.right, control.right);
+      const top = Math.min(word.top, control.top);
+      const bottom = Math.max(word.bottom, control.bottom);
+      const centerX = surface.x + surface.width / 2;
+      const centerY = surface.y + surface.height / 2;
+      const spaces = [
+        { gap: left - surface.left, x: (surface.left + left) / 2, y: centerY },
+        {
+          gap: surface.right - right,
+          x: (right + surface.right) / 2,
+          y: centerY,
+        },
+        { gap: top - surface.top, x: centerX, y: (surface.top + top) / 2 },
+        {
+          gap: surface.bottom - bottom,
+          x: centerX,
+          y: (bottom + surface.bottom) / 2,
+        },
+      ].sort((a, b) => b.gap - a.gap);
+      const space = spaces[0]!;
+      if (space.gap <= 2)
+        throw new Error("레이블에 글자·체크 기호 밖 클릭 가능한 여백이 없다");
+      const hit = document.elementFromPoint(space.x, space.y);
+      if (!hit || !label.contains(hit)) {
+        throw new Error("칩의 여백 좌표가 연결된 레이블 표면에 닿지 않는다");
+      }
+      return { x: space.x, y: space.y };
+    }, area);
+
+    await page.mouse.click(point.x, point.y);
+
+    await expect(checkbox).toBeChecked();
+    await expect
+      .poll(() => new URL(page.url()).searchParams.getAll("difficulty"))
+      .toEqual(["Newbie"]);
+  });
+}
+
 // 카드들을 담은 가로 스크롤 영역(Rail)의 보이는 범위 안에 카드가 전부 들어오는지 본다.
 // 가로 스크롤 영역이 없으면 null을 돌려준다.
 async function measureRail(page: Page) {
