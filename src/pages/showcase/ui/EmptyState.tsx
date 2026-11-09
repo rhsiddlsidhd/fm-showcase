@@ -7,11 +7,17 @@ type EmptyStateProps =
 
 export const EmptyState = (props: EmptyStateProps) => {
   if (props.kind === "unregistered") {
-    return <p>아직 등록된 챌린지가 없습니다.</p>;
+    return (
+      <p className="text-foreground text-(length:--showcase-body-size) leading-(--showcase-body-leading)">
+        아직 등록된 챌린지가 없습니다.
+      </p>
+    );
   }
   return (
     <>
-      <p>조건에 맞는 챌린지가 없습니다.</p>
+      <p className="text-foreground text-(length:--showcase-body-size) leading-(--showcase-body-leading)">
+        조건에 맞는 챌린지가 없습니다.
+      </p>
       <Button
         type="button"
         variant="secondary"

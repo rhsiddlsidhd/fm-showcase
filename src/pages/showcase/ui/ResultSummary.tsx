@@ -8,7 +8,9 @@ export const ResultSummary = ({
   announcement,
 }: ResultSummaryProps) => (
   <>
-    <p>{visibleCount}개의 챌린지</p>
+    <p className="text-muted-foreground text-(length:--showcase-body-size) leading-(--showcase-body-leading)">
+      {visibleCount}개의 챌린지
+    </p>
     <div role="status" className="sr-only">
       {announcement}
     </div>
