@@ -5,6 +5,7 @@ import { filterChallenges } from "../model/filter";
 import { parseSelection, toSearchParams } from "../model/query";
 import { getStackOptions } from "../model/stack-options";
 import { ChallengeFilters } from "./ChallengeFilters";
+import type { ToggleHandler } from "./ChallengeFilters";
 import { ChallengeRail } from "./ChallengeRail";
 import { EmptyState } from "./EmptyState";
 import { ResultSummary } from "./ResultSummary";
@@ -34,8 +35,16 @@ export const ShowcaseController = ({ challenges }: ShowcaseControllerProps) => {
 
   if (challenges.length === 0) return <EmptyState kind="unregistered" />;
 
-  const handleChange = (next: FilterSelection) =>
+  const handleToggle: ToggleHandler = (group, value, checked) => {
+    const current: readonly string[] = selection[group];
+    const next: FilterSelection = {
+      ...selection,
+      [group]: checked
+        ? [...current, value]
+        : current.filter((item) => item !== value),
+    };
     setSearchParams(toSearchParams(next));
+  };
   const handleReset = () => setSearchParams(new URLSearchParams());
   const hasSelection = selection.difficulty.length + selection.stack.length > 0;
   return (
@@ -43,11 +52,14 @@ export const ShowcaseController = ({ challenges }: ShowcaseControllerProps) => {
       <ChallengeFilters
         stackOptions={getStackOptions([...challenges])}
         selection={selection}
-        onChange={handleChange}
+        onToggle={handleToggle}
         showReset={hasSelection && hasResults}
         onReset={handleReset}
       />
-      <ResultSummary countText={countText} announcement={announcement} />
+      <ResultSummary
+        visibleCount={filtered.length}
+        announcement={announcement}
+      />
       {!hasResults && <EmptyState kind="no-results" onReset={handleReset} />}
       <ChallengeRail challenges={filtered} />
     </>

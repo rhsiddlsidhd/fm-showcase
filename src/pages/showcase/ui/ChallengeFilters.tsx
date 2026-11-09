@@ -1,25 +1,24 @@
 import { DIFFICULTIES } from "../model/challenge";
 import type { FilterSelection, Stack } from "../model/challenge";
 
+export type ToggleHandler = <G extends keyof FilterSelection>(
+  group: G,
+  value: FilterSelection[G][number],
+  checked: boolean,
+) => void;
+
 interface ChallengeFiltersProps {
   stackOptions: readonly Stack[];
   selection: FilterSelection;
-  onChange: (selection: FilterSelection) => void;
+  onToggle: ToggleHandler;
   showReset: boolean;
   onReset: () => void;
 }
 
-const toggle = <T extends string>(
-  values: readonly T[],
-  value: T,
-  checked: boolean,
-): T[] =>
-  checked ? [...values, value] : values.filter((item) => item !== value);
-
 export const ChallengeFilters = ({
   stackOptions,
   selection,
-  onChange,
+  onToggle,
   showReset,
   onReset,
 }: ChallengeFiltersProps) => (
@@ -33,14 +32,7 @@ export const ChallengeFilters = ({
             value={difficulty}
             checked={selection.difficulty.includes(difficulty)}
             onChange={(event) =>
-              onChange({
-                ...selection,
-                difficulty: toggle(
-                  selection.difficulty,
-                  difficulty,
-                  event.target.checked,
-                ),
-              })
+              onToggle("difficulty", difficulty, event.target.checked)
             }
           />
           {difficulty}
@@ -55,12 +47,7 @@ export const ChallengeFilters = ({
             type="checkbox"
             value={stack}
             checked={selection.stack.includes(stack)}
-            onChange={(event) =>
-              onChange({
-                ...selection,
-                stack: toggle(selection.stack, stack, event.target.checked),
-              })
-            }
+            onChange={(event) => onToggle("stack", stack, event.target.checked)}
           />
           {stack}
         </label>
