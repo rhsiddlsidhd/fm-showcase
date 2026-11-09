@@ -19,18 +19,18 @@ export const ShowcaseController = ({ challenges }: ShowcaseControllerProps) => {
   const [announcement, setAnnouncement] = useState("");
   const newbieButtonRef = useRef<HTMLButtonElement | null>(null);
   const restoreFocus = useRef(false);
-  const isFirstRender = useRef(true);
   const query = searchParams.toString();
+  const previousQuery = useRef(query);
   const selection = parseSelection(searchParams);
   const filtered = filterChallenges(challenges, selection);
   const hasResults = filtered.length > 0;
   const countText = `${filtered.length}개의 챌린지`;
 
   useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
+    if (previousQuery.current === query) {
       return;
     }
+    previousQuery.current = query;
     setAnnouncement(countText);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
