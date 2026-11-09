@@ -49,9 +49,11 @@ async function measureRail(page: Page) {
         .map(({ index }) => index),
       tops: rects.map((rect) => Math.round(rect.top)),
       scrollable: scroller.scrollWidth > scroller.clientWidth,
-      center: {
-        x: (box.left + box.right) / 2,
-        y: (box.top + box.bottom) / 2,
+      // 목록 중 뷰포트 안에 보이는 부분의 중앙. 카드가 뷰포트보다 높아도
+      // 휠 입력이 실제로 목록 위에서 일어나게 한다.
+      pointer: {
+        x: (Math.max(box.left, 0) + Math.min(box.right, innerWidth)) / 2,
+        y: (Math.max(box.top, 0) + Math.min(box.bottom, innerHeight)) / 2,
       },
     };
   }, handles);
@@ -92,8 +94,10 @@ for (const { width, label, visible } of layouts) {
         .poll(async () => (await measureRail(page))?.scrollable ?? null)
         .toBe(true);
 
+      // 사용자가 목록을 화면 안으로 끌어온 뒤 그 위에서 가로로 넘긴다.
+      await cardLink(page, titles[0]!).scrollIntoViewIfNeeded();
       const rail = await measureRail(page);
-      await page.mouse.move(rail!.center.x, rail!.center.y);
+      await page.mouse.move(rail!.pointer.x, rail!.pointer.y);
       await page.mouse.wheel(2000, 0);
 
       await expect
