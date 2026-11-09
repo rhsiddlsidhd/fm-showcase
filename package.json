@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "test": "vitest run",
-    "test:e2e": "playwright test --pass-with-no-tests",
+    "test:e2e": "playwright test",
     "typecheck": "tsc -p tsconfig.app.json && tsc -p tsconfig.node.json",
     "dev": "vite",
     "build": "tsc -p tsconfig.app.json && vite build",
