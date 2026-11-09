@@ -1,3 +1,7 @@
+import { Button } from "@/shared/ui/button";
+
+import { RESET_BUTTON_CLASS } from "./ChallengeFilters";
+
 type EmptyStateProps =
   { kind: "unregistered" } | { kind: "no-results"; onReset: () => void };
 
@@ -8,9 +12,14 @@ export const EmptyState = (props: EmptyStateProps) => {
   return (
     <>
       <p>조건에 맞는 챌린지가 없습니다.</p>
-      <button type="button" onClick={props.onReset}>
+      <Button
+        type="button"
+        variant="secondary"
+        onClick={props.onReset}
+        className={RESET_BUTTON_CLASS}
+      >
         필터 초기화
-      </button>
+      </Button>
     </>
   );
 };
