@@ -13,16 +13,20 @@ description: "기능 하나를 테스트 선행으로 구현하는 오케스트�
 
 ## 에이전트 구성
 
-Codex 기본 서브에이전트에 `references/prompts.md`의 공통 블록과 역할 블록을 전달한다. OMC 플러그인과 Claude 전용 에이전트 정의는 사용하지 않는다. 별도 커스텀 에이전트 설정은 필요하지 않다.
+OMC 5.7.5 전문 에이전트의 원본 본문을 보존한 `.codex/agents/omc-*.toml`을 사용한다. 각 파일의 `developer_instructions` 뒤에 이 하네스의 역할별 프롬프트를 붙인다. TOML의 Codex 이식·저장소 우선 규칙이 OMC 원본보다 우선하고, 호출별 범위·검증·보고서 지시가 그보다 구체적이다.
 
-| 역할        | task_name 예시       | 모델                     | 수정 가능 경로               |
-| ----------- | -------------------- | ------------------------ | ---------------------------- |
-| 테스트 작성 | `test_engineer_31`   | 부모 모델·추론 수준 상속 | 이번 바퀴의 테스트 경로      |
-| 구현        | `executor_32`        | 부모 모델·추론 수준 상속 | 이번 바퀴의 구현 경로        |
-| 정리        | `code_simplifier_40` | 부모 모델·추론 수준 상속 | 이번 실행에서 만든 구현 경로 |
-| 종합 검증   | `verifier_41`        | 부모 모델·추론 수준 상속 | 없음(프롬프트로 쓰기 금지)   |
+| 역할        | 원본 OMC 전문 에이전트             | 원본 모델                         | Codex 정의                               | Codex 모델·추론                                                         |
+| ----------- | ---------------------------------- | --------------------------------- | ---------------------------------------- | ----------------------------------------------------------------------- |
+| 테스트 작성 | `oh-my-claudecode:test-engineer`   | `opus`                            | `.codex/agents/omc-test-engineer.toml`   | `gpt-6-astra`, `high`                                                   |
+| 구현        | `oh-my-claudecode:executor`        | `sonnet`, 구현 문제 재시도 `opus` | `.codex/agents/omc-executor.toml`        | 첫 호출 `gpt-6.1-sol`, `medium`; 구현 문제 재시도 `gpt-6-astra`, `high` |
+| 정리        | `oh-my-claudecode:code-simplifier` | `opus`                            | `.codex/agents/omc-code-simplifier.toml` | `gpt-6-astra`, `high`                                                   |
+| 종합 검증   | `oh-my-claudecode:verifier`        | `opus`                            | `.codex/agents/omc-verifier.toml`        | `gpt-6-astra`, `high`                                                   |
 
-Claude의 opus/sonnet 비용별 배정과 재시도 시 모델 승격은 이식하지 않는다. 모델 변경이 필요하면 사용자의 명시적 선택을 따른다. 서브에이전트의 도구와 권한은 부모 세션을 상속한다. 역할별 읽기·쓰기 범위는 프롬프트 지시이며 강제 격리가 아니다. verifier도 도구가 제거된 것이 아니라 파일 수정 금지 지시를 받는다. 이 한계를 강제 격리로 보고하지 않는다.
+모델 배정은 원본 실행 오케스트레이터의 역할별 배정이 기준이다(원본 개별 에이전트의 기본 모델과 다를 수 있다). Opus→Astra, Sonnet→Sol은 역할·비용 구분을 보존하기 위한 선정이며 모델 성능 동등성을 뜻하지 않는다. Claude/OMC 런타임을 실행하는 것이 아니라 원본 전문 지침을 Codex 런타임에서 실행한다.
+
+호출 전에 해당 TOML을 읽어 `name`, `model`, `model_reasoning_effort`, `developer_instructions`를 확인한다. 현재 위임 도구가 커스텀 에이전트 선택을 지원하면 그 정의를 사용한다. `collaboration.spawn_agent`처럼 `agent_type` 선택 인자가 없으면 `fork_turns="none"`과 명시적 `model`·`reasoning_effort`를 지정하고, `developer_instructions` 전문 + 공통 블록 + 역할별 블록을 `message`로 전달한다. 파일명만 전달하거나 원본 지침 없이 역할 이름만 붙이는 호출은 하지 않는다. 실제 전달한 전문을 `_workspace/{NN}_{agent}_prompt.md`에 저장한다.
+
+도구와 권한은 부모 세션을 상속한다. verifier의 원본 `disallowedTools: Write, Edit`는 파일 쓰기 금지 지시로 대응하며 도구 수준 차단은 아니다. 역할별 읽기·쓰기 범위도 프롬프트 지시다. OMC의 `level` 메타데이터는 Codex 필드로 만들지 않는다. 원본 라이선스는 `.codex/agents/OMC-LICENSE`에 보존한다.
 
 **경로 구분:** 테스트 경로는 `*.test.*`, `*.spec.*`, `e2e/**`, `src/shared/test/**`다. 구현 경로는 테스트 경로를 뺀 `src/**`다. 설정 파일, `docs/`, `AGENTS.md`, `package.json`, `.sdd/`는 어느 에이전트도 고치지 않는다. 바꿔야 하면 멈추고 사용자에게 묻는다.
 
@@ -164,7 +168,7 @@ _workspace/
 **⑥ 구현 확인**
 
 - `git status --porcelain -uall`의 경로가 모두 이번 바퀴의 구현 경로 안이어야 한다. **테스트 경로가 하나라도 있으면** 그 경로를 되돌리고 재시도 1회를 써서 다시 부른다.
-- 아래 「구현 확인 명령」이 모두 통과해야 한다. 실패하면 실패 출력을 넣어 재시도 1회로 다시 부른다. 재시도에서도 부모 모델·추론 수준을 상속한다.
+- 아래 「구현 확인 명령」이 모두 통과해야 한다. 실패하면 실패 출력을 넣어 재시도 1회로 다시 부른다. 구현 문제 재시도에서는 `gpt-6-astra`와 `high`를 명시한다.
 - 보고서의 `## 실행한 명령`과 직접 실행한 결과가 다르면 직접 실행한 결과를 따르고, 차이를 `{NN}_checks.md`에 남긴다.
 
 **⑦ 구현 커밋**
@@ -272,7 +276,7 @@ executor가 `TEST_CONFLICT`를 내면 오케스트레이터가 근거(테스트 
 
 ## Codex 이식
 
-- 2026-11-09: 프로젝트 Claude 스킬을 Codex 순차 서브에이전트 호출로 이식했다. 기존 `_workspace/`와 재시도 횟수·커밋 순서는 그대로 이어받는다.
+- 2026-11-09: 최초 이전에서 누락한 OMC 5.7.5 전문 지침 네 개와 역할별 모델 배정을 복원했다. 프로젝트 Claude 스킬을 Codex 순차 서브에이전트 호출로 이식했다. 기존 `_workspace/`와 재시도 횟수·커밋 순서는 그대로 이어받는다.
 - 공식 문서: https://learn.chatgpt.com/docs/agent-configuration/subagents
 
 ## 변경 이력

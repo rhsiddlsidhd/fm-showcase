@@ -1,20 +1,10 @@
-Migration inventory:
-  inactive: instruction files - none found
-  active: skills - 1 found
-    - implement-orchestrator
-  inactive: command sources - none found
-  inactive: subagents - none found
-Migration surfaces:
-  inactive: AGENTS.md - No supported instruction file found.
-  active: skills - 1 skill(s) converted.
-  inactive: MCP config - Not selected by CLI flags.
-  inactive: subagents - Not selected by CLI flags.
-Migration report:
-  rewritten: .agents/skills/implement-orchestrator/SKILL.md - Converted Claude skill.
-
-Codex adaptation review:
-  reviewed: implement-orchestrator - Sequential fresh Codex subagents; no OMC dependency.
-  behavior_changed: Models inherit parent; Claude opus/sonnet routing not retained.
-  limitation: Role read/write boundaries remain prompt guidance, not enforced isolation.
-  preserved: Existing _workspace records, RED-before-implementation commits, retry limits.
-  scope: Only implement-orchestrator selected; other skills and configuration unchanged.
+OMC specialist migration correction, 2026-11-09
+Source: oh-my-claudecode 5.7.5 (MIT)
+Four complete source agent prompt bodies preserved in .codex/agents/omc-*.toml.
+Source SHA256 included in each file; original license retained.
+Harness original Opus roles -> gpt-6-astra/high. Sonnet executor -> gpt-6.1-sol/medium, implementation retry -> gpt-6-astra/high.
+Source level metadata omitted. Verifier Write/Edit prohibition retained as prompt guidance, not tool isolation.
+Claude tools mapped to available Codex tools; repository role boundaries override source agent defaults.
+Skill now requires full specialist instructions and explicit model settings in each fresh sequential call.
+Earlier generic test-engineer call 31 is preserved in history; specialist review is required before implementation.
+Official guidance: https://learn.chatgpt.com/docs/agent-configuration/subagents and https://learn.chatgpt.com/docs/models
