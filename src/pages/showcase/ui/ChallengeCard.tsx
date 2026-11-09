@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { Badge } from "@/shared/ui/badge";
 import type { Challenge } from "../model/challenge";
 import { challengePath } from "../model/challenge-path";
 
@@ -9,10 +10,12 @@ interface ChallengeCardProps {
 export const ChallengeCard = ({ challenge }: ChallengeCardProps) => (
   <Link to={challengePath(challenge.slug)} aria-label={challenge.title}>
     <h2>{challenge.title}</h2>
-    <span>{challenge.difficulty}</span>
+    <Badge>{challenge.difficulty}</Badge>
     <ul>
       {challenge.stack.map((stack) => (
-        <li key={stack}>{stack}</li>
+        <li key={stack}>
+          <Badge>{stack}</Badge>
+        </li>
       ))}
     </ul>
     <p>{challenge.description}</p>
