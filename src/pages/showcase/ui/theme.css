@@ -37,10 +37,22 @@
   --showcase-option-gap: 0.625rem;
   --showcase-rail-gap: 1.25rem;
   --showcase-rail-inset: 0.375rem;
+  --showcase-rail-viewport-inset: 1rem;
+  --showcase-rail-visible-count: 1;
+  --showcase-card-height-ratio: 1.61803398875;
+  --showcase-card-max-width: calc(
+    (100svh - 2 * var(--showcase-rail-viewport-inset)) /
+      var(--showcase-card-height-ratio)
+  );
+  --showcase-rail-max-width: calc(
+    var(--showcase-rail-visible-count) * var(--showcase-card-max-width) +
+      (var(--showcase-rail-visible-count) - 1) * var(--showcase-rail-gap) + 2 *
+      var(--showcase-rail-inset)
+  );
   --showcase-card-width: 100%;
   --showcase-card-width-md: calc((100% - var(--showcase-rail-gap)) / 2);
   --showcase-card-width-lg: calc((100% - 2 * var(--showcase-rail-gap)) / 3);
-  --showcase-card-aspect-ratio: 1 / 1.61803398875;
+  --showcase-card-aspect-ratio: 1 / var(--showcase-card-height-ratio);
   --showcase-card-padding: clamp(1.25rem, 2vw, 1.75rem);
   --showcase-card-content-gap: 1rem;
   --showcase-card-radius: 1.25rem;
@@ -93,6 +105,22 @@
   background-color: var(--background);
   background-image: var(--showcase-background-image);
   background-attachment: fixed;
+}
+
+@media (width >= 48rem) {
+  .theme-showcase {
+    --showcase-rail-visible-count: 2;
+  }
+}
+
+@media (width >= 64rem) {
+  .theme-showcase {
+    --showcase-rail-visible-count: 3;
+  }
+}
+
+.theme-showcase .showcase-rail .showcase-card {
+  scroll-margin-block: var(--showcase-rail-inset);
 }
 
 @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {

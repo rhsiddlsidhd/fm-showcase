@@ -6,7 +6,12 @@ interface ChallengeRailProps {
 }
 
 export const ChallengeRail = ({ challenges }: ChallengeRailProps) => (
-  <ul className="flex snap-x snap-mandatory scroll-px-(--showcase-rail-inset) gap-(--showcase-rail-gap) overflow-x-auto p-(--showcase-rail-inset)">
+  <ul
+    className="showcase-rail flex w-full max-w-(--showcase-rail-max-width) snap-x snap-mandatory scroll-px-(--showcase-rail-inset) gap-(--showcase-rail-gap) overflow-x-auto p-(--showcase-rail-inset)"
+    onFocus={(event) =>
+      event.target.scrollIntoView({ block: "nearest", inline: "nearest" })
+    }
+  >
     {challenges.map((challenge) => (
       <li
         key={challenge.slug}
