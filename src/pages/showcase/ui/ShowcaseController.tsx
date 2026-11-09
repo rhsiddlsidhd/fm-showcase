@@ -6,7 +6,7 @@ import { parseSelection, toSearchParams } from "../model/query";
 import { getStackOptions } from "../model/stack-options";
 import { ChallengeRail } from "./ChallengeRail";
 import { EmptyState } from "./EmptyState";
-import { FilterPanel } from "./FilterPanel";
+import { ChallengeFilters } from "./ChallengeFilters";
 
 interface ShowcaseControllerProps {
   challenges: readonly Challenge[];
@@ -44,12 +44,13 @@ export const ShowcaseController = ({ challenges }: ShowcaseControllerProps) => {
   );
   return (
     <>
-      <FilterPanel
+      <ChallengeFilters
         stackOptions={getStackOptions([...challenges])}
         selection={selection}
         onChange={handleChange}
+        showReset={hasSelection && hasResults}
+        onReset={handleReset}
       />
-      {hasSelection && hasResults && resetButton}
       <p>{countText}</p>
       <div role="status" className="sr-only">
         {announcement}

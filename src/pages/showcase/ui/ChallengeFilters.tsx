@@ -1,10 +1,12 @@
 import { DIFFICULTIES } from "../model/challenge";
 import type { FilterSelection, Stack } from "../model/challenge";
 
-interface FilterPanelProps {
+interface ChallengeFiltersProps {
   stackOptions: readonly Stack[];
   selection: FilterSelection;
   onChange: (selection: FilterSelection) => void;
+  showReset: boolean;
+  onReset: () => void;
 }
 
 const toggle = <T extends string>(
@@ -14,11 +16,13 @@ const toggle = <T extends string>(
 ): T[] =>
   checked ? [...values, value] : values.filter((item) => item !== value);
 
-export const FilterPanel = ({
+export const ChallengeFilters = ({
   stackOptions,
   selection,
   onChange,
-}: FilterPanelProps) => (
+  showReset,
+  onReset,
+}: ChallengeFiltersProps) => (
   <div>
     <fieldset>
       <legend>난이도</legend>
@@ -62,5 +66,10 @@ export const FilterPanel = ({
         </label>
       ))}
     </fieldset>
+    {showReset && (
+      <button type="button" onClick={onReset}>
+        필터 초기화
+      </button>
+    )}
   </div>
 );
