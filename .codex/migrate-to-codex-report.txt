@@ -8,3 +8,6 @@ Claude tools mapped to available Codex tools; repository role boundaries overrid
 Skill now requires full specialist instructions and explicit model settings in each fresh sequential call.
 Earlier generic test-engineer call 31 is preserved in history; specialist review is required before implementation.
 Official guidance: https://learn.chatgpt.com/docs/agent-configuration/subagents and https://learn.chatgpt.com/docs/models
+
+User model adjustment, 2026-11-09 (after K4):
+All specialist models lowered one tier. Test/simplify/verify and executor retry: gpt-6-astra/high -> gpt-6.1-sol/high. Initial executor: gpt-6.1-sol/medium -> gpt-6-luna/medium. Reasoning efforts unchanged. Root model and original OMC prompt bodies unchanged.

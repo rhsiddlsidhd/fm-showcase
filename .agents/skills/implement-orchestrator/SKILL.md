@@ -15,14 +15,14 @@ description: "기능 하나를 테스트 선행으로 구현하는 오케스트�
 
 OMC 5.7.5 전문 에이전트의 원본 본문을 보존한 `.codex/agents/omc-*.toml`을 사용한다. 각 파일의 `developer_instructions` 뒤에 이 하네스의 역할별 프롬프트를 붙인다. TOML의 Codex 이식·저장소 우선 규칙이 OMC 원본보다 우선하고, 호출별 범위·검증·보고서 지시가 그보다 구체적이다.
 
-| 역할        | 원본 OMC 전문 에이전트             | 원본 모델                         | Codex 정의                               | Codex 모델·추론                                                         |
-| ----------- | ---------------------------------- | --------------------------------- | ---------------------------------------- | ----------------------------------------------------------------------- |
-| 테스트 작성 | `oh-my-claudecode:test-engineer`   | `opus`                            | `.codex/agents/omc-test-engineer.toml`   | `gpt-6-astra`, `high`                                                   |
-| 구현        | `oh-my-claudecode:executor`        | `sonnet`, 구현 문제 재시도 `opus` | `.codex/agents/omc-executor.toml`        | 첫 호출 `gpt-6.1-sol`, `medium`; 구현 문제 재시도 `gpt-6-astra`, `high` |
-| 정리        | `oh-my-claudecode:code-simplifier` | `opus`                            | `.codex/agents/omc-code-simplifier.toml` | `gpt-6-astra`, `high`                                                   |
-| 종합 검증   | `oh-my-claudecode:verifier`        | `opus`                            | `.codex/agents/omc-verifier.toml`        | `gpt-6-astra`, `high`                                                   |
+| 역할        | 원본 OMC 전문 에이전트             | 원본 모델                         | Codex 정의                               | Codex 모델·추론                                                        |
+| ----------- | ---------------------------------- | --------------------------------- | ---------------------------------------- | ---------------------------------------------------------------------- |
+| 테스트 작성 | `oh-my-claudecode:test-engineer`   | `opus`                            | `.codex/agents/omc-test-engineer.toml`   | `gpt-6.1-sol`, `high`                                                  |
+| 구현        | `oh-my-claudecode:executor`        | `sonnet`, 구현 문제 재시도 `opus` | `.codex/agents/omc-executor.toml`        | 첫 호출 `gpt-6-luna`, `medium`; 구현 문제 재시도 `gpt-6.1-sol`, `high` |
+| 정리        | `oh-my-claudecode:code-simplifier` | `opus`                            | `.codex/agents/omc-code-simplifier.toml` | `gpt-6.1-sol`, `high`                                                  |
+| 종합 검증   | `oh-my-claudecode:verifier`        | `opus`                            | `.codex/agents/omc-verifier.toml`        | `gpt-6.1-sol`, `high`                                                  |
 
-모델 배정은 원본 실행 오케스트레이터의 역할별 배정이 기준이다(원본 개별 에이전트의 기본 모델과 다를 수 있다). Opus→Astra, Sonnet→Sol은 역할·비용 구분을 보존하기 위한 선정이며 모델 성능 동등성을 뜻하지 않는다. Claude/OMC 런타임을 실행하는 것이 아니라 원본 전문 지침을 Codex 런타임에서 실행한다.
+모델 배정은 원본 실행 오케스트레이터의 역할별 배정이 기준이다(원본 개별 에이전트의 기본 모델과 다를 수 있다). 사용자 지시(2026-11-09)로 전체 서브에이전트 모델을 한 단계 낮췄다. Opus 역할→Sol, Sonnet 역할→Luna는 역할·비용 구분을 보존하기 위한 선정이며 모델 성능 동등성을 뜻하지 않는다. Claude/OMC 런타임을 실행하는 것이 아니라 원본 전문 지침을 Codex 런타임에서 실행한다.
 
 호출 전에 해당 TOML을 읽어 `name`, `model`, `model_reasoning_effort`, `developer_instructions`를 확인한다. 현재 위임 도구가 커스텀 에이전트 선택을 지원하면 그 정의를 사용한다. `collaboration.spawn_agent`처럼 `agent_type` 선택 인자가 없으면 `fork_turns="none"`과 명시적 `model`·`reasoning_effort`를 지정하고, `developer_instructions` 전문 + 공통 블록 + 역할별 블록을 `message`로 전달한다. 전체 프롬프트가 메시지 길이에 비해 크면 그 전문을 기록한 파일을 첫 작업으로 전부 읽도록 전달할 수 있다. 이때 전문 로드 사실을 보고받고, 역할 이름만으로 작업하거나 다른 기록을 읽게 하지 않는다. 원본 지침 없이 역할 이름만 붙이는 호출은 하지 않는다. 실제 전달한 전문을 `_workspace/{NN}_{agent}_prompt.md`에 저장한다.
 
@@ -168,7 +168,7 @@ _workspace/
 **⑥ 구현 확인**
 
 - `git status --porcelain -uall`의 경로가 모두 이번 바퀴의 구현 경로 안이어야 한다. **테스트 경로가 하나라도 있으면** 그 경로를 되돌리고 재시도 1회를 써서 다시 부른다.
-- 아래 「구현 확인 명령」이 모두 통과해야 한다. 실패하면 실패 출력을 넣어 재시도 1회로 다시 부른다. 구현 문제 재시도에서는 `gpt-6-astra`와 `high`를 명시한다.
+- 아래 「구현 확인 명령」이 모두 통과해야 한다. 실패하면 실패 출력을 넣어 재시도 1회로 다시 부른다. 구현 문제 재시도에서는 `gpt-6.1-sol`와 `high`를 명시한다.
 - 보고서의 `## 실행한 명령`과 직접 실행한 결과가 다르면 직접 실행한 결과를 따르고, 차이를 `{NN}_checks.md`에 남긴다.
 
 **⑦ 구현 커밋**
