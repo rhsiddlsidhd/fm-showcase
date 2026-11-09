@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import type { Challenge, FilterSelection } from "../model/challenge";
 import { filterChallenges } from "../model/filter";
@@ -13,8 +14,21 @@ interface ShowcaseControllerProps {
 
 export const ShowcaseController = ({ challenges }: ShowcaseControllerProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
-  if (challenges.length === 0) return <EmptyState />;
+  const [announcement, setAnnouncement] = useState("");
+  const isFirstRender = useRef(true);
+  const query = searchParams.toString();
   const selection = parseSelection(searchParams);
+  const filtered = filterChallenges([...challenges], selection);
+  const countText = `${filtered.length}개의 챌린지`;
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    setAnnouncement(countText);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query]);
+  if (challenges.length === 0) return <EmptyState />;
   const handleChange = (next: FilterSelection) =>
     setSearchParams(toSearchParams(next));
   return (
@@ -24,9 +38,11 @@ export const ShowcaseController = ({ challenges }: ShowcaseControllerProps) => {
         selection={selection}
         onChange={handleChange}
       />
-      <ChallengeRail
-        challenges={filterChallenges([...challenges], selection)}
-      />
+      <p>{countText}</p>
+      <div role="status" className="sr-only">
+        {announcement}
+      </div>
+      <ChallengeRail challenges={filtered} />
     </>
   );
 };
