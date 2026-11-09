@@ -20,7 +20,7 @@ export const ShowcaseController = ({ challenges }: ShowcaseControllerProps) => {
   const isFirstRender = useRef(true);
   const query = searchParams.toString();
   const selection = parseSelection(searchParams);
-  const filtered = filterChallenges([...challenges], selection);
+  const filtered = filterChallenges(challenges, selection);
   const hasResults = filtered.length > 0;
   const countText = `${filtered.length}개의 챌린지`;
 
@@ -50,7 +50,7 @@ export const ShowcaseController = ({ challenges }: ShowcaseControllerProps) => {
   return (
     <>
       <ChallengeFilters
-        stackOptions={getStackOptions([...challenges])}
+        stackOptions={getStackOptions(challenges)}
         selection={selection}
         onToggle={handleToggle}
         showReset={hasSelection && hasResults}
