@@ -21,15 +21,22 @@ interface ChallengeFiltersProps {
   onToggle: ToggleHandler;
   showReset: boolean;
   onReset: () => void;
+  newbieButtonRef?: (element: HTMLButtonElement | null) => void;
 }
 
 interface FilterChipProps {
   label: string;
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
+  buttonRef?: (element: HTMLButtonElement | null) => void;
 }
 
-const FilterChip = ({ label, checked, onCheckedChange }: FilterChipProps) => {
+const FilterChip = ({
+  label,
+  checked,
+  onCheckedChange,
+  buttonRef,
+}: FilterChipProps) => {
   const id = useId();
   return (
     <span
@@ -40,6 +47,7 @@ const FilterChip = ({ label, checked, onCheckedChange }: FilterChipProps) => {
         id={id}
         nativeButton
         render={<button type="button" />}
+        ref={buttonRef}
         className="border-input data-checked:border-primary-foreground data-checked:bg-primary data-checked:text-primary-foreground size-(--showcase-check-size) focus-visible:ring-0"
         checked={checked}
         onCheckedChange={onCheckedChange}
@@ -57,6 +65,7 @@ export const ChallengeFilters = ({
   onToggle,
   showReset,
   onReset,
+  newbieButtonRef,
 }: ChallengeFiltersProps) => (
   <div className="flex flex-col gap-(--showcase-filter-group-gap)">
     <fieldset className="flex flex-wrap gap-(--showcase-option-gap)">
@@ -67,6 +76,7 @@ export const ChallengeFilters = ({
         <FilterChip
           key={difficulty}
           label={difficulty}
+          buttonRef={difficulty === "Newbie" ? newbieButtonRef : undefined}
           checked={selection.difficulty.includes(difficulty)}
           onCheckedChange={(checked) =>
             onToggle("difficulty", difficulty, checked)

@@ -17,6 +17,8 @@ interface ShowcaseControllerProps {
 export const ShowcaseController = ({ challenges }: ShowcaseControllerProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [announcement, setAnnouncement] = useState("");
+  const newbieButtonRef = useRef<HTMLButtonElement | null>(null);
+  const restoreFocus = useRef(false);
   const isFirstRender = useRef(true);
   const query = searchParams.toString();
   const selection = parseSelection(searchParams);
@@ -33,6 +35,12 @@ export const ShowcaseController = ({ challenges }: ShowcaseControllerProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
+  useEffect(() => {
+    if (!restoreFocus.current || query) return;
+    restoreFocus.current = false;
+    newbieButtonRef.current?.focus();
+  }, [query]);
+
   if (challenges.length === 0) return <EmptyState kind="unregistered" />;
 
   const handleToggle: ToggleHandler = (group, value, checked) => {
@@ -45,7 +53,10 @@ export const ShowcaseController = ({ challenges }: ShowcaseControllerProps) => {
     };
     setSearchParams(toSearchParams(next));
   };
-  const handleReset = () => setSearchParams(new URLSearchParams());
+  const handleReset = () => {
+    restoreFocus.current = true;
+    setSearchParams(new URLSearchParams());
+  };
   const hasSelection = selection.difficulty.length + selection.stack.length > 0;
   return (
     <>
@@ -55,6 +66,9 @@ export const ShowcaseController = ({ challenges }: ShowcaseControllerProps) => {
         onToggle={handleToggle}
         showReset={hasSelection && hasResults}
         onReset={handleReset}
+        newbieButtonRef={(element) => {
+          newbieButtonRef.current = element;
+        }}
       />
       <ResultSummary
         visibleCount={filtered.length}
