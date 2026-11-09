@@ -4,10 +4,10 @@ import type { Challenge, FilterSelection } from "../model/challenge";
 import { filterChallenges } from "../model/filter";
 import { parseSelection, toSearchParams } from "../model/query";
 import { getStackOptions } from "../model/stack-options";
+import { ChallengeFilters } from "./ChallengeFilters";
 import { ChallengeRail } from "./ChallengeRail";
 import { EmptyState } from "./EmptyState";
 import { ResultSummary } from "./ResultSummary";
-import { ChallengeFilters } from "./ChallengeFilters";
 
 interface ShowcaseControllerProps {
   challenges: readonly Challenge[];
