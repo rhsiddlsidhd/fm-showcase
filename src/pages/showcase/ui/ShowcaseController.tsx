@@ -32,17 +32,12 @@ export const ShowcaseController = ({ challenges }: ShowcaseControllerProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
-  if (challenges.length === 0) return <EmptyState />;
+  if (challenges.length === 0) return <EmptyState kind="unregistered" />;
 
   const handleChange = (next: FilterSelection) =>
     setSearchParams(toSearchParams(next));
   const handleReset = () => setSearchParams(new URLSearchParams());
   const hasSelection = selection.difficulty.length + selection.stack.length > 0;
-  const resetButton = (
-    <button type="button" onClick={handleReset}>
-      필터 초기화
-    </button>
-  );
   return (
     <>
       <ChallengeFilters
@@ -53,12 +48,7 @@ export const ShowcaseController = ({ challenges }: ShowcaseControllerProps) => {
         onReset={handleReset}
       />
       <ResultSummary countText={countText} announcement={announcement} />
-      {!hasResults && (
-        <>
-          <p>조건에 맞는 챌린지가 없습니다.</p>
-          {resetButton}
-        </>
-      )}
+      {!hasResults && <EmptyState kind="no-results" onReset={handleReset} />}
       <ChallengeRail challenges={filtered} />
     </>
   );
