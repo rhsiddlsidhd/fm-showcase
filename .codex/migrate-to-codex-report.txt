@@ -1,0 +1,20 @@
+Migration inventory:
+  inactive: instruction files - none found
+  active: skills - 1 found
+    - implement-orchestrator
+  inactive: command sources - none found
+  inactive: subagents - none found
+Migration surfaces:
+  inactive: AGENTS.md - No supported instruction file found.
+  active: skills - 1 skill(s) converted.
+  inactive: MCP config - Not selected by CLI flags.
+  inactive: subagents - Not selected by CLI flags.
+Migration report:
+  rewritten: .agents/skills/implement-orchestrator/SKILL.md - Converted Claude skill.
+
+Codex adaptation review:
+  reviewed: implement-orchestrator - Sequential fresh Codex subagents; no OMC dependency.
+  behavior_changed: Models inherit parent; Claude opus/sonnet routing not retained.
+  limitation: Role read/write boundaries remain prompt guidance, not enforced isolation.
+  preserved: Existing _workspace records, RED-before-implementation commits, retry limits.
+  scope: Only implement-orchestrator selected; other skills and configuration unchanged.
