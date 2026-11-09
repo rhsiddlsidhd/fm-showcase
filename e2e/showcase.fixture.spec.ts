@@ -147,6 +147,83 @@ test("Tab과 Shift+Tab으로 Newbie·Junior Checkbox 버튼을 오가면 해당 
   }
 });
 
+async function tabTo(page: Page, target: Locator) {
+  for (let index = 0; index < 20; index += 1) {
+    await page.keyboard.press("Tab");
+    if (await target.evaluate((element) => element === document.activeElement))
+      break;
+  }
+  await expect(target).toBeFocused();
+}
+
+test("결과가 있는 화면에서 필터 초기화를 키보드로 활성화하면 사라진 버튼 대신 Newbie Checkbox 버튼에 포커스가 복구된다", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const newbie = page
+    .getByRole("group", { name: "난이도", exact: true })
+    .getByRole("checkbox", { name: "Newbie", exact: true });
+  const reset = page.getByRole("button", {
+    name: "필터 초기화",
+    exact: true,
+  });
+  const cards = page.getByRole("link", { name: /^가상 챌린지 / });
+
+  await tabTo(page, newbie);
+  await page.keyboard.press("Space");
+  await expect(newbie).toBeChecked();
+  await expect(cards).toHaveCount(2);
+  await tabTo(page, reset);
+
+  await page.keyboard.press("Enter");
+
+  await expect(reset).toHaveCount(0);
+  await expect(newbie).toHaveJSProperty("tagName", "BUTTON");
+  await expect(newbie).toBeFocused();
+  await expect(newbie).not.toBeChecked();
+  await expect(cards).toHaveCount(challenges.length);
+  await expect.poll(() => new URL(page.url()).search).toBe("");
+});
+
+test("결과 없음 안내의 필터 초기화를 키보드로 활성화하면 전체 목록이 복원되고 Newbie Checkbox 버튼에 포커스가 복구된다", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const newbie = page
+    .getByRole("group", { name: "난이도", exact: true })
+    .getByRole("checkbox", { name: "Newbie", exact: true });
+  const react = page
+    .getByRole("group", { name: "사용 기술", exact: true })
+    .getByRole("checkbox", { name: "React", exact: true });
+  const reset = page.getByRole("button", {
+    name: "필터 초기화",
+    exact: true,
+  });
+  const cards = page.getByRole("link", { name: /^가상 챌린지 / });
+  const noResults = page.getByText("조건에 맞는 챌린지가 없습니다.", {
+    exact: true,
+  });
+
+  await tabTo(page, newbie);
+  await page.keyboard.press("Space");
+  await tabTo(page, react);
+  await page.keyboard.press("Space");
+  await expect(noResults).toBeVisible();
+  await expect(cards).toHaveCount(0);
+  await tabTo(page, reset);
+
+  await page.keyboard.press("Enter");
+
+  await expect(reset).toHaveCount(0);
+  await expect(newbie).toHaveJSProperty("tagName", "BUTTON");
+  await expect(newbie).toBeFocused();
+  await expect(cards).toHaveCount(challenges.length);
+  await expect(noResults).toHaveCount(0);
+  await expect(newbie).not.toBeChecked();
+  await expect(react).not.toBeChecked();
+  await expect.poll(() => new URL(page.url()).search).toBe("");
+});
+
 for (const area of [
   "체크 기호",
   "레이블 글자",
