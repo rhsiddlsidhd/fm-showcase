@@ -59,6 +59,62 @@ async function measureRail(page: Page) {
   }, handles);
 }
 
+// 포커스된 카드 링크와 그 포커스 표시(outline) 영역이 목록의 보이는 영역과
+// 뷰포트 안에 모두 들어오는지 본다. 포커스가 카드에 없으면 null을 돌려준다.
+async function measureFocusedCard(page: Page, title: string) {
+  const handle = await cardLink(page, title).elementHandle();
+  return page.evaluate((card) => {
+    if (!card || document.activeElement !== card) return null;
+    let scroller = card.parentElement;
+    while (scroller) {
+      const overflowX = getComputedStyle(scroller).overflowX;
+      if (overflowX === "auto" || overflowX === "scroll") break;
+      scroller = scroller.parentElement;
+    }
+    if (!scroller) return null;
+    const box = scroller.getBoundingClientRect();
+    const view = {
+      left: Math.max(box.left + scroller.clientLeft, 0),
+      top: Math.max(box.top + scroller.clientTop, 0),
+      right: Math.min(
+        box.left + scroller.clientLeft + scroller.clientWidth,
+        innerWidth,
+      ),
+      bottom: Math.min(
+        box.top + scroller.clientTop + scroller.clientHeight,
+        innerHeight,
+      ),
+    };
+    const style = getComputedStyle(card);
+    const outlineWidth = parseFloat(style.outlineWidth) || 0;
+    const outlineShown = style.outlineStyle !== "none" && outlineWidth > 0;
+    const spread = outlineShown
+      ? Math.max(outlineWidth + (parseFloat(style.outlineOffset) || 0), 0)
+      : 0;
+    const rect = card.getBoundingClientRect();
+    const inside = (r: {
+      left: number;
+      top: number;
+      right: number;
+      bottom: number;
+    }) =>
+      r.left >= view.left - 0.5 &&
+      r.right <= view.right + 0.5 &&
+      r.top >= view.top - 0.5 &&
+      r.bottom <= view.bottom + 0.5;
+    return {
+      outlineShown,
+      linkVisible: inside(rect),
+      outlineVisible: inside({
+        left: rect.left - spread,
+        top: rect.top - spread,
+        right: rect.right + spread,
+        bottom: rect.bottom + spread,
+      }),
+    };
+  }, handle);
+}
+
 for (const { width, label, visible } of layouts) {
   test.describe(`화면 폭 ${width}px (${label})`, () => {
     test.use({ viewport: { width, height: 900 } });
@@ -106,6 +162,34 @@ for (const { width, label, visible } of layouts) {
           return after?.fullyVisible.includes(titles.indexOf(lastTitle!));
         })
         .toBe(true);
+    });
+
+    test("키보드로 화면 밖 카드에 포커스를 옮기면 카드 전체와 포커스 표시가 보인다", async ({
+      page,
+    }) => {
+      // 마지막 카드는 처음에 목록의 보이는 영역 밖에 있다.
+      await expect
+        .poll(async () =>
+          (await measureRail(page))?.fullyVisible.includes(
+            titles.indexOf(lastTitle!),
+          ),
+        )
+        .toBe(false);
+
+      const target = cardLink(page, lastTitle!);
+      for (let i = 0; i < 50; i += 1) {
+        await page.keyboard.press("Tab");
+        if (await target.evaluate((el) => el === document.activeElement)) break;
+      }
+      await expect(target).toBeFocused();
+
+      await expect
+        .poll(() => measureFocusedCard(page, lastTitle!))
+        .toEqual({
+          outlineShown: true,
+          linkVisible: true,
+          outlineVisible: true,
+        });
     });
   });
 }
