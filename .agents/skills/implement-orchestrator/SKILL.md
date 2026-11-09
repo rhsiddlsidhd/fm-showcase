@@ -1,6 +1,6 @@
 ---
 name: "implement-orchestrator"
-description: "기능 하나를 테스트 선행으로 구현하는 오케스트레이터. `.sdd/<슬라이스>/` 설계안의 요구사항을 바퀴로 나누고, 바퀴마다 Codex test-engineer가 테스트를 쓰고 RED를 확인한 뒤에만 Codex executor가 구현한다. 끝에 code-simplifier로 정리하고 verifier로 종합 검증한다. '기능 구현해줘', '이 슬라이스 구현해줘', 'TDD로 구현', '테스트부터 짜고 구현', '챌린지 구현' 같은 구현 요청에 사용한다. '이어서 진행', '다시 실행', '멈춘 바퀴부터 다시', '테스트 고쳐서 다시', '정리·검증만 다시', '이전 결과를 바탕으로 수정' 같은 후속 요청에도 사용한다. 질문·설명, 리뷰만 요청, 테스트만 작성 요청, 설계안(.sdd) 작성, 문서·설정 수정, PR 작업에는 사용하지 않는다."
+description: "기능 하나를 테스트 선행으로 구현하는 오케스트레이터. `.sdd/슬라이스/` 설계안의 요구사항을 바퀴로 나누고, 바퀴마다 Codex test-engineer가 테스트를 쓰고 RED를 확인한 뒤에만 Codex executor가 구현한다. 끝에 code-simplifier로 정리하고 verifier로 종합 검증한다. '기능 구현해줘', '이 슬라이스 구현해줘', 'TDD로 구현', '테스트부터 짜고 구현', '챌린지 구현' 같은 구현 요청에 사용한다. '이어서 진행', '다시 실행', '멈춘 바퀴부터 다시', '테스트 고쳐서 다시', '정리·검증만 다시', '이전 결과를 바탕으로 수정' 같은 후속 요청에도 사용한다. 질문·설명, 리뷰만 요청, 테스트만 작성 요청, 설계안(.sdd) 작성, 문서·설정 수정, PR 작업에는 사용하지 않는다."
 ---
 
 # 구현 오케스트레이터
@@ -24,7 +24,7 @@ OMC 5.7.5 전문 에이전트의 원본 본문을 보존한 `.codex/agents/omc-*
 
 모델 배정은 원본 실행 오케스트레이터의 역할별 배정이 기준이다(원본 개별 에이전트의 기본 모델과 다를 수 있다). Opus→Astra, Sonnet→Sol은 역할·비용 구분을 보존하기 위한 선정이며 모델 성능 동등성을 뜻하지 않는다. Claude/OMC 런타임을 실행하는 것이 아니라 원본 전문 지침을 Codex 런타임에서 실행한다.
 
-호출 전에 해당 TOML을 읽어 `name`, `model`, `model_reasoning_effort`, `developer_instructions`를 확인한다. 현재 위임 도구가 커스텀 에이전트 선택을 지원하면 그 정의를 사용한다. `collaboration.spawn_agent`처럼 `agent_type` 선택 인자가 없으면 `fork_turns="none"`과 명시적 `model`·`reasoning_effort`를 지정하고, `developer_instructions` 전문 + 공통 블록 + 역할별 블록을 `message`로 전달한다. 파일명만 전달하거나 원본 지침 없이 역할 이름만 붙이는 호출은 하지 않는다. 실제 전달한 전문을 `_workspace/{NN}_{agent}_prompt.md`에 저장한다.
+호출 전에 해당 TOML을 읽어 `name`, `model`, `model_reasoning_effort`, `developer_instructions`를 확인한다. 현재 위임 도구가 커스텀 에이전트 선택을 지원하면 그 정의를 사용한다. `collaboration.spawn_agent`처럼 `agent_type` 선택 인자가 없으면 `fork_turns="none"`과 명시적 `model`·`reasoning_effort`를 지정하고, `developer_instructions` 전문 + 공통 블록 + 역할별 블록을 `message`로 전달한다. 전체 프롬프트가 메시지 길이에 비해 크면 그 전문을 기록한 파일을 첫 작업으로 전부 읽도록 전달할 수 있다. 이때 전문 로드 사실을 보고받고, 역할 이름만으로 작업하거나 다른 기록을 읽게 하지 않는다. 원본 지침 없이 역할 이름만 붙이는 호출은 하지 않는다. 실제 전달한 전문을 `_workspace/{NN}_{agent}_prompt.md`에 저장한다.
 
 도구와 권한은 부모 세션을 상속한다. verifier의 원본 `disallowedTools: Write, Edit`는 파일 쓰기 금지 지시로 대응하며 도구 수준 차단은 아니다. 역할별 읽기·쓰기 범위도 프롬프트 지시다. OMC의 `level` 메타데이터는 Codex 필드로 만들지 않는다. 원본 라이선스는 `.codex/agents/OMC-LICENSE`에 보존한다.
 
