@@ -63,7 +63,7 @@ FSD의 레이어 6개와 이 저장소에서의 적용이다. 공통 원칙은 [
 
 > It's not common for a page to have a dedicated data model, and tiny bits of state can be kept in the components themselves.
 
-이 저장소는 그 컴포넌트를 `ui/`의 [동작 컴포넌트](../testing/test-boundaries.md#컴포넌트-분류)로 한정한다. 따라서 토글 하나를 위해 `model` 세그먼트를 만들지 않고 그 상태를 동작 컴포넌트에 둔다. 분기가 늘어나면 그때 그 로직을 함수나 훅으로 떼어 `model`이나 `lib`로 내린다.
+이 저장소는 그 컴포넌트를 `ui/`의 동작 컴포넌트로 한정한다. 동작 컴포넌트는 상태나 이벤트를 직접 다루는 UI 컴포넌트다. 따라서 토글 하나를 위해 `model` 세그먼트를 만들지 않고 그 상태를 동작 컴포넌트에 둔다. 분기가 늘어나면 그때 그 로직을 함수나 훅으로 떼어 `model`이나 `lib`로 내린다.
 페이지 컴포넌트는 `index.tsx`에 직접 정의하고 `ui/`의 컴포넌트를 배치만 한다.
 
 - 정적 값(상수, import한 데이터)을 props로 넘기는 것은 배치다.
