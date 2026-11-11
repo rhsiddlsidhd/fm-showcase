@@ -53,3 +53,29 @@ export async function routeForecastToHttp400(page: Page) {
     }),
   );
 }
+
+const apiPatterns = {
+  geocoding: "https://geocoding-api.open-meteo.com/**",
+  forecast: "https://api.open-meteo.com/**",
+};
+
+// 이후 요청의 응답을 붙잡아 두었다가 release()를 부르면 fixture로 돌려준다.
+// 나중에 등록한 경로가 먼저 적용되므로 기존 routeOpenMeteo 위에 덮어 쓴다.
+export async function holdOpenMeteo(
+  page: Page,
+  api: keyof typeof apiPatterns,
+  fixture: string,
+) {
+  let release!: () => void;
+  const released = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route(apiPatterns[api], async (route) => {
+    await released;
+    await route.fulfill({
+      path: `${fixtureDir}/${fixture}`,
+      headers: corsHeaders,
+    });
+  });
+  return release;
+}
