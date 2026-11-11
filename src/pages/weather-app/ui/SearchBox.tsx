@@ -1,6 +1,11 @@
+import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useId, useRef, useState } from "react";
 import { searchPlaces, type Place } from "../api/geocoding";
 import { candidateLabel } from "../model/place";
+import { PANEL_ENTER, SEARCH_SPIN } from "./motion";
+
+const PANEL_CLASS =
+  "absolute inset-x-0 top-full z-10 mt-2.5 rounded-xl border border-border bg-popover p-2 text-popover-foreground shadow-lg";
 
 type Props = {
   retry?: { query: string | null };
@@ -20,6 +25,7 @@ export const SearchBox = ({
   onSelect,
 }: Props) => {
   const listId = useId();
+  const reduceMotion = useReducedMotion();
   const [query, setQuery] = useState(retry?.query ?? "");
   const [searching, setSearching] = useState(false);
   const [candidates, setCandidates] = useState<Place[]>([]);
@@ -95,54 +101,88 @@ export const SearchBox = ({
 
   return (
     <form
-      className="relative flex flex-col gap-2 lg:flex-row"
+      className="mx-auto flex w-full max-w-2xl flex-col gap-3 lg:flex-row lg:gap-4"
       onSubmit={(event) => {
         event.preventDefault();
         void search();
       }}
     >
-      <img src="/weather-app/images/icon-search.svg" alt="" />
-      <input
-        className="min-w-0 lg:flex-1"
-        ref={inputRef}
-        type="search"
-        role="combobox"
-        aria-expanded={open}
-        aria-controls={open ? listId : undefined}
-        aria-activedescendant={
-          open && active >= 0 ? optionId(active) : undefined
-        }
-        aria-autocomplete="list"
-        placeholder="Search for a place..."
-        value={query}
-        onChange={(event) => setQuery(event.target.value)}
-        onKeyDown={handleKeyDown}
-      />
-      <button type="submit">Search</button>
-      {open && (
-        <ul id={listId} role="listbox" aria-label="Search results">
-          {candidates.map((place, index) => (
-            <li
-              key={`${place.latitude},${place.longitude}`}
-              id={optionId(index)}
-              role="option"
-              aria-selected={index === active}
-              onMouseDown={(event) => {
-                event.preventDefault();
-                choose(place);
-              }}
-            >
-              {candidateLabel(place)}
-            </li>
-          ))}
-        </ul>
-      )}
-      {searching && (
-        <p>
-          <img src="/weather-app/images/icon-loading.svg" alt="" />
-          Search in progress
-        </p>
-      )}
+      <div className="relative min-w-0 lg:flex-1">
+        <img
+          src="/weather-app/images/icon-search.svg"
+          alt=""
+          className="pointer-events-none absolute top-1/2 left-6 -translate-y-1/2"
+        />
+        <input
+          className="bg-input hover:bg-accent focus-visible:ring-ring w-full rounded-xl py-4 pr-6 pl-15 text-(length:--weather-app-text-body) placeholder:text-(--weather-app-text-subtle) focus-visible:ring-2"
+          ref={inputRef}
+          type="search"
+          role="combobox"
+          aria-expanded={open}
+          aria-controls={open ? listId : undefined}
+          aria-activedescendant={
+            open && active >= 0 ? optionId(active) : undefined
+          }
+          aria-autocomplete="list"
+          placeholder="Search for a place..."
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          onKeyDown={handleKeyDown}
+        />
+        {open && (
+          <motion.ul
+            key="candidates"
+            id={listId}
+            role="listbox"
+            aria-label="Search results"
+            className={`${PANEL_CLASS} flex flex-col gap-1`}
+            initial={
+              reduceMotion
+                ? { opacity: 0 }
+                : { opacity: 0, y: PANEL_ENTER.offsetY }
+            }
+            animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+            transition={PANEL_ENTER.transition}
+          >
+            {candidates.map((place, index) => (
+              <li
+                key={`${place.latitude},${place.longitude}`}
+                id={optionId(index)}
+                role="option"
+                aria-selected={index === active}
+                className="hover:bg-accent aria-selected:border-border aria-selected:bg-accent cursor-pointer rounded-lg px-2 py-2.5 aria-selected:border"
+                onMouseDown={(event) => {
+                  event.preventDefault();
+                  choose(place);
+                }}
+              >
+                {candidateLabel(place)}
+              </li>
+            ))}
+          </motion.ul>
+        )}
+        {searching && (
+          <p className={`${PANEL_CLASS} flex items-center gap-2.5 px-4 py-3`}>
+            {reduceMotion ? (
+              <img src="/weather-app/images/icon-loading.svg" alt="" />
+            ) : (
+              <motion.img
+                src="/weather-app/images/icon-loading.svg"
+                alt=""
+                animate={{ rotate: 360 }}
+                transition={SEARCH_SPIN.transition}
+              />
+            )}
+            Search in progress
+          </p>
+        )}
+      </div>
+      <button
+        type="submit"
+        className="bg-primary text-primary-foreground focus-visible:ring-ring rounded-xl px-6 py-4 text-(length:--weather-app-text-body) hover:bg-(--weather-app-primary-hover) focus-visible:ring-2"
+      >
+        Search
+      </button>
     </form>
   );
 };
