@@ -1,13 +1,16 @@
 import type { Forecast } from "../api/forecast";
 import { formatTemperature, formatWeekdayShort } from "../model/format";
+import { toTemperature, type Units } from "../model/units";
 import { WeatherIconImage } from "./WeatherIconImage";
 
 const DAYS = 7;
 
 export const DailyForecast = ({
   daily,
+  units,
 }: {
   daily: Forecast["daily"] | null;
+  units: Units;
 }) => (
   <section>
     <h2>Daily forecast</h2>
@@ -20,8 +23,16 @@ export const DailyForecast = ({
                 code={daily.weather_code[i]}
                 className="size-10"
               />
-              <span>{formatTemperature(daily.temperature_2m_max[i])}</span>
-              <span>{formatTemperature(daily.temperature_2m_min[i])}</span>
+              <span>
+                {formatTemperature(
+                  toTemperature(daily.temperature_2m_max[i], units),
+                )}
+              </span>
+              <span>
+                {formatTemperature(
+                  toTemperature(daily.temperature_2m_min[i], units),
+                )}
+              </span>
             </li>
           ))
         : Array.from({ length: DAYS }, (_, i) => (

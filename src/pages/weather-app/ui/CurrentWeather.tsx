@@ -1,5 +1,11 @@
 import type { Forecast } from "../api/forecast";
 import { formatCurrentDate, formatTemperature } from "../model/format";
+import {
+  formatPrecipitation,
+  formatWind,
+  toTemperature,
+  type Units,
+} from "../model/units";
 import { WeatherIconImage } from "./WeatherIconImage";
 
 const PENDING = "—";
@@ -7,21 +13,28 @@ const PENDING = "—";
 export const CurrentWeather = ({
   label,
   current,
+  units,
 }: {
   label: string;
   current: Forecast["current"] | null;
+  units: Units;
 }) => {
   const metrics: Array<[string, string]> = [
     [
       "Feels Like",
-      current ? formatTemperature(current.apparent_temperature) : PENDING,
+      current
+        ? formatTemperature(toTemperature(current.apparent_temperature, units))
+        : PENDING,
     ],
     [
       "Humidity",
       current ? `${Math.round(current.relative_humidity_2m)}%` : PENDING,
     ],
-    ["Wind", current ? `${Math.round(current.wind_speed_10m)} km/h` : PENDING],
-    ["Precipitation", current ? `${current.precipitation} mm` : PENDING],
+    ["Wind", current ? formatWind(current.wind_speed_10m, units) : PENDING],
+    [
+      "Precipitation",
+      current ? formatPrecipitation(current.precipitation, units) : PENDING,
+    ],
   ];
   return (
     <section>
@@ -34,7 +47,7 @@ export const CurrentWeather = ({
             </div>
             <WeatherIconImage code={current.weather_code} className="size-20" />
             <p className="text-6xl">
-              {formatTemperature(current.temperature_2m)}
+              {formatTemperature(toTemperature(current.temperature_2m, units))}
             </p>
           </>
         ) : (

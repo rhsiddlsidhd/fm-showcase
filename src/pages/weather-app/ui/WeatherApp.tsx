@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { fetchForecast, type Forecast } from "../api/forecast";
 import type { Place } from "../api/geocoding";
 import { BERLIN, placeLabel } from "../model/place";
+import { METRIC, type Units } from "../model/units";
 import { CurrentWeather } from "./CurrentWeather";
 import { DailyForecast } from "./DailyForecast";
 import { HourlyForecast } from "./HourlyForecast";
 import { SearchBox } from "./SearchBox";
+import { UnitsMenu } from "./UnitsMenu";
 
 const LOADING = "Loading...";
 
@@ -14,6 +16,7 @@ export const WeatherApp = () => {
   const [forecast, setForecast] = useState<Forecast | null>(null);
   const [noResult, setNoResult] = useState(false);
   const [status, setStatus] = useState("");
+  const [units, setUnits] = useState<Units>(METRIC);
 
   useEffect(() => {
     if (!place) return;
@@ -47,11 +50,7 @@ export const WeatherApp = () => {
     <main>
       <header className="flex items-center justify-between">
         <img src="/weather-app/images/logo.svg" alt="Weather Now" />
-        <button type="button">
-          <img src="/weather-app/images/icon-units.svg" alt="" />
-          Units
-          <img src="/weather-app/images/icon-dropdown.svg" alt="" />
-        </button>
+        <UnitsMenu units={units} onChange={setUnits} />
       </header>
       <SearchBox
         onSearching={() => setStatus("Search in progress")}
@@ -69,9 +68,10 @@ export const WeatherApp = () => {
           <CurrentWeather
             label={place ? placeLabel(place) : ""}
             current={forecast?.current ?? null}
+            units={units}
           />
-          <DailyForecast daily={forecast?.daily ?? null} />
-          <HourlyForecast forecast={forecast} />
+          <DailyForecast daily={forecast?.daily ?? null} units={units} />
+          <HourlyForecast forecast={forecast} units={units} />
         </>
       )}
     </main>

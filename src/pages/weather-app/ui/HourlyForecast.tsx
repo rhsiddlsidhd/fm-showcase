@@ -8,11 +8,18 @@ import {
 import type { Forecast } from "../api/forecast";
 import { formatTemperature, formatWeekdayLong } from "../model/format";
 import { dayHourlyRows } from "../model/hourly";
+import { toTemperature, type Units } from "../model/units";
 import { WeatherIconImage } from "./WeatherIconImage";
 
 const ROWS = 8;
 
-const HourlyContent = ({ forecast }: { forecast: Forecast }) => {
+const HourlyContent = ({
+  forecast,
+  units,
+}: {
+  forecast: Forecast;
+  units: Units;
+}) => {
   const [date, setDate] = useState(forecast.daily.time[0]);
 
   return (
@@ -35,7 +42,9 @@ const HourlyContent = ({ forecast }: { forecast: Forecast }) => {
           <li key={row.label}>
             <WeatherIconImage code={row.code} className="size-8" />
             <span>{row.label}</span>
-            <span>{formatTemperature(row.temperature)}</span>
+            <span>
+              {formatTemperature(toTemperature(row.temperature, units))}
+            </span>
           </li>
         ))}
       </ul>
@@ -43,11 +52,21 @@ const HourlyContent = ({ forecast }: { forecast: Forecast }) => {
   );
 };
 
-export const HourlyForecast = ({ forecast }: { forecast: Forecast | null }) => (
+export const HourlyForecast = ({
+  forecast,
+  units,
+}: {
+  forecast: Forecast | null;
+  units: Units;
+}) => (
   <section>
     <h2>Hourly forecast</h2>
     {forecast ? (
-      <HourlyContent key={forecast.daily.time[0]} forecast={forecast} />
+      <HourlyContent
+        key={forecast.daily.time[0]}
+        forecast={forecast}
+        units={units}
+      />
     ) : (
       <ul>
         {Array.from({ length: ROWS }, (_, i) => (
