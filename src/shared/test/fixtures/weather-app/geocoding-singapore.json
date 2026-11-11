@@ -1,0 +1,15 @@
+{
+  "results": [
+    {
+      "id": 1880252,
+      "name": "Singapore",
+      "latitude": 1.28967,
+      "longitude": 103.85007,
+      "country_code": "SG",
+      "country": "Singapore",
+      "timezone": "Asia/Singapore",
+      "population": 5638700
+    }
+  ],
+  "generationtime_ms": 0.22184849
+}
