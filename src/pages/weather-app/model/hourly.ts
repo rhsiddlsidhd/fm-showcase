@@ -24,3 +24,22 @@ export function todayHourlyRows(forecast: Forecast): HourlyRow[] {
       : [],
   );
 }
+
+// 오늘이 아닌 날은 12 AM부터 11 PM까지 하루 전체.
+export function dayHourlyRows(forecast: Forecast, date: string): HourlyRow[] {
+  if (date === forecast.current.time.slice(0, 10)) {
+    return todayHourlyRows(forecast);
+  }
+  const { hourly } = forecast;
+  return hourly.time.flatMap((time, i) =>
+    time.slice(0, 10) === date
+      ? [
+          {
+            label: hourLabel(time),
+            temperature: hourly.temperature_2m[i],
+            code: hourly.weather_code[i],
+          },
+        ]
+      : [],
+  );
+}

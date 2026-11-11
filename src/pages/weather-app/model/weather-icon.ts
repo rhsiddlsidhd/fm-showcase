@@ -6,8 +6,8 @@ const icon = (file: string, name: string): WeatherIcon => ({
 });
 
 export function weatherIcon(code: number): WeatherIcon {
-  if (code === 0) return icon("sunny", "Clear");
-  if (code <= 2) return icon("partly-cloudy", "Partly cloudy");
+  if (code <= 1) return icon("sunny", "Clear");
+  if (code === 2) return icon("partly-cloudy", "Partly cloudy");
   if (code === 3) return icon("overcast", "Overcast");
   if (code === 45 || code === 48) return icon("fog", "Fog");
   if (code >= 51 && code <= 57) return icon("drizzle", "Drizzle");
