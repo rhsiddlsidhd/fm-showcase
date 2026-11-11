@@ -357,7 +357,7 @@ test.describe("움직임 줄이기 설정", () => {
     const card = cardLink(page, titles[0]!);
     await expect(card).toBeVisible();
 
-    const top = async () => Math.round((await card.boundingBox())!.top);
+    const top = async () => Math.round((await card.boundingBox())!.y);
     const before = await top();
     // 부유 주기(4.5초)의 절반 가까이 기다린 뒤에도 같은 자리에 있어야 한다.
     await page.waitForTimeout(2500);
