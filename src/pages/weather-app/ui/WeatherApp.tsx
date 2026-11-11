@@ -25,12 +25,14 @@ export const WeatherApp = () => {
   const [attempt, setAttempt] = useState(0);
   const [retry, setRetry] = useState<Retry | undefined>(undefined);
   const searchingQuery = useRef<string | null>(null);
+  const searchFailed = useRef(false);
 
   useEffect(() => {
     if (!place) return;
     const controller = new AbortController();
     fetchForecast(place, controller.signal)
       .then((result) => {
+        if (searchFailed.current) return;
         setForecast(result);
         setStatus((current) =>
           current === LOADING ? `Weather for ${placeLabel(place)}` : current,
@@ -65,7 +67,8 @@ export const WeatherApp = () => {
 
   const retryAfterError = () => {
     if (!error) return;
-    if (error.kind === "weather") setAttempt((count) => count + 1);
+    searchFailed.current = false;
+    if (error.kind === "weather" || !forecast) setAttempt((count) => count + 1);
     setRetry({ query: error.query });
     setError(null);
   };
@@ -90,6 +93,7 @@ export const WeatherApp = () => {
           }}
           onError={(query) => {
             searchingQuery.current = null;
+            searchFailed.current = true;
             setError({ kind: "search", query });
             setStatus("");
           }}
