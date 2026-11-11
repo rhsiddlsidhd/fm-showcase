@@ -1,9 +1,11 @@
 import { render, screen, within } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
 import { describe, expect, it } from "vitest";
-import forecastBerlin1d from "@/shared/test/fixtures/weather-app/forecast-berlin-1d.json";
-import forecastBerlin7d from "@/shared/test/fixtures/weather-app/forecast-berlin-7d.json";
-import { setupTestServer } from "@/shared/test/msw-server";
+import {
+  forecastBerlin1d,
+  forecastBerlin7d,
+  setupTestServer,
+} from "@/shared/test";
 import { WeatherAppPage } from "../index";
 
 const server = setupTestServer();
