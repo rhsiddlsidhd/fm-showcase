@@ -85,7 +85,7 @@ export const WeatherApp = () => {
           <UnitsMenu units={units} onChange={setUnits} />
         </header>
         {!error && (
-          <h1 className="text-center font-(family-name:--font-heading) text-5xl/tight font-bold lg:text-6xl">
+          <h1 className="font-heading text-center text-5xl/tight font-bold lg:text-6xl">
             How&apos;s the sky looking today?
           </h1>
         )}
