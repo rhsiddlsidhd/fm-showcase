@@ -1,19 +1,47 @@
 import { useEffect, useState } from "react";
-import { fetchBerlinForecast, type Forecast } from "../api/forecast";
+import { fetchForecast, type Forecast } from "../api/forecast";
+import type { Place } from "../api/geocoding";
+import { BERLIN, placeLabel } from "../model/place";
 import { CurrentWeather } from "./CurrentWeather";
 import { DailyForecast } from "./DailyForecast";
 import { HourlyForecast } from "./HourlyForecast";
+import { SearchBox } from "./SearchBox";
+
+const LOADING = "Loading...";
 
 export const WeatherApp = () => {
+  const [place, setPlace] = useState<Place | null>(BERLIN);
   const [forecast, setForecast] = useState<Forecast | null>(null);
+  const [noResult, setNoResult] = useState(false);
+  const [status, setStatus] = useState("");
 
   useEffect(() => {
+    if (!place) return;
     const controller = new AbortController();
-    fetchBerlinForecast(controller.signal)
-      .then(setForecast)
+    fetchForecast(place, controller.signal)
+      .then((result) => {
+        setForecast(result);
+        setStatus((current) =>
+          current === LOADING ? `Weather for ${placeLabel(place)}` : current,
+        );
+      })
       .catch(() => {});
     return () => controller.abort();
-  }, []);
+  }, [place]);
+
+  const select = (selected: Place) => {
+    setNoResult(false);
+    setForecast(null);
+    setStatus(LOADING);
+    setPlace(selected);
+  };
+
+  const showNoResult = () => {
+    setPlace(null);
+    setForecast(null);
+    setNoResult(true);
+    setStatus("No search result found!");
+  };
 
   return (
     <main>
@@ -25,19 +53,26 @@ export const WeatherApp = () => {
           <img src="/weather-app/images/icon-dropdown.svg" alt="" />
         </button>
       </header>
-      <div className="relative">
-        <img src="/weather-app/images/icon-search.svg" alt="" />
-        <input type="search" placeholder="Search for a place..." />
-      </div>
-      <p role="status" className="sr-only" />
-      {forecast ? (
+      <SearchBox
+        onSearching={() => setStatus("Search in progress")}
+        onResults={() => setStatus("")}
+        onNoResult={showNoResult}
+        onSelect={select}
+      />
+      <p role="status" className="sr-only">
+        {status}
+      </p>
+      {noResult ? (
+        <p>No search result found!</p>
+      ) : (
         <>
-          <CurrentWeather current={forecast.current} />
-          <DailyForecast daily={forecast.daily} />
+          <CurrentWeather
+            label={place ? placeLabel(place) : ""}
+            current={forecast?.current ?? null}
+          />
+          <DailyForecast daily={forecast?.daily ?? null} />
           <HourlyForecast forecast={forecast} />
         </>
-      ) : (
-        <p>Loading...</p>
       )}
     </main>
   );

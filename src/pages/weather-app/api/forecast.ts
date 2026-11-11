@@ -1,7 +1,5 @@
 const FORECAST_URL = "https://api.open-meteo.com/v1/forecast";
 
-const BERLIN = { latitude: "52.52437", longitude: "13.41053" };
-
 export type Forecast = {
   current: {
     time: string;
@@ -25,12 +23,14 @@ export type Forecast = {
   };
 };
 
-export async function fetchBerlinForecast(
+export async function fetchForecast(
+  coordinates: { latitude: number; longitude: number },
   signal?: AbortSignal,
 ): Promise<Forecast> {
   const url = new URL(FORECAST_URL);
   url.search = new URLSearchParams({
-    ...BERLIN,
+    latitude: String(coordinates.latitude),
+    longitude: String(coordinates.longitude),
     current:
       "temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,precipitation,weather_code",
     daily: "weather_code,temperature_2m_max,temperature_2m_min",
