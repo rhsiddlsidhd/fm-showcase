@@ -27,6 +27,8 @@ test.describe("포커스 링", () => {
       const label = `옵션 "${(await item.textContent())?.trim()}"`;
       const focused = await item.evaluate(readRing);
       await page.keyboard.press("ArrowDown");
+      // 포커스가 실제로 다음 항목(마지막이면 첫 항목)으로 옮겨 간 뒤에 포커스 없는 상태를 읽는다.
+      await expect(item).not.toBeFocused();
       const unfocused = await item.evaluate(readRing);
       expectRingShownOnFocus({ label, focused, unfocused });
     }
