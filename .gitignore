@@ -7,3 +7,4 @@ playwright-report/
 .sdd/
 .env.local
 _workspace*/
+.challenge

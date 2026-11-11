@@ -23,6 +23,7 @@
 | [`animation.md`](animation.md) | 애니메이션을 설계하거나 구현할 때 | `motion` 사용, 움직임 값의 위치, 성능, 움직임 줄이기 구현 |
 | [`responsive.md`](responsive.md) | 화면 폭에 따른 배치를 설계하거나 구현할 때 | 공통 경계, 챌린지별 기준 |
 | [`theme.md`](theme.md) | `theme.css`를 만들거나 구현에서 디자인 토큰을 쓸 때 | 디자인 토큰의 정의, 구현 방식, 산출 규칙, 산출 순서, 사용 규칙, 다크 모드, 폰트, Portal |
+| [`static-assets.md`](static-assets.md) | 이미지·아이콘 같은 정적 자산을 설계하거나 구현에서 참조할 때 | `public/` 산출 위치, 슬라이스 네임스페이싱, 절대경로 참조, 전역 승격 판단 |
 
 ## 산출 위치
 
