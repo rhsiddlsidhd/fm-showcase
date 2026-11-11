@@ -1,1 +1,3 @@
-export const WeatherAppPage = () => <main />;
+import { WeatherApp } from "./ui/WeatherApp";
+
+export const WeatherAppPage = () => <WeatherApp />;
