@@ -4,3 +4,4 @@ export { default as geocodingBerlin } from "./fixtures/weather-app/geocoding-ber
 export { default as geocodingNoResults } from "./fixtures/weather-app/geocoding-no-results.json";
 export { default as geocodingSingapore } from "./fixtures/weather-app/geocoding-singapore.json";
 export { setupTestServer } from "./msw-server";
+export { stubPrefersReducedMotion } from "./match-media";
