@@ -1,15 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { fetchForecast, type Forecast } from "../api/forecast";
 import type { Place } from "../api/geocoding";
 import { BERLIN, placeLabel } from "../model/place";
 import { METRIC, type Units } from "../model/units";
 import { CurrentWeather } from "./CurrentWeather";
 import { DailyForecast } from "./DailyForecast";
+import { ErrorScreen } from "./ErrorScreen";
 import { HourlyForecast } from "./HourlyForecast";
 import { SearchBox } from "./SearchBox";
 import { UnitsMenu } from "./UnitsMenu";
 
 const LOADING = "Loading...";
+
+type Retry = { query: string | null };
+type AppError = { kind: "search" | "weather"; query: string | null };
 
 export const WeatherApp = () => {
   const [place, setPlace] = useState<Place | null>(BERLIN);
@@ -17,6 +21,10 @@ export const WeatherApp = () => {
   const [noResult, setNoResult] = useState(false);
   const [status, setStatus] = useState("");
   const [units, setUnits] = useState<Units>(METRIC);
+  const [error, setError] = useState<AppError | null>(null);
+  const [attempt, setAttempt] = useState(0);
+  const [retry, setRetry] = useState<Retry | undefined>(undefined);
+  const searchingQuery = useRef<string | null>(null);
 
   useEffect(() => {
     if (!place) return;
@@ -28,11 +36,19 @@ export const WeatherApp = () => {
           current === LOADING ? `Weather for ${placeLabel(place)}` : current,
         );
       })
-      .catch(() => {});
+      .catch(() => {
+        if (controller.signal.aborted) return;
+        setError(
+          (current) =>
+            current ?? { kind: "weather", query: searchingQuery.current },
+        );
+        setStatus("");
+      });
     return () => controller.abort();
-  }, [place]);
+  }, [place, attempt]);
 
   const select = (selected: Place) => {
+    searchingQuery.current = null;
     setNoResult(false);
     setForecast(null);
     setStatus(LOADING);
@@ -40,10 +56,18 @@ export const WeatherApp = () => {
   };
 
   const showNoResult = () => {
+    searchingQuery.current = null;
     setPlace(null);
     setForecast(null);
     setNoResult(true);
     setStatus("No search result found!");
+  };
+
+  const retryAfterError = () => {
+    if (!error) return;
+    if (error.kind === "weather") setAttempt((count) => count + 1);
+    setRetry({ query: error.query });
+    setError(null);
   };
 
   return (
@@ -52,16 +76,32 @@ export const WeatherApp = () => {
         <img src="/weather-app/images/logo.svg" alt="Weather Now" />
         <UnitsMenu units={units} onChange={setUnits} />
       </header>
-      <SearchBox
-        onSearching={() => setStatus("Search in progress")}
-        onResults={() => setStatus("")}
-        onNoResult={showNoResult}
-        onSelect={select}
-      />
+      {!error && (
+        <SearchBox
+          retry={retry}
+          onSearching={(query) => {
+            searchingQuery.current = query;
+            setStatus("Search in progress");
+          }}
+          onResults={() => {
+            searchingQuery.current = null;
+            setStatus("");
+          }}
+          onError={(query) => {
+            searchingQuery.current = null;
+            setError({ kind: "search", query });
+            setStatus("");
+          }}
+          onNoResult={showNoResult}
+          onSelect={select}
+        />
+      )}
       <p role="status" className="sr-only">
         {status}
       </p>
-      {noResult ? (
+      {error ? (
+        <ErrorScreen onRetry={retryAfterError} />
+      ) : noResult ? (
         <p>No search result found!</p>
       ) : (
         <>

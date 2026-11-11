@@ -3,24 +3,29 @@ import { searchPlaces, type Place } from "../api/geocoding";
 import { candidateLabel } from "../model/place";
 
 type Props = {
-  onSearching: () => void;
+  retry?: { query: string | null };
+  onSearching: (query: string) => void;
+  onError: (query: string) => void;
   onNoResult: () => void;
   onResults: () => void;
   onSelect: (place: Place) => void;
 };
 
 export const SearchBox = ({
+  retry,
   onSearching,
+  onError,
   onNoResult,
   onResults,
   onSelect,
 }: Props) => {
   const listId = useId();
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(retry?.query ?? "");
   const [searching, setSearching] = useState(false);
   const [candidates, setCandidates] = useState<Place[]>([]);
   const [active, setActive] = useState(-1);
   const controllerRef = useRef<AbortController | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => () => controllerRef.current?.abort(), []);
 
@@ -37,15 +42,15 @@ export const SearchBox = ({
     onSelect(place);
   };
 
-  const search = async () => {
-    const name = query.trim();
+  const search = async (override?: string) => {
+    const name = (override ?? query).trim();
     if (!name) return;
     controllerRef.current?.abort();
     const controller = new AbortController();
     controllerRef.current = controller;
     close();
     setSearching(true);
-    onSearching();
+    onSearching(name);
     try {
       const places = await searchPlaces(name, controller.signal);
       if (controller.signal.aborted) return;
@@ -57,9 +62,20 @@ export const SearchBox = ({
       setCandidates(places);
       onResults();
     } catch {
-      if (!controller.signal.aborted) setSearching(false);
+      if (controller.signal.aborted) return;
+      setSearching(false);
+      onError(name);
     }
   };
+
+  useEffect(() => {
+    if (!retry) return;
+    inputRef.current?.focus();
+    const { query: retryQuery } = retry;
+    if (retryQuery) void Promise.resolve().then(() => search(retryQuery));
+    // 다시 시도로 마운트될 때 한 번만 실행한다.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (!open) return;
@@ -87,6 +103,7 @@ export const SearchBox = ({
     >
       <img src="/weather-app/images/icon-search.svg" alt="" />
       <input
+        ref={inputRef}
         type="search"
         role="combobox"
         aria-expanded={open}
