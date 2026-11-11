@@ -45,6 +45,7 @@
 
 - 폰트는 `@fontsource` 패키지로 설치하고 슬라이스 `index.tsx`에서 가져온다.
 - 범위 클래스에 `--font-sans`와 `font-family`를 함께 쓴다. `font-sans` 유틸리티는 값이 고정되어 있고, `font-heading`은 변수를 따른다.
+- 범위 클래스에 `--font-heading`도 쓴다. 쓰지 않으면 전역 기본값(전역 `--font-sans`)을 이어받아 슬라이스의 본문 폰트와 달라진다. 제목이 본문과 같으면 `var(--font-sans)`로 쓴다.
 
 ## Portal
 
