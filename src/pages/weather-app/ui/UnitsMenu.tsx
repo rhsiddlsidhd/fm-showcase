@@ -9,6 +9,8 @@ import {
 } from "@/shared/ui/dropdown-menu";
 import { IMPERIAL, isImperial, METRIC, type Units } from "../model/units";
 
+const ITEM_RING = "focus:ring-2 focus:ring-ring";
+
 export const UnitsMenu = ({
   units,
   onChange,
@@ -26,6 +28,7 @@ export const UnitsMenu = ({
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem
+          className={ITEM_RING}
           onClick={() => onChange(imperial ? METRIC : IMPERIAL)}
         >
           {imperial ? "Switch to Metric" : "Switch to Imperial"}
@@ -37,10 +40,10 @@ export const UnitsMenu = ({
             onChange({ ...units, temperature: value as Units["temperature"] })
           }
         >
-          <DropdownMenuRadioItem value="celsius">
+          <DropdownMenuRadioItem value="celsius" className={ITEM_RING}>
             Celsius (°C)
           </DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="fahrenheit">
+          <DropdownMenuRadioItem value="fahrenheit" className={ITEM_RING}>
             Fahrenheit (°F)
           </DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>
@@ -51,8 +54,12 @@ export const UnitsMenu = ({
             onChange({ ...units, wind: value as Units["wind"] })
           }
         >
-          <DropdownMenuRadioItem value="kmh">km/h</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="mph">mph</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="kmh" className={ITEM_RING}>
+            km/h
+          </DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="mph" className={ITEM_RING}>
+            mph
+          </DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>
         <DropdownMenuSeparator />
         <DropdownMenuRadioGroup
@@ -64,10 +71,12 @@ export const UnitsMenu = ({
             })
           }
         >
-          <DropdownMenuRadioItem value="mm">
+          <DropdownMenuRadioItem value="mm" className={ITEM_RING}>
             Millimeters (mm)
           </DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="in">Inches (in)</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="in" className={ITEM_RING}>
+            Inches (in)
+          </DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>
