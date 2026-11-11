@@ -8,7 +8,7 @@ interface ChallengeRailProps {
 
 export const ChallengeRail = ({ challenges }: ChallengeRailProps) => (
   <ul
-    className="showcase-rail mx-auto flex w-full max-w-(--showcase-rail-max-width) snap-x snap-mandatory scroll-px-(--showcase-rail-inset) gap-(--showcase-rail-gap) overflow-x-auto p-(--showcase-rail-inset) md:grid md:grid-cols-2 md:snap-none md:overflow-visible md:max-w-none md:p-0 lg:grid-cols-3"
+    className="showcase-rail mx-auto flex w-full max-w-(--showcase-rail-max-width) snap-x snap-mandatory scroll-px-(--showcase-rail-inset) gap-(--showcase-rail-gap) overflow-x-auto p-(--showcase-rail-inset) md:grid md:max-w-none md:snap-none md:grid-cols-2 md:overflow-visible md:p-0 lg:grid-cols-3"
     onFocus={(event) =>
       event.target.scrollIntoView({ block: "nearest", inline: "nearest" })
     }

@@ -27,7 +27,7 @@ export const ChallengeCard = ({ challenge }: ChallengeCardProps) => {
     <MotionLink
       to={challengePath(challenge.slug)}
       aria-labelledby={titleId}
-      className="showcase-card mx-auto w-full max-w-(--showcase-card-max-width) text-card-foreground outline-ring flex aspect-(--showcase-card-aspect-ratio) flex-col gap-(--showcase-card-content-gap) overflow-hidden rounded-(--showcase-card-radius) p-(--showcase-card-padding) shadow-(--showcase-card-shadow) outline-offset-(--showcase-focus-offset) focus-visible:outline-(length:--showcase-focus-width)"
+      className="showcase-card text-card-foreground outline-ring mx-auto flex aspect-(--showcase-card-aspect-ratio) w-full max-w-(--showcase-card-max-width) flex-col gap-(--showcase-card-content-gap) overflow-hidden rounded-(--showcase-card-radius) p-(--showcase-card-padding) shadow-(--showcase-card-shadow) outline-offset-(--showcase-focus-offset) focus-visible:outline-(length:--showcase-focus-width)"
       animate={
         shouldReduceMotion
           ? { y: 0, backgroundPosition: CARD_SHEEN_POSITIONS[0] }

@@ -28,16 +28,34 @@
   --showcase-moon-mint: rgb(158 239 207 / 0.5);
   --showcase-moon-blue: rgb(158 199 255 / 0.5);
   --showcase-moon-gold: rgb(255 214 158 / 0.45);
-  --showcase-moon: radial-gradient(
+  --showcase-moon:
+    radial-gradient(
       9rem circle at 10% 42%,
       var(--showcase-moon-pink),
       transparent 65%
     ),
-    radial-gradient(9rem circle at 8.5% 44%, var(--showcase-moon-mint), transparent 65%),
-    radial-gradient(9rem circle at 11% 44.5%, var(--showcase-moon-blue), transparent 65%),
-    radial-gradient(9rem circle at 9.5% 41%, var(--showcase-moon-gold), transparent 65%);
-  --showcase-vignette: radial-gradient(120% 90% at 50% 32%, #171a22, transparent 70%);
-  --showcase-background-image: var(--showcase-moon), var(--showcase-vignette),
+    radial-gradient(
+      9rem circle at 8.5% 44%,
+      var(--showcase-moon-mint),
+      transparent 65%
+    ),
+    radial-gradient(
+      9rem circle at 11% 44.5%,
+      var(--showcase-moon-blue),
+      transparent 65%
+    ),
+    radial-gradient(
+      9rem circle at 9.5% 41%,
+      var(--showcase-moon-gold),
+      transparent 65%
+    );
+  --showcase-vignette: radial-gradient(
+    120% 90% at 50% 32%,
+    #171a22,
+    transparent 70%
+  );
+  --showcase-background-image:
+    var(--showcase-moon), var(--showcase-vignette),
     linear-gradient(145deg, var(--background), var(--showcase-background-end));
   --showcase-content-max-width: 76rem;
   --showcase-page-inline-padding: clamp(1rem, 4vw, 3rem);
@@ -52,7 +70,10 @@
   --showcase-rail-max-width: 24rem;
   /* 카드 높이가 포커스 표시 여유를 포함해 화면 높이를 넘지 않도록 폭을 제한한다. */
   --showcase-card-max-width: calc(
-    (100dvh - 2 * (var(--showcase-focus-offset) + var(--showcase-focus-width))) /
+    (
+        100dvh - 2 *
+          (var(--showcase-focus-offset) + var(--showcase-focus-width))
+      ) /
       var(--showcase-card-height-ratio)
   );
   --showcase-card-aspect-ratio: 1 / var(--showcase-card-height-ratio);
@@ -61,8 +82,9 @@
   --showcase-card-radius: 1.25rem;
   --showcase-card-shadow-near: 0 2px 8px rgb(0 0 0 / 0.22);
   --showcase-card-shadow-far: 0 16px 24px rgb(0 0 0 / 0.26);
-  --showcase-card-shadow: var(--showcase-card-shadow-near),
-    var(--showcase-card-shadow-far), var(--showcase-card-bevel);
+  --showcase-card-shadow:
+    var(--showcase-card-shadow-near), var(--showcase-card-shadow-far),
+    var(--showcase-card-bevel);
   --showcase-border-width: 1px;
   --showcase-focus-width: 2px;
   --showcase-focus-offset: 3px;
@@ -140,9 +162,9 @@
     --showcase-card-backdrop-filter: blur(var(--showcase-glass-blur))
       saturate(var(--showcase-glass-saturate));
     --showcase-card-border-color: var(--showcase-glass-border);
-    --showcase-card-shadow: var(--showcase-card-shadow-near),
-      var(--showcase-card-shadow-far), var(--showcase-glass-inset-highlight),
-      var(--showcase-card-bevel);
+    --showcase-card-shadow:
+      var(--showcase-card-shadow-near), var(--showcase-card-shadow-far),
+      var(--showcase-glass-inset-highlight), var(--showcase-card-bevel);
   }
 }
 
@@ -152,16 +174,20 @@
     --showcase-card-highlight-surface: var(--showcase-card-highlight);
     --showcase-card-backdrop-filter: none;
     --showcase-card-border-color: transparent;
-    --showcase-card-shadow: var(--showcase-card-shadow-near),
-      var(--showcase-card-shadow-far), var(--showcase-card-bevel);
+    --showcase-card-shadow:
+      var(--showcase-card-shadow-near), var(--showcase-card-shadow-far),
+      var(--showcase-card-bevel);
   }
 }
 
 .theme-showcase .showcase-card {
   background-color: var(--showcase-card-surface);
   background-image: var(--showcase-card-sheen), var(--showcase-card-noise);
-  background-size: var(--showcase-card-sheen-size), var(--showcase-card-noise-size);
-  background-position: 0% 0%, 0 0;
+  background-size:
+    var(--showcase-card-sheen-size), var(--showcase-card-noise-size);
+  background-position:
+    0% 0%,
+    0 0;
   border: var(--showcase-border-width) solid var(--showcase-card-border-color);
   -webkit-backdrop-filter: var(--showcase-card-backdrop-filter);
   backdrop-filter: var(--showcase-card-backdrop-filter);
