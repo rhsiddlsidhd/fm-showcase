@@ -15,13 +15,18 @@ test("날씨 앱 주소로 바로 들어가면 날씨 앱 페이지의 헤드라
   await expect(page.getByRole("heading", { name: headline })).toBeVisible();
 });
 
-test("쇼케이스에서 날씨 앱 카드를 누르면 날씨 앱 페이지로 이동한다", async ({
-  page,
-}) => {
-  await page.goto("/");
+test.describe("쇼케이스 카드 탐색", () => {
+  // 쇼케이스 카드의 부유 애니메이션은 검증 대상이 아니다. 클릭은 움직임이 없는 상태로 한다.
+  test.use({ reducedMotion: "reduce" });
 
-  await page.getByRole("link", { name: /Weather app/ }).click();
+  test("쇼케이스에서 날씨 앱 카드를 누르면 날씨 앱 페이지로 이동한다", async ({
+    page,
+  }) => {
+    await page.goto("/");
 
-  await expect(page).toHaveURL(/\/weather-app$/);
-  await expect(page.getByRole("heading", { name: headline })).toBeVisible();
+    await page.getByRole("link", { name: /Weather app/ }).click();
+
+    await expect(page).toHaveURL(/\/weather-app$/);
+    await expect(page.getByRole("heading", { name: headline })).toBeVisible();
+  });
 });
