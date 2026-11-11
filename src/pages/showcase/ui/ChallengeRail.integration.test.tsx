@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { createMemoryRouter, MemoryRouter, RouterProvider } from "react-router";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { Challenge } from "../model/challenge";
-import { ShowcaseController } from "./ShowcaseController";
+import { ChallengeRail } from "./ChallengeRail";
 
 // 검증용 가상 데이터 A~D. 앱의 등록 목록에는 추가하지 않는다.
 const challengeA: Challenge = {
@@ -53,14 +53,14 @@ afterAll(() => {
 const renderList = () =>
   render(
     <MemoryRouter initialEntries={["/"]}>
-      <ShowcaseController challenges={challenges} />
+      <ChallengeRail challenges={challenges} />
     </MemoryRouter>,
   );
 
 const getCard = (challenge: Challenge) =>
   screen.getByRole("link", { name: challenge.title });
 
-describe("ShowcaseController 카드 목록", () => {
+describe("ChallengeRail 카드 목록", () => {
   it("등록된 챌린지마다 제목을 이름으로 가진 카드 링크가 하나씩 보인다", () => {
     renderList();
 
@@ -123,13 +123,39 @@ describe("ShowcaseController 카드 목록", () => {
     }
   });
 
+  it("카드는 등록된 순서대로 보인다", () => {
+    renderList();
+
+    expect(screen.getAllByRole("link").map((link) => link.textContent)).toEqual(
+      challenges.map((challenge) => expect.stringContaining(challenge.title)),
+    );
+  });
+
+  it("카드마다 그 챌린지의 경로로 가는 링크 하나다", () => {
+    renderList();
+
+    for (const challenge of challenges) {
+      expect(getCard(challenge)).toHaveAttribute("href", `/${challenge.slug}`);
+    }
+    expect(screen.getAllByRole("link")).toHaveLength(challenges.length);
+  });
+
+  it("카드 목록 외에 페이지 제목, 필터, 결과 개수가 없다", () => {
+    renderList();
+
+    expect(screen.queryByRole("heading", { level: 1 })).not.toBeInTheDocument();
+    expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+    expect(screen.queryByText(/\d+\s*개/)).not.toBeInTheDocument();
+  });
+
   it("카드를 누르면 그 챌린지의 경로로 이동한다", async () => {
     const user = userEvent.setup();
     const router = createMemoryRouter(
       [
         {
           path: "/",
-          element: <ShowcaseController challenges={challenges} />,
+          element: <ChallengeRail challenges={challenges} />,
         },
         { path: "/:slug", element: <p>도착한 챌린지 화면</p> },
       ],
@@ -140,5 +166,34 @@ describe("ShowcaseController 카드 목록", () => {
     await user.click(getCard(challengeC));
 
     expect(router.state.location.pathname).toBe("/challenge-c");
+  });
+});
+
+describe("ChallengeRail 빈 상태", () => {
+  const renderEmpty = () =>
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <ChallengeRail challenges={[]} />
+      </MemoryRouter>,
+    );
+
+  it("등록된 챌린지가 없으면 등록 안내 카드가 보인다", () => {
+    renderEmpty();
+
+    expect(screen.getByText("챌린지들 등록해주세요.")).toBeInTheDocument();
+  });
+
+  it("등록 안내는 화면 낭독기에 알려지는 상태 영역으로 보인다", () => {
+    renderEmpty();
+
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "챌린지들 등록해주세요.",
+    );
+  });
+
+  it("등록된 챌린지가 없으면 카드 링크가 하나도 없다", () => {
+    renderEmpty();
+
+    expect(screen.queryAllByRole("link")).toHaveLength(0);
   });
 });

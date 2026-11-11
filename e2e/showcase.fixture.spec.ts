@@ -1,322 +1,23 @@
-import { expect, test, type Locator, type Page } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { challenges } from "./fixtures/showcase-registry.ts";
 
 // Tailwind 기본 브레이크포인트: md = 48rem(768px), lg = 64rem(1024px).
 // 이 저장소의 src/app/styles/index.css는 이 값을 재정의하지 않는다.
-const layouts = [
-  { width: 767, label: "md 미만", visible: 1 },
-  { width: 768, label: "md 이상·lg 미만", visible: 2 },
-  { width: 1023, label: "md 이상·lg 미만", visible: 2 },
-  { width: 1024, label: "lg 이상", visible: 3 },
+const railLayout = { width: 767, label: "md 미만", visible: 1 } as const;
+const gridLayouts = [
+  { width: 768, label: "md 이상·lg 미만", columns: 2 },
+  { width: 1023, label: "md 이상·lg 미만", columns: 2 },
+  { width: 1024, label: "lg 이상", columns: 3 },
 ] as const;
+
+// 부유 애니메이션의 진행은 검증 대상이 아니다. 레이아웃·포커스 측정은 움직임이 없는 상태로 한다.
+test.use({ reducedMotion: "reduce" });
 
 const titles = challenges.map((challenge) => challenge.title);
 const lastTitle = titles[titles.length - 1];
 
 function cardLink(page: Page, title: string) {
   return page.getByRole("link", { name: new RegExp(title) });
-}
-
-async function measureChipFocus(checkbox: Locator) {
-  return checkbox.evaluate((element) => {
-    const label = (element as HTMLButtonElement).labels?.[0];
-    if (!label) throw new Error("Checkbox에 연결된 레이블이 없다");
-    let chip: Element = label;
-    while (!chip.contains(element)) {
-      if (!chip.parentElement) throw new Error("Checkbox 칩을 찾을 수 없다");
-      chip = chip.parentElement;
-    }
-
-    const surface = chip.getBoundingClientRect();
-    const view = { left: 0, top: 0, right: innerWidth, bottom: innerHeight };
-    let ancestor = chip.parentElement;
-    while (ancestor) {
-      const style = getComputedStyle(ancestor);
-      const rect = ancestor.getBoundingClientRect();
-      if (style.overflowX !== "visible") {
-        view.left = Math.max(view.left, rect.left + ancestor.clientLeft);
-        view.right = Math.min(
-          view.right,
-          rect.left + ancestor.clientLeft + ancestor.clientWidth,
-        );
-      }
-      if (style.overflowY !== "visible") {
-        view.top = Math.max(view.top, rect.top + ancestor.clientTop);
-        view.bottom = Math.min(
-          view.bottom,
-          rect.top + ancestor.clientTop + ancestor.clientHeight,
-        );
-      }
-      ancestor = ancestor.parentElement;
-    }
-
-    // 작은 Checkbox의 링만으로 통과하지 않도록, 표시를 그리는 요소의
-    // 실제 사각형이 레이블과 체크 기호를 합성한 칩 전체를 덮는지 본다.
-    const indicators = [chip, ...chip.querySelectorAll("*")].flatMap((node) => {
-      const style = getComputedStyle(node);
-      const rect = node.getBoundingClientRect();
-      const width = parseFloat(style.outlineWidth) || 0;
-      if (
-        style.outlineStyle === "none" ||
-        style.outlineStyle === "hidden" ||
-        width <= 0 ||
-        style.outlineColor === "rgba(0, 0, 0, 0)" ||
-        style.visibility !== "visible" ||
-        Number(style.opacity) === 0 ||
-        rect.width <= 0 ||
-        rect.height <= 0
-      )
-        return [];
-      if (
-        rect.left > surface.left + 0.5 ||
-        rect.top > surface.top + 0.5 ||
-        rect.right < surface.right - 0.5 ||
-        rect.bottom < surface.bottom - 0.5
-      )
-        return [];
-
-      const spread = Math.max(
-        width + (parseFloat(style.outlineOffset) || 0),
-        0,
-      );
-      return [
-        {
-          left: rect.left - spread,
-          top: rect.top - spread,
-          right: rect.right + spread,
-          bottom: rect.bottom + spread,
-        },
-      ];
-    });
-    return {
-      focusedButton:
-        element instanceof HTMLButtonElement &&
-        document.activeElement === element,
-      wholeChipIndicator: indicators.length > 0,
-      indicatorUnclipped: indicators.some(
-        (rect) =>
-          rect.left >= view.left - 0.5 &&
-          rect.top >= view.top - 0.5 &&
-          rect.right <= view.right + 0.5 &&
-          rect.bottom <= view.bottom + 0.5,
-      ),
-    };
-  });
-}
-
-test("Tab과 Shift+Tab으로 Newbie·Junior Checkbox 버튼을 오가면 해당 칩 전체의 포커스 표시가 잘리지 않고 보인다", async ({
-  page,
-}) => {
-  await page.goto("/");
-  const difficulty = page.getByRole("group", { name: "난이도", exact: true });
-  const newbie = difficulty.getByRole("checkbox", {
-    name: "Newbie",
-    exact: true,
-  });
-  const junior = difficulty.getByRole("checkbox", {
-    name: "Junior",
-    exact: true,
-  });
-  await expect(newbie).toBeVisible();
-  await page.evaluate(() => document.fonts.ready);
-  expect((await measureChipFocus(newbie)).wholeChipIndicator).toBe(false);
-  expect((await measureChipFocus(junior)).wholeChipIndicator).toBe(false);
-
-  for (let index = 0; index < 50; index += 1) {
-    await page.keyboard.press("Tab");
-    if (await newbie.evaluate((element) => element === document.activeElement))
-      break;
-  }
-  for (const [target, other, key] of [
-    [newbie, junior, null],
-    [junior, newbie, "Tab"],
-    [newbie, junior, "Shift+Tab"],
-  ] as const) {
-    if (key) await page.keyboard.press(key);
-    await expect(target).toBeFocused();
-    await expect
-      .poll(() => measureChipFocus(target))
-      .toEqual({
-        focusedButton: true,
-        wholeChipIndicator: true,
-        indicatorUnclipped: true,
-      });
-    await expect
-      .poll(async () => (await measureChipFocus(other)).wholeChipIndicator)
-      .toBe(false);
-  }
-});
-
-async function tabTo(page: Page, target: Locator) {
-  for (let index = 0; index < 20; index += 1) {
-    await page.keyboard.press("Tab");
-    if (await target.evaluate((element) => element === document.activeElement))
-      break;
-  }
-  await expect(target).toBeFocused();
-}
-
-test("결과가 있는 화면에서 필터 초기화를 키보드로 활성화하면 사라진 버튼 대신 Newbie Checkbox 버튼에 포커스가 복구된다", async ({
-  page,
-}) => {
-  await page.goto("/");
-  const newbie = page
-    .getByRole("group", { name: "난이도", exact: true })
-    .getByRole("checkbox", { name: "Newbie", exact: true });
-  const reset = page.getByRole("button", {
-    name: "필터 초기화",
-    exact: true,
-  });
-  const cards = page.getByRole("link", { name: /^가상 챌린지 / });
-
-  await tabTo(page, newbie);
-  await page.keyboard.press("Space");
-  await expect(newbie).toBeChecked();
-  await expect(cards).toHaveCount(2);
-  await tabTo(page, reset);
-
-  await page.keyboard.press("Enter");
-
-  await expect(reset).toHaveCount(0);
-  await expect(newbie).toHaveJSProperty("tagName", "BUTTON");
-  await expect(newbie).toBeFocused();
-  await expect(newbie).not.toBeChecked();
-  await expect(cards).toHaveCount(challenges.length);
-  await expect.poll(() => new URL(page.url()).search).toBe("");
-});
-
-test("결과 없음 안내의 필터 초기화를 키보드로 활성화하면 전체 목록이 복원되고 Newbie Checkbox 버튼에 포커스가 복구된다", async ({
-  page,
-}) => {
-  await page.goto("/");
-  const newbie = page
-    .getByRole("group", { name: "난이도", exact: true })
-    .getByRole("checkbox", { name: "Newbie", exact: true });
-  const react = page
-    .getByRole("group", { name: "사용 기술", exact: true })
-    .getByRole("checkbox", { name: "React", exact: true });
-  const reset = page.getByRole("button", {
-    name: "필터 초기화",
-    exact: true,
-  });
-  const cards = page.getByRole("link", { name: /^가상 챌린지 / });
-  const noResults = page.getByText("조건에 맞는 챌린지가 없습니다.", {
-    exact: true,
-  });
-
-  await tabTo(page, newbie);
-  await page.keyboard.press("Space");
-  await tabTo(page, react);
-  await page.keyboard.press("Space");
-  await expect(noResults).toBeVisible();
-  await expect(cards).toHaveCount(0);
-  await tabTo(page, reset);
-
-  await page.keyboard.press("Enter");
-
-  await expect(reset).toHaveCount(0);
-  await expect(newbie).toHaveJSProperty("tagName", "BUTTON");
-  await expect(newbie).toBeFocused();
-  await expect(cards).toHaveCount(challenges.length);
-  await expect(noResults).toHaveCount(0);
-  await expect(newbie).not.toBeChecked();
-  await expect(react).not.toBeChecked();
-  await expect.poll(() => new URL(page.url()).search).toBe("");
-});
-
-for (const area of [
-  "체크 기호",
-  "레이블 글자",
-  "글자·체크 기호 밖 레이블 표면",
-] as const) {
-  test(`Newbie 칩의 ${area} 위치를 클릭하면 Newbie가 선택된다`, async ({
-    page,
-  }) => {
-    await page.goto("/");
-    const checkbox = page
-      .getByRole("group", { name: "난이도", exact: true })
-      .getByRole("checkbox", { name: "Newbie", exact: true });
-    await expect(checkbox).toBeVisible();
-    await expect(checkbox).not.toBeChecked();
-    await page.evaluate(() => document.fonts.ready);
-    await checkbox.scrollIntoViewIfNeeded();
-
-    const point = await checkbox.evaluate((element, targetArea) => {
-      const control = element.getBoundingClientRect();
-      if (targetArea === "체크 기호") {
-        return {
-          x: control.x + control.width / 2,
-          y: control.y + control.height / 2,
-        };
-      }
-
-      const label = (element as HTMLButtonElement).labels?.[0];
-      if (!label) throw new Error("Newbie에 연결된 레이블이 없다");
-      const walker = document.createTreeWalker(label, NodeFilter.SHOW_TEXT);
-      let text = walker.nextNode();
-      while (text && !text.textContent?.includes("Newbie"))
-        text = walker.nextNode();
-      if (!text) throw new Error("레이블에 Newbie 글자가 없다");
-      const start = text.textContent!.indexOf("Newbie");
-      const range = document.createRange();
-      range.setStart(text, start);
-      range.setEnd(text, start + "Newbie".length);
-      const word = range.getBoundingClientRect();
-      if (targetArea === "레이블 글자") {
-        // 첫 글자 N의 실제 텍스트 영역 중앙을 누른다.
-        range.setEnd(text, start + 1);
-        const letter = range.getBoundingClientRect();
-        return {
-          x: letter.x + letter.width / 2,
-          y: letter.y + letter.height / 2,
-        };
-      }
-
-      // 레이블은 가상 요소로 칩 전체에 클릭 영역을 넓힐 수도 있다.
-      // 연결된 레이블과 체크박스를 함께 담은 칩의 실제 치수를 쓴다.
-      let chip: Element = label;
-      while (!chip.contains(element)) {
-        if (!chip.parentElement) throw new Error("Newbie 칩을 찾을 수 없다");
-        chip = chip.parentElement;
-      }
-      const surface = chip.getBoundingClientRect();
-      const left = Math.min(word.left, control.left);
-      const right = Math.max(word.right, control.right);
-      const top = Math.min(word.top, control.top);
-      const bottom = Math.max(word.bottom, control.bottom);
-      const centerX = surface.x + surface.width / 2;
-      const centerY = surface.y + surface.height / 2;
-      const spaces = [
-        { gap: left - surface.left, x: (surface.left + left) / 2, y: centerY },
-        {
-          gap: surface.right - right,
-          x: (right + surface.right) / 2,
-          y: centerY,
-        },
-        { gap: top - surface.top, x: centerX, y: (surface.top + top) / 2 },
-        {
-          gap: surface.bottom - bottom,
-          x: centerX,
-          y: (bottom + surface.bottom) / 2,
-        },
-      ].sort((a, b) => b.gap - a.gap);
-      const space = spaces[0]!;
-      if (space.gap <= 2)
-        throw new Error("레이블에 글자·체크 기호 밖 클릭 가능한 여백이 없다");
-      const hit = document.elementFromPoint(space.x, space.y);
-      if (!hit || !label.contains(hit)) {
-        throw new Error("칩의 여백 좌표가 연결된 레이블 표면에 닿지 않는다");
-      }
-      return { x: space.x, y: space.y };
-    }, area);
-
-    await page.mouse.click(point.x, point.y);
-
-    await expect(checkbox).toBeChecked();
-    await expect
-      .poll(() => new URL(page.url()).searchParams.getAll("difficulty"))
-      .toEqual(["Newbie"]);
-  });
 }
 
 // 카드들을 담은 가로 스크롤 영역(Rail)의 보이는 범위 안에 카드가 전부 들어오는지 본다.
@@ -351,8 +52,7 @@ async function measureRail(page: Page) {
         .map(({ index }) => index),
       tops: rects.map((rect) => Math.round(rect.top)),
       scrollable: scroller.scrollWidth > scroller.clientWidth,
-      // 목록 중 뷰포트 안에 보이는 부분의 중앙. 카드가 뷰포트보다 높아도
-      // 휠 입력이 실제로 목록 위에서 일어나게 한다.
+      // 목록 중 뷰포트 안에 보이는 부분의 중앙. 휠 입력이 실제로 목록 위에서 일어나게 한다.
       pointer: {
         x: (Math.max(box.left, 0) + Math.min(box.right, innerWidth)) / 2,
         y: (Math.max(box.top, 0) + Math.min(box.bottom, innerHeight)) / 2,
@@ -417,7 +117,95 @@ async function measureFocusedCard(page: Page, title: string) {
   }, handle);
 }
 
-async function expectKeyboardCardExposure(page: Page) {
+// 카드가 화면에서 놓인 자리를 본다. 가로 스크롤 영역과 무관하게 뷰포트 기준이다.
+async function measureGrid(page: Page) {
+  const handles = await Promise.all(
+    titles.map((title) => cardLink(page, title).elementHandle()),
+  );
+  return page.evaluate((cards) => {
+    const rects = cards.map((card) => card!.getBoundingClientRect());
+    const firstTop = Math.round(rects[0]!.top);
+    const hasHorizontalScroller = (element: Element) => {
+      let node: Element | null = element.parentElement;
+      while (node) {
+        const overflowX = getComputedStyle(node).overflowX;
+        if (
+          (overflowX === "auto" || overflowX === "scroll") &&
+          node.scrollWidth > node.clientWidth
+        )
+          return true;
+        node = node.parentElement;
+      }
+      return false;
+    };
+    return {
+      columns: rects.filter((rect) => Math.round(rect.top) === firstTop).length,
+      rows: new Set(rects.map((rect) => Math.round(rect.top))).size,
+      allInsideViewportWidth: rects.every(
+        (rect) => rect.left >= -0.5 && rect.right <= innerWidth + 0.5,
+      ),
+      horizontalOverflow:
+        document.documentElement.scrollWidth >
+          document.documentElement.clientWidth ||
+        cards.some((card) => hasHorizontalScroller(card!)),
+    };
+  }, handles);
+}
+
+// 포커스된 카드 링크와 그 포커스 표시(outline) 영역이 뷰포트 안에 모두 들어오는지 본다.
+async function measureFocusedCardInViewport(page: Page, title: string) {
+  const handle = await cardLink(page, title).elementHandle();
+  return page.evaluate((card) => {
+    if (!card || document.activeElement !== card) return null;
+    const style = getComputedStyle(card);
+    const outlineWidth = parseFloat(style.outlineWidth) || 0;
+    const outlineShown = style.outlineStyle !== "none" && outlineWidth > 0;
+    const spread = outlineShown
+      ? Math.max(outlineWidth + (parseFloat(style.outlineOffset) || 0), 0)
+      : 0;
+    const rect = card.getBoundingClientRect();
+    const inViewport = (r: {
+      left: number;
+      top: number;
+      right: number;
+      bottom: number;
+    }) =>
+      r.left >= -0.5 &&
+      r.top >= -0.5 &&
+      r.right <= innerWidth + 0.5 &&
+      r.bottom <= innerHeight + 0.5;
+    return {
+      outlineShown,
+      linkVisible: inViewport(rect),
+      outlineVisible: inViewport({
+        left: rect.left - spread,
+        top: rect.top - spread,
+        right: rect.right + spread,
+        bottom: rect.bottom + spread,
+      }),
+    };
+  }, handle);
+}
+
+async function tabTo(page: Page, title: string) {
+  const target = cardLink(page, title);
+  for (let i = 0; i < 50; i += 1) {
+    await page.keyboard.press("Tab");
+    if (await target.evaluate((el) => el === document.activeElement)) break;
+  }
+  await expect(target).toBeFocused();
+}
+
+// 승인된 세로 황금비를 실제 링크 치수로 확인한다. 서브픽셀 반올림만 허용한다.
+async function expectGoldenRatio(page: Page, title: string) {
+  const box = await cardLink(page, title).boundingBox();
+  expect(box).not.toBeNull();
+  expect(
+    Math.abs(box!.height - box!.width * 1.61803398875),
+  ).toBeLessThanOrEqual(1);
+}
+
+async function expectRailKeyboardExposure(page: Page) {
   // 마지막 카드는 처음에 목록의 보이는 영역 밖에 있다.
   await expect
     .poll(async () =>
@@ -426,27 +214,7 @@ async function expectKeyboardCardExposure(page: Page) {
       ),
     )
     .toBe(false);
-
-  const target = cardLink(page, lastTitle!);
-  const before = await target.boundingBox();
-  expect(before).not.toBeNull();
-  // 승인된 세로 황금비를 실제 링크 치수로 확인한다. 서브픽셀 반올림만 허용한다.
-  expect(
-    Math.abs(before!.height - before!.width * 1.61803398875),
-  ).toBeLessThanOrEqual(1);
-  for (let i = 0; i < 50; i += 1) {
-    await page.keyboard.press("Tab");
-    if (await target.evaluate((el) => el === document.activeElement)) break;
-  }
-  await expect(target).toBeFocused();
-  const after = await target.boundingBox();
-  expect(after).not.toBeNull();
-  expect(
-    Math.abs(after!.height - after!.width * 1.61803398875),
-  ).toBeLessThanOrEqual(1);
-  expect(Math.abs(after!.width - before!.width)).toBeLessThanOrEqual(0.5);
-  expect(Math.abs(after!.height - before!.height)).toBeLessThanOrEqual(0.5);
-
+  await tabTo(page, lastTitle!);
   await expect
     .poll(() => measureFocusedCard(page, lastTitle!))
     .toEqual({
@@ -456,23 +224,36 @@ async function expectKeyboardCardExposure(page: Page) {
     });
 }
 
-for (const { width, label, visible } of layouts) {
-  test.describe(`화면 폭 ${width}px (${label})`, () => {
-    test.use({ viewport: { width, height: 900 } });
+async function expectGridKeyboardExposure(page: Page) {
+  await tabTo(page, lastTitle!);
+  await expect
+    .poll(() => measureFocusedCardInViewport(page, lastTitle!))
+    .toEqual({
+      outlineShown: true,
+      linkVisible: true,
+      outlineVisible: true,
+    });
+}
+
+const heights = [900, 600] as const;
+
+for (const height of heights) {
+  test.describe(`화면 ${railLayout.width}×${height}px (${railLayout.label})`, () => {
+    test.use({ viewport: { width: railLayout.width, height } });
 
     test.beforeEach(async ({ page }) => {
       await page.goto("/");
       await expect(cardLink(page, titles[0]!)).toBeVisible();
     });
 
-    test(`챌린지 카드 ${visible}개가 목록의 보이는 영역 안에 전부 들어온다`, async ({
+    test(`챌린지 카드 ${railLayout.visible}개가 목록의 보이는 영역 안에 전부 들어온다`, async ({
       page,
     }) => {
       await expect
         .poll(
           async () => (await measureRail(page))?.fullyVisible.length ?? null,
         )
-        .toBe(visible);
+        .toBe(railLayout.visible);
     });
 
     test("등록된 챌린지 카드는 모두 한 줄에 놓인다", async ({ page }) => {
@@ -505,49 +286,97 @@ for (const { width, label, visible } of layouts) {
         .toBe(true);
     });
 
+    test("카드 비율은 황금비다", async ({ page }) => {
+      await expectGoldenRatio(page, titles[0]!);
+    });
+
     test("키보드로 화면 밖 카드에 포커스를 옮기면 카드 전체와 포커스 표시가 보인다", async ({
       page,
     }) => {
-      await expectKeyboardCardExposure(page);
+      await expectRailKeyboardExposure(page);
     });
   });
 }
 
-for (const { width, visible } of layouts.filter(
-  ({ width }) => width !== 1023,
-)) {
-  test.describe(`화면 ${width}×600px`, () => {
-    test.use({ viewport: { width, height: 600 } });
+for (const height of heights) {
+  for (const { width, label, columns } of gridLayouts) {
+    test.describe(`화면 ${width}×${height}px (${label})`, () => {
+      test.use({ viewport: { width, height } });
 
-    test(`낮은 화면에서도 카드 ${visible}개 노출과 황금비를 유지하며 키보드와 가로 스크롤로 탐색한다`, async ({
-      page,
-    }) => {
-      await page.goto("/");
-      await expect(cardLink(page, titles[0]!)).toBeVisible();
-      await expect
-        .poll(
-          async () => (await measureRail(page))?.fullyVisible.length ?? null,
-        )
-        .toBe(visible);
-      await expect
-        .poll(async () => {
-          const rail = await measureRail(page);
-          return rail ? new Set(rail.tops).size : null;
-        })
-        .toBe(1);
-      await expectKeyboardCardExposure(page);
-      const rail = await measureRail(page);
-      expect(rail?.scrollable).toBe(true);
-      await page.mouse.move(rail!.pointer.x, rail!.pointer.y);
-      await page.mouse.wheel(-2000, 0);
-      await expect
-        .poll(async () => (await measureRail(page))?.fullyVisible.includes(0))
-        .toBe(true);
-      await expect
-        .poll(
-          async () => (await measureRail(page))?.fullyVisible.length ?? null,
-        )
-        .toBe(visible);
+      test.beforeEach(async ({ page }) => {
+        await page.goto("/");
+        await expect(cardLink(page, titles[0]!)).toBeVisible();
+      });
+
+      test(`챌린지 카드가 ${columns}열로 줄바꿈되어 놓인다`, async ({
+        page,
+      }) => {
+        await expect
+          .poll(async () => {
+            const grid = await measureGrid(page);
+            return { columns: grid.columns, rows: grid.rows };
+          })
+          .toEqual({
+            columns,
+            rows: Math.ceil(titles.length / columns),
+          });
+      });
+
+      test("가로로 넘기지 않아도 모든 카드를 볼 수 있다", async ({ page }) => {
+        await expect
+          .poll(async () => {
+            const grid = await measureGrid(page);
+            return {
+              inside: grid.allInsideViewportWidth,
+              overflow: grid.horizontalOverflow,
+            };
+          })
+          .toEqual({ inside: true, overflow: false });
+      });
+
+      test("카드 비율은 황금비다", async ({ page }) => {
+        await expectGoldenRatio(page, titles[0]!);
+      });
+
+      test("키보드로 카드에 포커스를 옮기면 카드 전체와 포커스 표시가 화면에 보인다", async ({
+        page,
+      }) => {
+        await expectGridKeyboardExposure(page);
+      });
     });
-  });
+  }
 }
+
+test.describe("움직임 줄이기 설정", () => {
+  test.use({ viewport: { width: 1024, height: 900 } });
+
+  test("움직임 줄이기 설정에서는 카드가 제자리에서 움직이지 않는다", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const card = cardLink(page, titles[0]!);
+    await expect(card).toBeVisible();
+
+    const top = async () => Math.round((await card.boundingBox())!.top);
+    const before = await top();
+    // 부유 주기(4.5초)의 절반 가까이 기다린 뒤에도 같은 자리에 있어야 한다.
+    await page.waitForTimeout(2500);
+    expect(await top()).toBe(before);
+  });
+});
+
+test.describe("첫 화면 구성", () => {
+  test("첫 화면에는 페이지 제목, 필터, 결과 개수가 보이지 않는다", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await expect(cardLink(page, titles[0]!)).toBeVisible();
+
+    await expect(page.getByRole("heading", { level: 1 })).toHaveCount(0);
+    await expect(page.getByRole("checkbox")).toHaveCount(0);
+    await expect(page.getByRole("button")).toHaveCount(0);
+    await expect(page.getByRole("combobox")).toHaveCount(0);
+    await expect(page.getByRole("link")).toHaveCount(titles.length);
+    await expect(page.getByText(/\d+\s*개/)).toHaveCount(0);
+  });
+});
