@@ -95,7 +95,7 @@ export const SearchBox = ({
 
   return (
     <form
-      className="relative"
+      className="relative flex flex-col gap-2 lg:flex-row"
       onSubmit={(event) => {
         event.preventDefault();
         void search();
@@ -103,6 +103,7 @@ export const SearchBox = ({
     >
       <img src="/weather-app/images/icon-search.svg" alt="" />
       <input
+        className="min-w-0 lg:flex-1"
         ref={inputRef}
         type="search"
         role="combobox"

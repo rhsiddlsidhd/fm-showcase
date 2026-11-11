@@ -71,7 +71,7 @@ export const WeatherApp = () => {
   };
 
   return (
-    <main>
+    <main className="mx-auto flex max-w-6xl flex-col gap-6 px-4">
       <header className="flex items-center justify-between">
         <img src="/weather-app/images/logo.svg" alt="Weather Now" />
         <UnitsMenu units={units} onChange={setUnits} />
@@ -103,17 +103,19 @@ export const WeatherApp = () => {
       {error ? (
         <ErrorScreen onRetry={retryAfterError} />
       ) : noResult ? (
-        <p>No search result found!</p>
+        <p className="text-center">No search result found!</p>
       ) : (
-        <>
-          <CurrentWeather
-            label={place ? placeLabel(place) : ""}
-            current={forecast?.current ?? null}
-            units={units}
-          />
-          <DailyForecast daily={forecast?.daily ?? null} units={units} />
+        <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
+          <div className="flex min-w-0 flex-col gap-6">
+            <CurrentWeather
+              label={place ? placeLabel(place) : ""}
+              current={forecast?.current ?? null}
+              units={units}
+            />
+            <DailyForecast daily={forecast?.daily ?? null} units={units} />
+          </div>
           <HourlyForecast forecast={forecast} units={units} />
-        </>
+        </div>
       )}
     </main>
   );

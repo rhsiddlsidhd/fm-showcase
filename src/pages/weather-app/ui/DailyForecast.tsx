@@ -14,7 +14,7 @@ export const DailyForecast = ({
 }) => (
   <section>
     <h2>Daily forecast</h2>
-    <ul className="grid grid-cols-7 gap-2">
+    <ul className="grid grid-cols-3 gap-2 lg:grid-cols-7">
       {daily
         ? daily.time.map((date, i) => (
             <li key={date}>

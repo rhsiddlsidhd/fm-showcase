@@ -38,7 +38,7 @@ export const CurrentWeather = ({
   ];
   return (
     <section>
-      <div className="flex items-center justify-between rounded-2xl p-6">
+      <div className="flex flex-col items-center justify-between gap-2 rounded-2xl p-6 sm:flex-row">
         {current ? (
           <>
             <div>
@@ -65,7 +65,7 @@ export const CurrentWeather = ({
           </div>
         )}
       </div>
-      <ul className="grid grid-cols-2 gap-4">
+      <ul className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {metrics.map(([name, value]) => (
           <li key={name}>
             <span>{name}</span>

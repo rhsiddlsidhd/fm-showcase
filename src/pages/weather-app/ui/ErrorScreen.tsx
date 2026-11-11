@@ -1,5 +1,5 @@
 export const ErrorScreen = ({ onRetry }: { onRetry: () => void }) => (
-  <section>
+  <section className="flex flex-col items-center text-center">
     <img src="/weather-app/images/icon-error.svg" alt="" />
     <div role="alert">
       <h2>Something went wrong</h2>
