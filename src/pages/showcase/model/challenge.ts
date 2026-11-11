@@ -25,8 +25,3 @@ export interface Challenge {
   difficulty: Difficulty;
   stack: Stack[];
 }
-
-export interface FilterSelection {
-  difficulty: Difficulty[];
-  stack: Stack[];
-}
