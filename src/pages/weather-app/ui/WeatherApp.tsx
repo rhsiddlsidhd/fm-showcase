@@ -76,6 +76,7 @@ export const WeatherApp = () => {
         <img src="/weather-app/images/logo.svg" alt="Weather Now" />
         <UnitsMenu units={units} onChange={setUnits} />
       </header>
+      {!error && <h1>How&apos;s the sky looking today?</h1>}
       {!error && (
         <SearchBox
           retry={retry}
