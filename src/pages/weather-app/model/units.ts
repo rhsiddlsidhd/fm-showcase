@@ -31,5 +31,5 @@ export const formatWind = (kmh: number, units: Units) =>
 
 export const formatPrecipitation = (mm: number, units: Units) =>
   units.precipitation === "in"
-    ? `${Number((mm / 25.4).toFixed(2))} in`
-    : `${mm} mm`;
+    ? `${Math.round(mm / 25.4)} in`
+    : `${Math.round(mm)} mm`;
