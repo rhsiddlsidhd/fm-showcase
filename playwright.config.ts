@@ -21,6 +21,12 @@ export default defineConfig({
       testMatch: "**/showcase.fixture.spec.ts",
       use: { ...devices["Desktop Chrome"], baseURL: "http://localhost:4174" },
     },
+    {
+      // 챌린지 페이지는 운영 빌드에 그대로 있다. 외부 API는 스펙에서 경로 가로채기로 대역 처리한다.
+      name: "chromium-weather-app",
+      testMatch: /weather-app.*\.spec\.ts$/,
+      use: { ...devices["Desktop Chrome"], baseURL: "http://localhost:4173" },
+    },
   ],
   webServer: [
     {
