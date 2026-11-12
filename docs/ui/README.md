@@ -18,9 +18,9 @@
 
 | 문서 | 읽는 조건 | 다루는 내용 |
 | --- | --- | --- |
-| [`component.md`](component.md) | 컴포넌트를 설계하거나 구현할 때 | shadcn/ui 사용, 직접 제작 기준 |
-| [`accessibility.md`](accessibility.md) | 화면 컴포넌트를 설계하거나 구현할 때. `theme.css`의 색이나 반투명 효과를 정할 때 | 키보드 포커스, 화면 낭독기 알림, 명암비, 움직임·투명도 줄이기 |
-| [`animation.md`](animation.md) | 애니메이션을 설계하거나 구현할 때 | `motion` 사용, 움직임 값의 위치, 성능, 움직임 줄이기 구현 |
+| [`component.md`](component.md) | 컴포넌트를 설계하거나 구현할 때 | shadcn/ui 후보 탐색, 사용·직접 제작 기준 |
+| [`accessibility.md`](accessibility.md) | 화면 컴포넌트를 설계하거나 구현할 때. `theme.css`의 색이나 반투명 효과를 정할 때 | 키보드 포커스, 화면 낭독기 알림, 명암비, 애니메이션 동작 줄이기 설정·투명도 줄이기 |
+| [`animation.md`](animation.md) | 애니메이션을 설계하거나 구현할 때 | `motion` 사용, 움직임 값의 위치, 성능, 애니메이션 동작 줄이기 설정 대응 |
 | [`responsive.md`](responsive.md) | 화면 폭에 따른 배치를 설계하거나 구현할 때 | 공통 경계, 챌린지별 기준 |
 | [`theme.md`](theme.md) | `theme.css`를 만들거나 구현에서 디자인 토큰을 쓸 때 | 디자인 토큰의 정의, 구현 방식, 산출 규칙, 산출 순서, 사용 규칙, 다크 모드, 폰트, Portal |
 | [`static-assets.md`](static-assets.md) | 이미지·아이콘 같은 정적 자산을 설계하거나 구현에서 참조할 때 | `public/` 산출 위치, 슬라이스 네임스페이싱, 절대경로 참조, 전역 승격 판단 |

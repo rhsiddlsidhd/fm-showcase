@@ -19,5 +19,5 @@
 
 ## 사용자 설정
 
-- `prefers-reduced-motion: reduce`이면 움직임을 끈다. 구현 방법은 [애니메이션 규칙](animation.md#움직임-줄이기)을 따른다.
+- 애니메이션 동작 줄이기 설정(`prefers-reduced-motion: reduce`)이 켜져 있으면 비필수 애니메이션을 줄이거나 끈다. 기능과 정보는 유지하고, 필요한 피드백은 움직임이 적은 표현으로 제공한다. 구현 방법은 [애니메이션 규칙](animation.md#애니메이션-동작-줄이기-설정-대응)을 따른다.
 - 반투명 표현은 `prefers-reduced-transparency: reduce`이면 불투명 면으로 바꾼다.
