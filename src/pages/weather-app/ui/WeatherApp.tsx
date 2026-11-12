@@ -113,6 +113,7 @@ export const WeatherApp = () => {
               searchingQuery.current = null;
               setStatus(pendingStatus.current ?? "");
               pendingStatus.current = null;
+              setNoResult(false);
             }}
             onError={(query) => {
               searchingQuery.current = null;
@@ -134,17 +135,19 @@ export const WeatherApp = () => {
             No search result found!
           </p>
         ) : (
-          <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
-            <div className="flex min-w-0 flex-col gap-8 lg:gap-12">
-              <CurrentWeather
-                label={place ? placeLabel(place) : ""}
-                current={forecast?.current ?? null}
-                units={units}
-              />
-              <DailyForecast daily={forecast?.daily ?? null} units={units} />
+          place && (
+            <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
+              <div className="flex min-w-0 flex-col gap-8 lg:gap-12">
+                <CurrentWeather
+                  label={place ? placeLabel(place) : ""}
+                  current={forecast?.current ?? null}
+                  units={units}
+                />
+                <DailyForecast daily={forecast?.daily ?? null} units={units} />
+              </div>
+              <HourlyForecast forecast={forecast} units={units} />
             </div>
-            <HourlyForecast forecast={forecast} units={units} />
-          </div>
+          )
         )}
       </div>
     </main>
