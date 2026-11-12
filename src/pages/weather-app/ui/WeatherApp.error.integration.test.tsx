@@ -442,4 +442,24 @@ describe("Retry 뒤 날씨 알림", () => {
       ),
     );
   });
+
+  it("날씨 표시 중 검색이 실패한 뒤 Retry로 오류 화면이 사라지고 날씨가 다시 보이면 후보 목록이 나온 뒤에도 알림 영역이 Weather for Berlin, Germany를 알린다", async () => {
+    stubOpenMeteo({ geocoding: [reply("http400")] });
+    const user = await renderAppLoaded();
+    await search(user, "Berlin");
+    await findErrorTitle();
+
+    await user.click(getRetryButton());
+
+    await screen.findByRole("listbox");
+    expect(
+      await screen.findByText("Berlin, Germany", OUTSIDE_STATUS),
+    ).toBeInTheDocument();
+    expect(queryErrorTitle()).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.getByRole("status").textContent?.trim()).toBe(
+        "Weather for Berlin, Germany",
+      ),
+    );
+  });
 });
