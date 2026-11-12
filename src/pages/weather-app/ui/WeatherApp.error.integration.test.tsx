@@ -397,3 +397,30 @@ describe("오류 중 진행 중이던 다른 요청", () => {
     expect(forecastRequests[1].searchParams.get("longitude")).toBe("13.41053");
   });
 });
+
+describe("오류 화면이 나타날 때의 포커스", () => {
+  it.each([
+    ["HTTP 400으로 실패하면", "http400"],
+    ["네트워크 오류로 실패하면", "network"],
+  ] as const)(
+    "지역 검색이 %s 오류 화면의 Retry 버튼으로 포커스가 이동한다",
+    async (_, kind) => {
+      stubOpenMeteo({ geocoding: [reply(kind)] });
+      const user = await renderAppLoaded();
+
+      await search(user, "Berlin");
+      await findErrorTitle();
+
+      await waitFor(() => expect(getRetryButton()).toHaveFocus());
+    },
+  );
+
+  it("처음 날씨 요청이 HTTP 400으로 실패하면 오류 화면의 Retry 버튼으로 포커스가 이동한다", async () => {
+    stubOpenMeteo({ forecast: [reply("http400")] });
+    renderApp();
+
+    await findErrorTitle();
+
+    await waitFor(() => expect(getRetryButton()).toHaveFocus());
+  });
+});
