@@ -534,4 +534,35 @@ describe("날씨 응답 대기 중 다시 검색", () => {
       expect(getStatus()).toHaveTextContent("Weather for Berlin, Germany"),
     );
   });
+
+  it("후보를 고른 뒤 Singapore를 검색하고 날씨가 먼저 표시된 다음 후보 목록이 도착해도 알림 영역은 Weather for Berlin, Germany를 알린다", async () => {
+    const { gates } = stubOpenMeteo();
+    const user = await renderApp();
+    await searchAndWaitForCandidates(user, "Berlin");
+    const forecastGate = createGate();
+    gates.forecast = forecastGate.promise;
+    await user.click(
+      screen.getByRole("option", { name: "Berlin, State of Berlin, Germany" }),
+    );
+    await screen.findByText("Loading...", OUTSIDE_STATUS);
+
+    const geocodingGate = createGate();
+    gates.geocoding = geocodingGate.promise;
+    await user.clear(getSearchInput());
+    await user.type(getSearchInput(), "Singapore{Enter}");
+    await screen.findByText("Search in progress", OUTSIDE_STATUS);
+
+    forecastGate.release();
+    expect(await screen.findByText("Berlin, Germany")).toBeInTheDocument();
+
+    geocodingGate.release();
+    const listbox = await screen.findByRole("listbox");
+    expect(
+      within(listbox).getByRole("option", { name: "Singapore, Singapore" }),
+    ).toBeInTheDocument();
+
+    await waitFor(() =>
+      expect(getStatus()).toHaveTextContent("Weather for Berlin, Germany"),
+    );
+  });
 });
