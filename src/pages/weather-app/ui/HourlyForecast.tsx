@@ -1,14 +1,18 @@
 import { useState } from "react";
+import { Button } from "@/shared/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu";
+import { GHOST_BUTTON_CLASS } from "./buttonStyle";
+import { MENU_ITEM_CLASS, MENU_PANEL_CLASS } from "./menuStyle";
 import type { Forecast } from "../api/forecast";
 import { formatTemperature, formatWeekdayLong } from "../model/format";
 import { dayHourlyRows } from "../model/hourly";
 import { toTemperature, type Units } from "../model/units";
+import { PlaceholderItem } from "./surface";
 import { UnitValue } from "./UnitValue";
 import { WeatherIconImage } from "./WeatherIconImage";
 
@@ -32,19 +36,18 @@ const HourlyContent = ({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger
-          className={`${SELECTOR_CLASS} hover:bg-accent focus-visible:ring-ring focus-visible:ring-2`}
+          render={
+            <Button className={`${SELECTOR_CLASS} ${GHOST_BUTTON_CLASS}`} />
+          }
         >
           {formatWeekdayLong(date)}
           <img src="/weather-app/images/icon-dropdown.svg" alt="" />
         </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align="end"
-          className="theme-weather-app bg-popover w-56 p-2"
-        >
+        <DropdownMenuContent align="end" className={MENU_PANEL_CLASS}>
           {forecast.daily.time.map((day) => (
             <DropdownMenuItem
               key={day}
-              className="focus:ring-ring px-2 py-2.5 text-(length:--weather-app-text-body) focus:ring-2"
+              className={MENU_ITEM_CLASS}
               onClick={() => setDate(day)}
             >
               {formatWeekdayLong(day)}
@@ -92,9 +95,9 @@ export const HourlyForecast = ({
         </span>
         <ul className={LIST_CLASS}>
           {Array.from({ length: ROWS }, (_, i) => (
-            <li
+            <PlaceholderItem
               key={i}
-              data-testid="hourly-placeholder"
+              testId="hourly-placeholder"
               className={`${ROW_CLASS} h-15`}
             />
           ))}

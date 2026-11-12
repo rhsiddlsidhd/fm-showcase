@@ -1,4 +1,6 @@
 import { useEffect, useRef } from "react";
+import { Button } from "@/shared/ui/button";
+import { GHOST_BUTTON_CLASS } from "./buttonStyle";
 
 export const ErrorScreen = ({ onRetry }: { onRetry: () => void }) => {
   const retryRef = useRef<HTMLButtonElement>(null);
@@ -23,15 +25,15 @@ export const ErrorScreen = ({ onRetry }: { onRetry: () => void }) => {
           in a few moments.
         </p>
       </div>
-      <button
+      <Button
         ref={retryRef}
         type="button"
         onClick={onRetry}
-        className="bg-card hover:bg-accent focus-visible:ring-ring flex items-center gap-2.5 rounded-lg px-4 py-3 focus-visible:ring-2"
+        className={`${GHOST_BUTTON_CLASS} bg-card flex gap-2.5 rounded-lg px-4 py-3`}
       >
         <img src="/weather-app/images/icon-retry.svg" alt="" />
         Retry
-      </button>
+      </Button>
     </section>
   );
 };
