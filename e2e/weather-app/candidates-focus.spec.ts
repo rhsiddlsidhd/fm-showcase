@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { unitsButton } from "./keyboard-focus.ts";
 import { routeOpenMeteoToBerlin } from "./open-meteo-route.ts";
 
 // 후보 목록이 포커스 이탈로 닫히는 동작이 생겨도 깨지면 안 되는 동작을 지킨다.
@@ -58,4 +59,37 @@ test("후보 Berlin, State of Berlin, Germany 행을 클릭하면 목록이 닫�
   await forecastRequest;
   await expect(candidateList(page)).toBeHidden();
   await expect(page.getByText("Berlin, Germany").first()).toBeVisible();
+});
+
+// 지역명과 현재 기온을 함께 담은 가장 안쪽 영역. forecast-berlin-1d.json의 현재 기온 2.3°C → "2°".
+const currentWeather = (page: Page) =>
+  page
+    .locator("div")
+    .filter({ has: page.getByText("Berlin, Germany", { exact: true }) })
+    .filter({ has: page.getByText("2°", { exact: true }) })
+    .last();
+
+test("후보 목록이 열린 채 페이지의 빈 곳을 클릭하면 목록이 닫히고 날씨 영역과 검색창의 검색어는 그대로다", async ({
+  page,
+}) => {
+  await openCandidates(page);
+  await expect(currentWeather(page)).toBeVisible();
+
+  // 페이지 왼쪽 위 모서리의 빈 곳을 누른다.
+  await page.locator("body").click({ position: { x: 1, y: 1 } });
+
+  await expect(candidateList(page)).toBeHidden();
+  await expect(currentWeather(page)).toBeVisible();
+  await expect(searchInput(page)).toHaveValue("Berlin");
+});
+
+test("후보 목록이 열린 채 포커스를 검색 영역 밖의 Units 버튼으로 옮기면 목록이 닫힌다", async ({
+  page,
+}) => {
+  await openCandidates(page);
+
+  await unitsButton(page).focus();
+
+  await expect(unitsButton(page)).toBeFocused();
+  await expect(candidateList(page)).toBeHidden();
 });
