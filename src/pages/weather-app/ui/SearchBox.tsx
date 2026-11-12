@@ -168,16 +168,12 @@ export const SearchBox = ({
         )}
         {searching && (
           <p className={`${PANEL_CLASS} flex items-center gap-2.5 px-4 py-3`}>
-            {reduceMotion ? (
-              <img src="/weather-app/images/icon-loading.svg" alt="" />
-            ) : (
-              <motion.img
-                src="/weather-app/images/icon-loading.svg"
-                alt=""
-                animate={{ rotate: 360 }}
-                transition={SEARCH_SPIN.transition}
-              />
-            )}
+            <motion.img
+              src="/weather-app/images/icon-loading.svg"
+              alt=""
+              animate={{ rotate: 360 }}
+              transition={SEARCH_SPIN.transition}
+            />
             Search in progress
           </p>
         )}
