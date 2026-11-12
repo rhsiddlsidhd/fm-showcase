@@ -102,6 +102,9 @@ export const SearchBox = ({
   return (
     <form
       className="mx-auto flex w-full max-w-2xl flex-col gap-3 lg:flex-row lg:gap-4"
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) close();
+      }}
       onSubmit={(event) => {
         event.preventDefault();
         void search();
