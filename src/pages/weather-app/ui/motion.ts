@@ -1,5 +1,5 @@
 // 움직임 값은 디자인 토큰이 아니라 motion에 넘기는 JS 값이다(docs/ui/animation.md).
-// 값의 출처는 .sdd/weather-app/ux-design.md 「인터랙션과 애니메이션」 표다.
+// 값은 이 파일이 기준이다. 움직임 줄이기 설정에 따른 분기는 각 컴포넌트에 있다.
 
 export const PANEL_ENTER = {
   offsetY: 8,

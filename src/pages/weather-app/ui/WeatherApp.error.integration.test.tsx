@@ -19,7 +19,8 @@ const ERROR_TITLE = "Something went wrong";
 const ERROR_DESCRIPTION =
   "We couldn't connect to the server (API error). Please try again in a few moments.";
 
-// api-spec.md에 기록된 실제 HTTP 400 응답 본문.
+// Open-Meteo가 잘못된 요청에 돌려주는 HTTP 400 JSON 본문 형태(https://open-meteo.com/en/docs 의 Errors 절).
+// 앱은 reason 문구와 무관하게 상태 코드로 오류를 처리한다.
 const FORECAST_400_BODY = {
   reason: "Latitude must be in range of -90 to 90°. Given: 999.0.",
   error: true,

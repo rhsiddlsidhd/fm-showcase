@@ -1,13 +1,12 @@
 /*
  * weather-app 설계 단계 theme.css (docs/ui/theme.md 산출 규칙)
- * 값 출처: .challenge/weather-app-main/style-guide.md
- * 설계안(.sdd/weather-app/theme.css)에서 복사했다. 이후 기준은 이 파일이다.
+ * 값 출처: 챌린지 원본의 스타일 가이드. 이후 기준은 이 파일이다.
  * 이 챌린지는 원본이 고정된 단일 다크 팔레트라 .dark 변형을 두지 않는다
  * (원본 재현이 목적, docs/ui/README.md).
  */
 
 .theme-weather-app {
-  /* 1. 도메인 원본 값 (style-guide.md 그대로) */
+  /* 1. 도메인 원본 값 (스타일 가이드 값 그대로) */
   --weather-app-neutral-900: hsl(243, 96%, 9%);
   --weather-app-neutral-800: hsl(243, 27%, 20%);
   --weather-app-neutral-700: hsl(243, 23%, 24%);
@@ -51,17 +50,17 @@
   --weather-app-text-subtle: var(--weather-app-neutral-200);
   /* 요일 선택기 버튼 배경(desktop-design-metric.jpg 픽셀 대조). Hourly 행(--secondary)보다 한 단계 밝다 */
   --weather-app-day-selector: var(--weather-app-neutral-600);
-  /* 현재 날씨 카드 배경 장식(ux-design 정적 자산 표: CSS 배경). 공통 토큰에 대응 없음 */
+  /* 현재 날씨 카드 배경 장식(CSS 배경). 공통 토큰에 대응 없음 */
   --weather-app-current-card-image-large: url("/weather-app/images/bg-today-large.svg");
   --weather-app-current-card-image-small: url("/weather-app/images/bg-today-small.svg");
   /* Orange 500은 로고(public/weather-app/images/logo.svg)에 내장된 색이라
-     지금은 이 색을 쓰는 CSS 대상이 없다. style-guide.md 값을 잃지 않기 위해 변수로만 남긴다 */
+     지금은 이 색을 쓰는 CSS 대상이 없다. 스타일 가이드 값을 잃지 않기 위해 변수로만 남긴다 */
   --weather-app-accent: var(--weather-app-orange-500);
-  /* 본문 글자 크기(style-guide.md: Body Copy 18px). 공통 --text-base를 덮어쓰지 않고
+  /* 본문 글자 크기(스타일 가이드: Body Copy 18px). 공통 --text-base를 덮어쓰지 않고
      이 슬라이스 전용 변수로 둔다(재정의하면 shadcn 부품까지 바뀐다, theme.md#사용-규칙) */
   --weather-app-text-body: 18px;
 
-  /* 4. --radius 등 나머지 공통 토큰은 재정의하지 않는다 — style-guide.md에 값이 없다
+  /* 4. --radius 등 나머지 공통 토큰은 재정의하지 않는다 — 스타일 가이드에 값이 없다
      (JPG 디자인이라 모서리 반경·여백은 원본에 수치가 없음, 과제 README도 이 점을 명시).
      구현 시 원본 이미지를 보며 전역 기본값으로 충분한지 눈으로 확인한다. */
 }
