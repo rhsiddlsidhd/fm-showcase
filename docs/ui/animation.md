@@ -19,5 +19,5 @@
 
 움직임 줄이기를 `motion`으로 구현하는 방법이다.
 
-- `MotionConfig reducedMotion="user"`만으로는 hover·focus 효과와 진입 `opacity`가 남는다.
-- `useReducedMotion` 값으로 `initial`, `whileHover`, `whileFocus`, `layout`을 직접 끈다.
+- `MotionConfig reducedMotion="user"`만으로는 hover·focus 효과와 진입 `opacity`가 남으므로 그것만으로 처리하지 않는다.
+- `useReducedMotion` 값으로 움직임을 만드는 모든 경로를 직접 끈다. 진입·상호작용·반복 움직임을 포함하고, 실제로 쓴 속성(`initial`, `animate`, `exit`, `whileHover`, `whileFocus`, `layout` 등)을 확인한다.
