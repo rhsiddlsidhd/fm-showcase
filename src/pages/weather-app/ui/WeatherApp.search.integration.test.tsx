@@ -566,3 +566,44 @@ describe("날씨 응답 대기 중 다시 검색", () => {
     );
   });
 });
+
+describe("결과 없음 뒤 다시 검색", () => {
+  it("결과 없음 문구가 보이던 중 Berlin을 검색해 후보 목록이 열리면 문구가 사라지고 날씨 영역은 비어 있으며 후보를 고르면 날씨를 보여준다", async () => {
+    stubOpenMeteo();
+    const user = await renderApp();
+    await user.type(getSearchInput(), `${NO_RESULT_QUERY}{Enter}`);
+    await screen.findByText("No search result found!", OUTSIDE_STATUS);
+    await user.clear(getSearchInput());
+
+    const listbox = await searchAndWaitForCandidates(user, "Berlin");
+
+    expect(
+      within(listbox).getByRole("option", {
+        name: "Berlin, State of Berlin, Germany",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText("No search result found!", OUTSIDE_STATUS),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Berlin, Germany")).not.toBeInTheDocument();
+    expect(screen.queryByText("Feels Like")).not.toBeInTheDocument();
+    expect(screen.queryByText("Daily forecast")).not.toBeInTheDocument();
+    expect(screen.queryByText("Hourly forecast")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Loading...", OUTSIDE_STATUS),
+    ).not.toBeInTheDocument();
+    // 점과 빈 칸은 내용이 없는 장식이라 역할·이름이 없어 테스트 ID로 센다.
+    expect(screen.queryAllByTestId("loading-dot")).toHaveLength(0);
+    expect(screen.queryAllByTestId("daily-placeholder")).toHaveLength(0);
+    expect(screen.queryAllByTestId("hourly-placeholder")).toHaveLength(0);
+
+    await user.click(
+      screen.getByRole("option", { name: "Berlin, State of Berlin, Germany" }),
+    );
+
+    expect(await screen.findByText("Berlin, Germany")).toBeInTheDocument();
+    expect(
+      screen.queryByText("No search result found!", OUTSIDE_STATUS),
+    ).not.toBeInTheDocument();
+  });
+});
