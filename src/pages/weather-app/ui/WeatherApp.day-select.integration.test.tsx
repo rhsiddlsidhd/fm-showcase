@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { describe, expect, it } from "vitest";
@@ -222,5 +222,29 @@ describe("새 지역 선택 뒤 요일 선택기", () => {
     expect(visibleHourLabels()).toEqual(
       Array.from({ length: 15 }, (_, i) => hourLabel(9 + i)),
     );
+  });
+});
+
+describe("요일 선택과 알림 영역", () => {
+  const getStatusText = () => screen.getByRole("status").textContent?.trim();
+
+  it("검색으로 고른 지역의 날씨 알림이 있는 상태에서 Thursday를 고르면 알림 영역 문구가 그대로다", async () => {
+    stubOpenMeteo();
+    const user = await renderApp();
+    await user.type(screen.getByRole("combobox"), "Berlin{Enter}");
+    await user.click(
+      await screen.findByRole("option", {
+        name: "Berlin, New Hampshire, United States",
+      }),
+    );
+    await waitFor(() =>
+      expect(getStatusText()).toBe("Weather for Berlin, United States"),
+    );
+
+    await selectDay(user, "Thursday");
+    // 요일이 실제로 바뀐 뒤 확인한다.
+    await screen.findByRole("button", { name: "Thursday" });
+
+    expect(getStatusText()).toBe("Weather for Berlin, United States");
   });
 });

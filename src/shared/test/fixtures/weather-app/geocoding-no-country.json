@@ -1,0 +1,13 @@
+{
+  "results": [
+    {
+      "id": 9999001,
+      "name": "Nowhere",
+      "latitude": 10.5,
+      "longitude": 20.25,
+      "timezone": "GMT",
+      "population": 0
+    }
+  ],
+  "generationtime_ms": 0.1
+}

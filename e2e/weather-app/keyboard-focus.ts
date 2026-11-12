@@ -106,9 +106,16 @@ export async function openWithBerlinWeekly(page: Page) {
 export type Visit = { label: string; focused: Ring; unfocused: Ring };
 
 // 문서 처음부터 Tab으로 끝까지 돌며, 요소마다 포커스가 있을 때와 다음 Tab으로 떠난 뒤의 링을 잰다.
+// 페이지가 이미 어떤 요소에 포커스를 줬다면 blur()만으로는 Chromium의 순차 포커스 탐색 시작점이
+// 그 요소에 남아 첫 Tab이 그 다음 요소로 간다. 그래서 문서 맨 앞에 Tab 순서에 들지 않는 임시 요소를 두고
+// 거기에 포커스를 줘서 시작점을 문서 처음으로 옮긴 뒤 순회하고, 끝나면 지운다.
 export async function tabThroughPage(page: Page): Promise<Visit[]> {
-  await page.evaluate(() => {
-    (document.activeElement as HTMLElement | null)?.blur();
+  const start = await page.evaluateHandle(() => {
+    const element = document.createElement("span");
+    element.tabIndex = -1;
+    document.body.prepend(element);
+    element.focus();
+    return element;
   });
   const visits: Visit[] = [];
   let previous: {
@@ -149,6 +156,7 @@ export async function tabThroughPage(page: Page): Promise<Visit[]> {
       focused: await handle.evaluate(readRing),
     };
   }
+  await start.evaluate((element) => element.remove());
   return visits;
 }
 

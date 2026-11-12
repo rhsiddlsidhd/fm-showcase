@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import {
   daySelector,
   disableTransitions,
@@ -104,4 +104,37 @@ test("요일 선택기에서 요일을 고르면 패널이 닫히고 포커스�
 
   await expect(page.getByRole("menu")).toBeHidden();
   await expect(page.getByRole("button", { name: "Thursday" })).toBeFocused();
+});
+
+// 지표 한 칸: "Feels Like" 글자를 담은 가장 안쪽 요소(문서 순서상 마지막 조상).
+const feelsLikeMetric = (page: Page) =>
+  page
+    .locator("div")
+    .filter({ has: page.getByText("Feels Like", { exact: true }) })
+    .last();
+
+test("Units 드롭다운에서 키보드로 Fahrenheit를 고르면 체감 기온이 화씨로 바뀌고 패널이 닫히며 포커스가 Units 버튼으로 돌아간다", async ({
+  page,
+}) => {
+  await openWithBerlinWeekly(page);
+  // forecast-berlin-7d.json의 체감 기온 -0.7°C → 섭씨 -1°, 화씨 30.74°F → 31°.
+  await expect(feelsLikeMetric(page)).toContainText("-1°");
+  await unitsButton(page).focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("menu")).toBeVisible();
+  await expect(
+    page.getByRole("menuitem", { name: "Switch to Imperial" }),
+  ).toBeFocused();
+
+  // 메뉴 항목 순서: Switch to Imperial, Celsius (°C), Fahrenheit (°F).
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("ArrowDown");
+  await expect(
+    page.getByRole("menuitemradio", { name: "Fahrenheit (°F)" }),
+  ).toBeFocused();
+  await page.keyboard.press("Enter");
+
+  await expect(page.getByRole("menu")).toBeHidden();
+  await expect(feelsLikeMetric(page)).toContainText("31°");
+  await expect(unitsButton(page)).toBeFocused();
 });

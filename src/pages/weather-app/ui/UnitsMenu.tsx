@@ -50,10 +50,18 @@ export const UnitsMenu = ({
               onChange({ ...units, temperature: value as Units["temperature"] })
             }
           >
-            <DropdownMenuRadioItem value="celsius" className={ITEM_CLASS}>
+            <DropdownMenuRadioItem
+              value="celsius"
+              className={ITEM_CLASS}
+              closeOnClick
+            >
               Celsius (°C)
             </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="fahrenheit" className={ITEM_CLASS}>
+            <DropdownMenuRadioItem
+              value="fahrenheit"
+              className={ITEM_CLASS}
+              closeOnClick
+            >
               Fahrenheit (°F)
             </DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
@@ -69,10 +77,18 @@ export const UnitsMenu = ({
               onChange({ ...units, wind: value as Units["wind"] })
             }
           >
-            <DropdownMenuRadioItem value="kmh" className={ITEM_CLASS}>
+            <DropdownMenuRadioItem
+              value="kmh"
+              className={ITEM_CLASS}
+              closeOnClick
+            >
               km/h
             </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="mph" className={ITEM_CLASS}>
+            <DropdownMenuRadioItem
+              value="mph"
+              className={ITEM_CLASS}
+              closeOnClick
+            >
               mph
             </DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
@@ -91,10 +107,18 @@ export const UnitsMenu = ({
               })
             }
           >
-            <DropdownMenuRadioItem value="mm" className={ITEM_CLASS}>
+            <DropdownMenuRadioItem
+              value="mm"
+              className={ITEM_CLASS}
+              closeOnClick
+            >
               Millimeters (mm)
             </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="in" className={ITEM_CLASS}>
+            <DropdownMenuRadioItem
+              value="in"
+              className={ITEM_CLASS}
+              closeOnClick
+            >
               Inches (in)
             </DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>

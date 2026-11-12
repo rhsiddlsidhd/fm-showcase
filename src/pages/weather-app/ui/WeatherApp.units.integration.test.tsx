@@ -5,6 +5,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   forecastBerlin1d,
   forecastBerlin7d,
+  geocodingBerlin,
+  geocodingNoResults,
   setupTestServer,
   stubPrefersReducedMotion,
 } from "@/shared/test";
@@ -318,5 +320,94 @@ describe("움직임 설정과 단위 전환", () => {
     await clickToggle(user, "Switch to Imperial");
 
     await expectImperialCurrent();
+  });
+});
+
+describe("개별 단위 선택 뒤 메뉴 닫힘", () => {
+  // Units 버튼으로 메뉴를 열고 개별 단위 항목을 고른다.
+  const openMenuAndChoose = async (user: User, name: string) => {
+    await user.click(getUnitsButton());
+    const menu = await screen.findByRole("menu");
+    await user.click(within(menu).getByRole("menuitemradio", { name }));
+  };
+
+  const expectMenuClosed = () =>
+    waitFor(() => {
+      expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+    });
+
+  it("Units 메뉴에서 Fahrenheit를 고르면 기온이 화씨로 바뀌고 메뉴가 닫힌다", async () => {
+    stubForecast();
+    const user = await renderApp();
+
+    await openMenuAndChoose(user, "Fahrenheit (°F)");
+
+    // 2.3°C → 36.14°F
+    expect(await findCurrentCard("36°")).toBeInTheDocument();
+    await expectMenuClosed();
+  });
+
+  it("Units 메뉴에서 mph를 고르면 풍속만 mph로 바뀌고 메뉴가 닫힌다", async () => {
+    stubForecast();
+    const user = await renderApp();
+
+    await openMenuAndChoose(user, "mph");
+
+    // 8.4 km/h → 5.22 mph
+    expect(await findMetric("Wind", "5 mph")).toBeInTheDocument();
+    expect(await findCurrentCard("2°")).toBeInTheDocument();
+    expect(await findMetric("Precipitation", "0 mm")).toBeInTheDocument();
+    await expectMenuClosed();
+  });
+
+  it("Units 메뉴에서 Inches를 고르면 강수량만 in으로 바뀌고 메뉴가 닫힌다", async () => {
+    stubForecast();
+    const user = await renderApp();
+
+    await openMenuAndChoose(user, "Inches (in)");
+
+    expect(await findMetric("Precipitation", "0 in")).toBeInTheDocument();
+    expect(await findCurrentCard("2°")).toBeInTheDocument();
+    expect(await findMetric("Wind", "8 km/h")).toBeInTheDocument();
+    await expectMenuClosed();
+  });
+});
+
+describe("단위 변경과 알림 영역", () => {
+  const GEOCODING_URL = "https://geocoding-api.open-meteo.com/v1/search";
+
+  // Geocoding은 "Berlin" 검색에만 후보를 돌려준다.
+  const stubGeocoding = () => {
+    server.use(
+      http.get(GEOCODING_URL, ({ request }) => {
+        const name = new URL(request.url).searchParams.get("name");
+        return HttpResponse.json(
+          name === "Berlin" ? geocodingBerlin : geocodingNoResults,
+        );
+      }),
+    );
+  };
+
+  const getStatusText = () => screen.getByRole("status").textContent?.trim();
+
+  it("검색으로 고른 지역의 날씨 알림이 있는 상태에서 Fahrenheit를 고르면 알림 영역 문구가 그대로다", async () => {
+    stubForecast();
+    stubGeocoding();
+    const user = await renderApp();
+    await user.type(screen.getByRole("combobox"), "Berlin{Enter}");
+    await user.click(
+      await screen.findByRole("option", {
+        name: "Berlin, New Hampshire, United States",
+      }),
+    );
+    await waitFor(() =>
+      expect(getStatusText()).toBe("Weather for Berlin, United States"),
+    );
+
+    await chooseUnit(user, "Fahrenheit (°F)");
+    // 기온 단위가 실제로 바뀐 뒤 확인한다: 체감온도 -1.0°C → 30°F.
+    await findMetric("Feels Like", "30°");
+
+    expect(getStatusText()).toBe("Weather for Berlin, United States");
   });
 });

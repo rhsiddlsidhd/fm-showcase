@@ -3,7 +3,7 @@ const GEOCODING_URL = "https://geocoding-api.open-meteo.com/v1/search";
 export type Place = {
   name: string;
   admin1?: string;
-  country: string;
+  country?: string;
   latitude: number;
   longitude: number;
 };

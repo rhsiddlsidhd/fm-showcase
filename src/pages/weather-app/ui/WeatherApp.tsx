@@ -26,6 +26,8 @@ export const WeatherApp = () => {
   const [retry, setRetry] = useState<Retry | undefined>(undefined);
   const searchingQuery = useRef<string | null>(null);
   const searchFailed = useRef(false);
+  const announceWeather = useRef(false);
+  const pendingStatus = useRef<string | null>(null);
 
   useEffect(() => {
     if (!place) return;
@@ -34,8 +36,16 @@ export const WeatherApp = () => {
       .then((result) => {
         if (searchFailed.current) return;
         setForecast(result);
+        const weatherStatus = `Weather for ${placeLabel(place)}`;
+        const announce = announceWeather.current;
+        announceWeather.current = false;
+        if (announce && searchingQuery.current !== null) {
+          pendingStatus.current = weatherStatus;
+        }
         setStatus((current) =>
-          current === LOADING ? `Weather for ${placeLabel(place)}` : current,
+          current === LOADING || (announce && current === "")
+            ? weatherStatus
+            : current,
         );
       })
       .catch(() => {
@@ -51,6 +61,8 @@ export const WeatherApp = () => {
 
   const select = (selected: Place) => {
     searchingQuery.current = null;
+    announceWeather.current = true;
+    pendingStatus.current = null;
     setNoResult(false);
     setForecast(null);
     setStatus(LOADING);
@@ -59,6 +71,8 @@ export const WeatherApp = () => {
 
   const showNoResult = () => {
     searchingQuery.current = null;
+    announceWeather.current = false;
+    pendingStatus.current = null;
     setPlace(null);
     setForecast(null);
     setNoResult(true);
@@ -98,7 +112,9 @@ export const WeatherApp = () => {
             }}
             onResults={() => {
               searchingQuery.current = null;
-              setStatus("");
+              setStatus(pendingStatus.current ?? "");
+              pendingStatus.current = null;
+              setNoResult(false);
             }}
             onError={(query) => {
               searchingQuery.current = null;
@@ -120,17 +136,19 @@ export const WeatherApp = () => {
             No search result found!
           </p>
         ) : (
-          <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
-            <div className="flex min-w-0 flex-col gap-8 lg:gap-12">
-              <CurrentWeather
-                label={place ? placeLabel(place) : ""}
-                current={forecast?.current ?? null}
-                units={units}
-              />
-              <DailyForecast daily={forecast?.daily ?? null} units={units} />
+          place && (
+            <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
+              <div className="flex min-w-0 flex-col gap-8 lg:gap-12">
+                <CurrentWeather
+                  label={placeLabel(place)}
+                  current={forecast?.current ?? null}
+                  units={units}
+                />
+                <DailyForecast daily={forecast?.daily ?? null} units={units} />
+              </div>
+              <HourlyForecast forecast={forecast} units={units} />
             </div>
-            <HourlyForecast forecast={forecast} units={units} />
-          </div>
+          )
         )}
       </div>
     </main>
