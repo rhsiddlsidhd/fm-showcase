@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   formatCurrentDate,
   formatTemperature,
@@ -30,6 +30,30 @@ describe("날짜 표기", () => {
   });
 
   it("현재 날씨 카드의 날짜는 요일 전체, 월 약어, 일, 연도 형식으로 표시된다", () => {
+    expect(formatCurrentDate("2026-11-11T06:00")).toBe(
+      "Wednesday, Nov 11, 2026",
+    );
+  });
+});
+
+describe("날짜 표기: UTC보다 느린 시간대", () => {
+  beforeEach(() => {
+    vi.stubEnv("TZ", "America/Los_Angeles");
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("실행 환경 시간대를 America/Los_Angeles로 바꿔도 2026-11-11의 요일 약어는 Wed로 표시된다", () => {
+    expect(formatWeekdayShort("2026-11-11")).toBe("Wed");
+  });
+
+  it("실행 환경 시간대를 America/Los_Angeles로 바꿔도 2026-11-11의 요일 전체 이름은 Wednesday로 표시된다", () => {
+    expect(formatWeekdayLong("2026-11-11")).toBe("Wednesday");
+  });
+
+  it("실행 환경 시간대를 America/Los_Angeles로 바꿔도 현재 날씨 카드의 날짜는 11일로 표시된다", () => {
     expect(formatCurrentDate("2026-11-11T06:00")).toBe(
       "Wednesday, Nov 11, 2026",
     );
