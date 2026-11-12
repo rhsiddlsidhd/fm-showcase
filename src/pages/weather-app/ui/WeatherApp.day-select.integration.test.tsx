@@ -53,14 +53,9 @@ const openDayMenu = async (user: User) => {
   return screen.findByRole("menu");
 };
 
-// 메뉴 항목은 일반 항목이나 라디오 항목일 수 있어 둘 다 모아 화면 순서로 정렬한다.
+// 요일 항목은 일반 메뉴 항목(menuitem)이고 화면 순서로 돌려준다.
 const getMenuItems = (menu: HTMLElement) =>
-  [
-    ...within(menu).queryAllByRole("menuitem"),
-    ...within(menu).queryAllByRole("menuitemradio"),
-  ].sort((a, b) =>
-    a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1,
-  );
+  within(menu).getAllByRole("menuitem");
 
 const selectDay = async (user: User, dayName: string) => {
   const menu = await openDayMenu(user);

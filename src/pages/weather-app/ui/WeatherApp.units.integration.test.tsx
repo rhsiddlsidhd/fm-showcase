@@ -44,22 +44,28 @@ const renderApp = async () => {
 
 const getUnitsButton = () => screen.getByRole("button", { name: "Units" });
 
-// Units 드롭다운이 열려 있으면 그대로 쓰고, 닫혀 있으면 Units 버튼으로 연다.
+// Units 버튼으로 드롭다운을 연다.
 const openUnitsMenu = async (user: User) => {
-  const opened = screen.queryByRole("menu");
-  if (opened) return opened;
   await user.click(getUnitsButton());
   return screen.findByRole("menu");
 };
 
+// 항목을 고르면 드롭다운이 닫힌다. 다음 조작이 닫힌 상태에서 시작하도록 닫힘을 확인한다.
+const expectUnitsMenuClosed = () =>
+  waitFor(() => {
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+  });
+
 const chooseUnit = async (user: User, name: string) => {
   const menu = await openUnitsMenu(user);
   await user.click(within(menu).getByRole("menuitemradio", { name }));
+  await expectUnitsMenuClosed();
 };
 
 const clickToggle = async (user: User, name: string) => {
   const menu = await openUnitsMenu(user);
   await user.click(within(menu).getByRole("menuitem", { name }));
+  await expectUnitsMenuClosed();
 };
 
 const escapeRegExp = (text: string) =>
@@ -302,7 +308,11 @@ describe("개별 단위 선택", () => {
 });
 
 describe("움직임 설정과 단위 전환", () => {
-  it("일반 모션에서 Switch to Imperial을 누르면 숫자가 Imperial 값으로 바뀐 상태로 끝난다", async () => {
+  // 현재 날씨 카드의 기온 숫자 요소.
+  const findCurrentTemperature = async (temperature: string) =>
+    within(await findCurrentCard(temperature)).getByText(temperature);
+
+  it("일반 모션에서 Switch to Imperial을 누르면 숫자가 Imperial 값으로 바뀌고 페이드가 끝나 불투명해진다", async () => {
     stubPrefersReducedMotion(false);
     stubForecast();
     const user = await renderApp();
@@ -310,9 +320,12 @@ describe("움직임 설정과 단위 전환", () => {
     await clickToggle(user, "Switch to Imperial");
 
     await expectImperialCurrent();
+    const temperature = await findCurrentTemperature("36°");
+    // 인라인 opacity는 페이드(motion)가 붙인 것이다. 끝나면 1이 된다.
+    await waitFor(() => expect(temperature.style.opacity).toBe("1"));
   });
 
-  it("움직임 줄이기에서 Switch to Imperial을 누르면 숫자가 Imperial 값으로 바뀐다", async () => {
+  it("움직임 줄이기에서 Switch to Imperial을 누르면 숫자가 Imperial 값으로 바뀌고 페이드 없이 교체만 한다", async () => {
     stubPrefersReducedMotion(true);
     stubForecast();
     const user = await renderApp();
@@ -320,6 +333,8 @@ describe("움직임 설정과 단위 전환", () => {
     await clickToggle(user, "Switch to Imperial");
 
     await expectImperialCurrent();
+    const temperature = await findCurrentTemperature("36°");
+    expect(temperature).not.toHaveAttribute("style");
   });
 });
 

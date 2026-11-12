@@ -48,62 +48,75 @@ test.describe("포커스 링", () => {
   });
 });
 
-for (const key of ["Enter", " ", "ArrowDown"]) {
-  const keyName = key === " " ? "Space" : key === "ArrowDown" ? "↓" : key;
+// 메뉴 열기·닫기·포커스 복귀는 메뉴 부품(Base UI)의 기본 동작이라 처음부터 통과한다.
+// 이 프로젝트가 쓴 코드가 아니라 이후 변경(부품 교체·업그레이드, 트리거 교체)이 이 동작을 깨뜨리지
+// 않게 지키는 회귀 테스트다(docs/testing/test-policy.md#회귀-테스트).
+test.describe("회귀 테스트: 메뉴의 기본 키보드 동작", () => {
+  const menus = [
+    {
+      name: "Units 버튼",
+      trigger: unitsButton,
+      firstItem: (page: Page) =>
+        page.getByRole("menuitem", { name: "Switch to Imperial" }),
+      firstItemName: "Switch to Imperial",
+    },
+    {
+      name: "요일 선택기",
+      trigger: daySelector,
+      firstItem: (page: Page) => menuItems(page).first(),
+      firstItemName: "Wednesday",
+    },
+  ];
+  const openKeys = [
+    { key: "Enter", label: "Enter" },
+    { key: " ", label: "Space" },
+    { key: "ArrowDown", label: "↓" },
+  ];
 
-  test(`Units 버튼에서 ${keyName} 키를 누르면 포커스가 첫 항목 Switch to Imperial로 간다`, async ({
+  for (const menu of menus) {
+    for (const { key, label } of openKeys) {
+      test(`${menu.name}에서 ${label} 키를 누르면 포커스가 첫 항목 ${menu.firstItemName}으로 간다`, async ({
+        page,
+      }) => {
+        await openWithBerlinWeekly(page);
+        await menu.trigger(page).focus();
+
+        await page.keyboard.press(key);
+
+        await expect(menu.firstItem(page)).toBeFocused();
+        await expect(menu.firstItem(page)).toHaveText(menu.firstItemName);
+      });
+    }
+  }
+
+  test("Units 드롭다운에서 Esc를 누르면 패널이 닫히고 포커스가 Units 버튼으로 돌아간다", async ({
     page,
   }) => {
     await openWithBerlinWeekly(page);
     await unitsButton(page).focus();
+    await page.keyboard.press("Enter");
+    await expect(page.getByRole("menu")).toBeVisible();
 
-    await page.keyboard.press(key);
+    await page.keyboard.press("Escape");
 
-    await expect(
-      page.getByRole("menuitem", { name: "Switch to Imperial" }),
-    ).toBeFocused();
+    await expect(page.getByRole("menu")).toBeHidden();
+    await expect(unitsButton(page)).toBeFocused();
   });
 
-  test(`요일 선택기에서 ${keyName} 키를 누르면 포커스가 첫 요일 항목 Wednesday로 간다`, async ({
+  test("요일 선택기에서 요일을 고르면 패널이 닫히고 포커스가 요일 선택기 버튼으로 돌아간다", async ({
     page,
   }) => {
     await openWithBerlinWeekly(page);
     await daySelector(page).focus();
+    await page.keyboard.press("Enter");
+    await expect(page.getByRole("menu")).toBeVisible();
 
-    await page.keyboard.press(key);
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("Enter");
 
-    await expect(menuItems(page).first()).toBeFocused();
-    await expect(menuItems(page).first()).toHaveText("Wednesday");
+    await expect(page.getByRole("menu")).toBeHidden();
+    await expect(page.getByRole("button", { name: "Thursday" })).toBeFocused();
   });
-}
-
-test("Units 드롭다운에서 Esc를 누르면 패널이 닫히고 포커스가 Units 버튼으로 돌아간다", async ({
-  page,
-}) => {
-  await openWithBerlinWeekly(page);
-  await unitsButton(page).focus();
-  await page.keyboard.press("Enter");
-  await expect(page.getByRole("menu")).toBeVisible();
-
-  await page.keyboard.press("Escape");
-
-  await expect(page.getByRole("menu")).toBeHidden();
-  await expect(unitsButton(page)).toBeFocused();
-});
-
-test("요일 선택기에서 요일을 고르면 패널이 닫히고 포커스가 요일 선택기 버튼으로 돌아간다", async ({
-  page,
-}) => {
-  await openWithBerlinWeekly(page);
-  await daySelector(page).focus();
-  await page.keyboard.press("Enter");
-  await expect(page.getByRole("menu")).toBeVisible();
-
-  await page.keyboard.press("ArrowDown");
-  await page.keyboard.press("Enter");
-
-  await expect(page.getByRole("menu")).toBeHidden();
-  await expect(page.getByRole("button", { name: "Thursday" })).toBeFocused();
 });
 
 // 지표 한 칸: "Feels Like" 글자를 담은 가장 안쪽 요소(문서 순서상 마지막 조상).

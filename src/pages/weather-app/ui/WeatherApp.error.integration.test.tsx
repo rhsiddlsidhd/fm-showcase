@@ -19,7 +19,8 @@ const ERROR_TITLE = "Something went wrong";
 const ERROR_DESCRIPTION =
   "We couldn't connect to the server (API error). Please try again in a few moments.";
 
-// api-spec.md에 기록된 실제 HTTP 400 응답 본문.
+// Open-Meteo가 잘못된 요청에 돌려주는 HTTP 400 JSON 본문 형태(https://open-meteo.com/en/docs 의 Errors 절).
+// 앱은 reason 문구와 무관하게 상태 코드로 오류를 처리한다.
 const FORECAST_400_BODY = {
   reason: "Latitude must be in range of -90 to 90°. Given: 999.0.",
   error: true,
@@ -182,6 +183,8 @@ const findGroup = (parts: string[], { withImage = false } = {}) => {
   });
 };
 
+const NO_RESULT_QUERY = "zzzqqqnonexistentplace";
+
 const TODAY = "Wednesday, Nov 11, 2026";
 
 describe("오류 화면 표시", () => {
@@ -197,6 +200,15 @@ describe("오류 화면 표시", () => {
 
   it("지역 검색 요청이 네트워크 오류로 실패하면 오류 화면이 나온다", async () => {
     stubOpenMeteo({ geocoding: [reply("network")] });
+    const user = await renderAppLoaded();
+
+    await search(user, "Berlin");
+
+    await expectErrorScreen();
+  });
+
+  it("지역 검색이 200이지만 본문이 JSON이 아니면 오류 화면이 나온다", async () => {
+    stubOpenMeteo({ geocoding: [reply("notJson")] });
     const user = await renderAppLoaded();
 
     await search(user, "Berlin");
@@ -255,6 +267,54 @@ describe("Retry", () => {
     expect(
       geocodingRequests.map((url) => url.searchParams.get("name")),
     ).toEqual(["Berlin", "Berlin"]);
+  });
+
+  it("검색이 실패해 Retry를 눌렀다가 다시 실패해도 오류 화면이 다시 나오고, 한 번 더 Retry하면 후보 목록을 보여준다", async () => {
+    const { geocodingRequests, forecastRequests } = stubOpenMeteo({
+      geocoding: [reply("http400"), reply("http400")],
+    });
+    const user = await renderAppLoaded();
+    await search(user, "Berlin");
+    await findErrorTitle();
+
+    await user.click(getRetryButton());
+    await waitFor(() => expect(geocodingRequests).toHaveLength(2));
+    await expectErrorScreen();
+    await user.click(getRetryButton());
+
+    const listbox = await screen.findByRole("listbox");
+    expect(
+      within(listbox).getByRole("option", {
+        name: "Berlin, State of Berlin, Germany",
+      }),
+    ).toBeInTheDocument();
+    expect(queryErrorTitle()).not.toBeInTheDocument();
+    expect(
+      geocodingRequests.map((url) => url.searchParams.get("name")),
+    ).toEqual(["Berlin", "Berlin", "Berlin"]);
+    expect(forecastRequests).toHaveLength(1);
+  });
+
+  it("검색이 실패해 Retry를 눌렀을 때 결과가 없으면 오류 화면 대신 No search result found!를 보여주고 날씨 영역은 비어 있다", async () => {
+    const { geocodingRequests } = stubOpenMeteo({
+      geocoding: [reply("http400")],
+    });
+    const user = await renderAppLoaded();
+    await search(user, NO_RESULT_QUERY);
+    await findErrorTitle();
+
+    await user.click(getRetryButton());
+
+    expect(
+      await screen.findByText("No search result found!", OUTSIDE_STATUS),
+    ).toBeInTheDocument();
+    expect(queryErrorTitle()).not.toBeInTheDocument();
+    expect(screen.queryByText("Berlin, Germany")).not.toBeInTheDocument();
+    expect(screen.queryByText("Daily forecast")).not.toBeInTheDocument();
+    expect(screen.queryByText("Hourly forecast")).not.toBeInTheDocument();
+    expect(
+      geocodingRequests.map((url) => url.searchParams.get("name")),
+    ).toEqual([NO_RESULT_QUERY, NO_RESULT_QUERY]);
   });
 
   it("날씨 표시 중 검색이 실패하면 Retry 때 날씨는 다시 요청하지 않는다", async () => {
@@ -338,7 +398,10 @@ describe("오류 화면에서 단위 변경", () => {
     await user.click(
       within(menu).getByRole("menuitemradio", { name: "Fahrenheit (°F)" }),
     );
-    if (screen.queryByRole("menu")) await user.keyboard("{Escape}");
+    // 항목을 고르면 메뉴가 닫힌다.
+    await waitFor(() =>
+      expect(screen.queryByRole("menu")).not.toBeInTheDocument(),
+    );
     await user.click(getRetryButton());
 
     // 1일 fixture 현재 기온 2.3°C → 36.14°F
@@ -369,16 +432,12 @@ describe("오류 중 진행 중이던 다른 요청", () => {
     return { ...stub, user };
   };
 
-  it("날씨 요청이 실패한 뒤 도착한 검색 응답은 무시하고 오류 화면을 유지한다", async () => {
-    await failWeatherWhileSearching();
+  it("날씨 요청이 실패한 뒤 도착한 검색 응답은 무시해 오류 화면을 유지하고, Retry를 누르면 검색과 날씨를 같은 입력으로 다시 요청해 날씨와 후보 목록을 보여준다", async () => {
+    const { user, forecastRequests, geocodingRequests } =
+      await failWeatherWhileSearching();
 
     expect(screen.getByText(ERROR_TITLE, OUTSIDE_STATUS)).toBeInTheDocument();
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
-  });
-
-  it("그 상태에서 Retry를 누르면 검색과 날씨를 같은 입력으로 다시 요청해 날씨와 후보 목록을 보여준다", async () => {
-    const { user, forecastRequests, geocodingRequests } =
-      await failWeatherWhileSearching();
 
     await user.click(getRetryButton());
 
@@ -461,5 +520,44 @@ describe("Retry 뒤 날씨 알림", () => {
         "Weather for Berlin, Germany",
       ),
     );
+  });
+});
+
+describe("오류 화면이 나타날 때의 알림 영역", () => {
+  const getStatus = () => screen.getByRole("status");
+
+  it("검색 중 알림이 있다가 지역 검색이 실패하면 알림 영역이 비워진다", async () => {
+    const geocodingGate = createGate();
+    stubOpenMeteo({ geocoding: [reply("http400", geocodingGate.promise)] });
+    const user = await renderAppLoaded();
+    await search(user, "Berlin");
+    await waitFor(() =>
+      expect(getStatus()).toHaveTextContent("Search in progress"),
+    );
+
+    geocodingGate.release();
+    await findErrorTitle();
+
+    expect(getStatus()).toBeEmptyDOMElement();
+  });
+
+  it("날씨 로딩 알림이 있다가 고른 후보의 날씨 요청이 실패하면 알림 영역이 비워진다", async () => {
+    const forecastGate = createGate();
+    stubOpenMeteo({
+      forecast: [reply("ok"), reply("http400", forecastGate.promise)],
+    });
+    const user = await renderAppLoaded();
+    await search(user, "Berlin");
+    await user.click(
+      await screen.findByRole("option", {
+        name: "Berlin, New Hampshire, United States",
+      }),
+    );
+    await waitFor(() => expect(getStatus()).toHaveTextContent("Loading..."));
+
+    forecastGate.release();
+    await findErrorTitle();
+
+    expect(getStatus()).toBeEmptyDOMElement();
   });
 });

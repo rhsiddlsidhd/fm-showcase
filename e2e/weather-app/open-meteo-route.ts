@@ -1,12 +1,14 @@
 import type { Page } from "@playwright/test";
 
 // 외부 API(Open-Meteo)는 통제할 수 없어 경로 가로채기로 fixture를 돌려준다.
-// fixture는 jsdom 테스트와 같은 파일을 쓴다(.sdd/weather-app/api-spec.md).
+// fixture는 jsdom 테스트와 같은 파일을 쓴다.
 const fixtureDir = "src/shared/test/fixtures/weather-app";
 
 const corsHeaders = { "access-control-allow-origin": "*" };
 
-// api-spec.md에 기록된 Forecast의 실제 HTTP 400 응답 본문.
+// Open-Meteo는 잘못된 요청에 HTTP 400과 { error: true, reason: "..." } JSON을 돌려준다
+// (https://open-meteo.com/en/docs 의 Errors 절). 이 본문은 위도가 범위를 벗어난 요청에서
+// 실제로 받은 응답의 형태이고, 앱은 reason 문구와 무관하게 상태 코드로 오류를 처리한다.
 const forecast400Body = {
   reason: "Latitude must be in range of -90 to 90°. Given: 999.0.",
   error: true,

@@ -1,11 +1,10 @@
 import { expect, type JSHandle, type Page } from "@playwright/test";
 import { routeOpenMeteo } from "./open-meteo-route.ts";
 
-// 포커스 링이 "보인다"의 판정 기준(ux-design.md 「포커스 표시(모든 인터랙티브 요소) — 테두리 --ring」,
-// 「focus: 키보드 포커스 진입 → 포커스 링 표시」):
+// 포커스 링이 "보인다"의 판정 기준(docs/ui/accessibility.md 키보드 포커스 표시 규칙):
 // 포커스를 받은 요소의 계산된 outline 또는 box-shadow 중 보이는 층(색이 투명하지 않고 두께·번짐이 0이 아닌 것)이
 // 있고, 그 보이는 층이 포커스가 없을 때와 다르다. 색 값 자체는 단언하지 않는다.
-// 애니메이션 진행 과정은 검증 대상이 아니라서(test-boundaries.md) 전환 효과를 끄고 최종 상태만 본다.
+// 애니메이션 진행 과정은 검증 대상이 아니라서(docs/testing/test-boundaries.md) 전환 효과를 끄고 최종 상태만 본다.
 
 export type Ring = { outline: string | null; shadows: string[] };
 
