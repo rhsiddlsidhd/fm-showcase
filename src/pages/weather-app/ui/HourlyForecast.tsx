@@ -6,6 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu";
+import { GHOST_BUTTON_CLASS } from "./buttonStyle";
 import { MENU_ITEM_CLASS, MENU_PANEL_CLASS } from "./menuStyle";
 import type { Forecast } from "../api/forecast";
 import { formatTemperature, formatWeekdayLong } from "../model/format";
@@ -36,9 +37,7 @@ const HourlyContent = ({
       <DropdownMenu>
         <DropdownMenuTrigger
           render={
-            <Button
-              className={`${SELECTOR_CLASS} hover:bg-accent focus-visible:ring-ring h-auto justify-start border-0 bg-clip-border text-[length:inherit] leading-[inherit] font-normal whitespace-normal text-inherit select-text focus-visible:ring-2 focus-visible:[outline-style:auto] active:not-aria-[haspopup]:translate-y-0`}
-            />
+            <Button className={`${SELECTOR_CLASS} ${GHOST_BUTTON_CLASS}`} />
           }
         >
           {formatWeekdayLong(date)}

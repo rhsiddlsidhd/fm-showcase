@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu";
 import { IMPERIAL, isImperial, METRIC, type Units } from "../model/units";
+import { GHOST_BUTTON_CLASS } from "./buttonStyle";
 import {
   MENU_ITEM_CLASS,
   MENU_LABEL_CLASS,
@@ -59,7 +60,9 @@ export const UnitsMenu = ({
     <DropdownMenu>
       <DropdownMenuTrigger
         render={
-          <Button className="bg-card hover:bg-accent focus-visible:ring-ring flex h-auto justify-start gap-2.5 rounded-lg border-0 bg-clip-border px-4 py-3 text-[length:inherit] leading-[inherit] font-normal whitespace-normal text-inherit select-text focus-visible:ring-2 focus-visible:[outline-style:auto] active:not-aria-[haspopup]:translate-y-0" />
+          <Button
+            className={`${GHOST_BUTTON_CLASS} bg-card flex gap-2.5 rounded-lg px-4 py-3`}
+          />
         }
       >
         <img src="/weather-app/images/icon-units.svg" alt="" />
