@@ -508,3 +508,30 @@ describe("검색 결과 없음", () => {
     );
   });
 });
+
+describe("날씨 응답 대기 중 다시 검색", () => {
+  it("후보를 고른 뒤 날씨 응답 전에 Singapore를 검색해도 날씨가 도착하면 알림 영역이 Weather for Berlin, Germany를 알린다", async () => {
+    const { gates } = stubOpenMeteo();
+    const user = await renderApp();
+    await searchAndWaitForCandidates(user, "Berlin");
+    const forecastGate = createGate();
+    gates.forecast = forecastGate.promise;
+    await user.click(
+      screen.getByRole("option", { name: "Berlin, State of Berlin, Germany" }),
+    );
+    await screen.findByText("Loading...", OUTSIDE_STATUS);
+
+    await user.clear(getSearchInput());
+    const listbox = await searchAndWaitForCandidates(user, "Singapore");
+    expect(
+      within(listbox).getByRole("option", { name: "Singapore, Singapore" }),
+    ).toBeInTheDocument();
+
+    forecastGate.release();
+
+    expect(await screen.findByText("Berlin, Germany")).toBeInTheDocument();
+    await waitFor(() =>
+      expect(getStatus()).toHaveTextContent("Weather for Berlin, Germany"),
+    );
+  });
+});
