@@ -4,11 +4,11 @@ import { placeLabel } from "./place";
 
 describe("지역명 표기", () => {
   it("국가 정보가 없는 지역은 국가 없이 지역명만, 국가 정보가 있는 지역은 지역명과 국가로 표시되고 undefined가 보이지 않는다", () => {
-    const nowhere = {
+    const nowhere: Place = {
       name: "Nowhere",
       latitude: 0,
       longitude: 0,
-    } as Place;
+    };
     const berlin: Place = {
       name: "Berlin",
       country: "Germany",
