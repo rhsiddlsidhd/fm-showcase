@@ -1,11 +1,11 @@
 import type { Forecast } from "../api/forecast";
 import { formatTemperature, formatWeekdayShort } from "../model/format";
 import { toTemperature, type Units } from "../model/units";
+import { CELL_CLASS, PlaceholderItem } from "./surface";
 import { UnitValue } from "./UnitValue";
 import { WeatherIconImage } from "./WeatherIconImage";
 
 const DAYS = 7;
-const CELL_CLASS = "rounded-xl border border-border bg-card";
 
 export const DailyForecast = ({
   daily,
@@ -46,9 +46,9 @@ export const DailyForecast = ({
             </li>
           ))
         : Array.from({ length: DAYS }, (_, i) => (
-            <li
+            <PlaceholderItem
               key={i}
-              data-testid="daily-placeholder"
+              testId="daily-placeholder"
               className={`${CELL_CLASS} h-40`}
             />
           ))}

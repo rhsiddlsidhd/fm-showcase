@@ -6,6 +6,7 @@ import {
   toTemperature,
   type Units,
 } from "../model/units";
+import { CELL_CLASS, SUBTLE_TEXT_CLASS } from "./surface";
 import { LoadingDots } from "./LoadingDots";
 import { UnitValue } from "./UnitValue";
 import { WeatherIconImage } from "./WeatherIconImage";
@@ -49,7 +50,7 @@ export const CurrentWeather = ({
         >
           <div className="flex flex-col gap-3">
             <p className="text-3xl font-bold">{label}</p>
-            <p className="text-(length:--weather-app-text-body) text-(--weather-app-text-subtle)">
+            <p className={SUBTLE_TEXT_CLASS}>
               {formatCurrentDate(current.time)}
             </p>
           </div>
@@ -67,21 +68,14 @@ export const CurrentWeather = ({
         <div className={`${CARD_CLASS} bg-card lg:justify-center`}>
           <div className="flex flex-col items-center gap-4">
             <LoadingDots />
-            <p className="text-(length:--weather-app-text-body) text-(--weather-app-text-subtle)">
-              Loading...
-            </p>
+            <p className={SUBTLE_TEXT_CLASS}>Loading...</p>
           </div>
         </div>
       )}
       <ul className="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6">
         {metrics.map(([name, value]) => (
-          <li
-            key={name}
-            className="border-border bg-card flex flex-col gap-6 rounded-xl border p-5"
-          >
-            <span className="text-(length:--weather-app-text-body) text-(--weather-app-text-subtle)">
-              {name}
-            </span>
+          <li key={name} className={`${CELL_CLASS} flex flex-col gap-6 p-5`}>
+            <span className={SUBTLE_TEXT_CLASS}>{name}</span>
             <UnitValue className="text-3xl font-light" value={value} />
           </li>
         ))}

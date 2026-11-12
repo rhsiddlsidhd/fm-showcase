@@ -9,6 +9,7 @@ import type { Forecast } from "../api/forecast";
 import { formatTemperature, formatWeekdayLong } from "../model/format";
 import { dayHourlyRows } from "../model/hourly";
 import { toTemperature, type Units } from "../model/units";
+import { PlaceholderItem } from "./surface";
 import { UnitValue } from "./UnitValue";
 import { WeatherIconImage } from "./WeatherIconImage";
 
@@ -92,9 +93,9 @@ export const HourlyForecast = ({
         </span>
         <ul className={LIST_CLASS}>
           {Array.from({ length: ROWS }, (_, i) => (
-            <li
+            <PlaceholderItem
               key={i}
-              data-testid="hourly-placeholder"
+              testId="hourly-placeholder"
               className={`${ROW_CLASS} h-15`}
             />
           ))}
