@@ -174,3 +174,40 @@ describe("날씨를 불러오는 중 검색 실패", () => {
     expect(await findErrorTitle()).toBeInTheDocument();
   });
 });
+
+describe("검색 오류 화면 중 처음 날씨 요청 실패", () => {
+  it("검색 오류 화면이 떠 있는 동안 처음 날씨 요청도 실패해도 오류 화면은 하나로 유지되고, Retry를 누르면 검색과 날씨를 모두 다시 요청해 날씨와 후보 목록을 보여준다", async () => {
+    const forecastGate = createGate();
+    const stub = stubOpenMeteo({
+      forecast: [reply("http400", forecastGate.promise)],
+      geocoding: [reply("http400")],
+    });
+    const user = userEvent.setup();
+    render(<WeatherAppPage />);
+    await waitFor(() => expect(stub.forecastRequests).toHaveLength(1));
+    await user.type(screen.getByRole("combobox"), "Berlin{Enter}");
+    await findErrorTitle();
+    forecastGate.release();
+    await settle(stub.forecastServed[0]);
+
+    expect(screen.getAllByText(ERROR_TITLE, OUTSIDE_STATUS)).toHaveLength(1);
+    expect(getRetryButton()).toBeInTheDocument();
+
+    await user.click(getRetryButton());
+
+    expect(await screen.findByText("Berlin, Germany")).toBeInTheDocument();
+    const listbox = await screen.findByRole("listbox");
+    expect(
+      within(listbox).getByRole("option", {
+        name: "Berlin, State of Berlin, Germany",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      stub.geocodingRequests.map((url) => url.searchParams.get("name")),
+    ).toEqual(["Berlin", "Berlin"]);
+    expect(stub.forecastRequests).toHaveLength(2);
+    expect(
+      screen.queryByText(ERROR_TITLE, OUTSIDE_STATUS),
+    ).not.toBeInTheDocument();
+  });
+});

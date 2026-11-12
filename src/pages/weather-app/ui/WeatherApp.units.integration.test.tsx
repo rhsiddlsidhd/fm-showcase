@@ -426,3 +426,62 @@ describe("단위 변경과 알림 영역", () => {
     expect(getStatusText()).toBe("Weather for Berlin, United States");
   });
 });
+
+describe("Units 드롭다운 구조", () => {
+  const GROUPS: [label: string, items: string[]][] = [
+    ["Temperature", ["Celsius (°C)", "Fahrenheit (°F)"]],
+    ["Wind Speed", ["km/h", "mph"]],
+    ["Precipitation", ["Millimeters (mm)", "Inches (in)"]],
+  ];
+
+  it("드롭다운을 열면 Temperature, Wind Speed, Precipitation 그룹이 이 순서로 있고 각 그룹 아래에 해당 단위 항목이 있다", async () => {
+    stubForecast();
+    const user = await renderApp();
+
+    const menu = await openUnitsMenu(user);
+
+    const groups = GROUPS.map(([label]) =>
+      within(menu).getByRole("group", { name: label }),
+    );
+    groups.slice(1).forEach((group, index) => {
+      expect(
+        groups[index].compareDocumentPosition(group) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+    });
+    GROUPS.forEach(([, items], index) => {
+      expect(
+        within(groups[index])
+          .getAllByRole("menuitemradio")
+          .map((item) => item.textContent),
+      ).toEqual(items);
+    });
+  });
+
+  it("구분선은 그룹 사이에만 있고 첫 그룹 앞이나 마지막 그룹 뒤에는 없다", async () => {
+    stubForecast();
+    const user = await renderApp();
+
+    const menu = await openUnitsMenu(user);
+
+    const labelled = [
+      ...GROUPS.map(
+        ([label]) =>
+          [within(menu).getByRole("group", { name: label }), label] as const,
+      ),
+      ...within(menu)
+        .getAllByRole("separator")
+        .map((separator) => [separator, "---"] as const),
+    ];
+    const inDocumentOrder = labelled.sort(([a], [b]) =>
+      a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1,
+    );
+    expect(inDocumentOrder.map(([, label]) => label)).toEqual([
+      "Temperature",
+      "---",
+      "Wind Speed",
+      "---",
+      "Precipitation",
+    ]);
+  });
+});
