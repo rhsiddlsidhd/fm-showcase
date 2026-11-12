@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import {
+  daySelector,
   expectRingShownOnFocus,
   menuItems,
   openWithBerlinWeekly,
@@ -25,6 +26,28 @@ test.describe("포커스 링", () => {
       const item = items.nth(index);
       await expect(item).toBeFocused();
       const label = `옵션 "${(await item.textContent())?.trim()}"`;
+      const focused = await item.evaluate(readRing);
+      await page.keyboard.press("ArrowDown");
+      // 포커스가 실제로 다음 항목(마지막이면 첫 항목)으로 옮겨 간 뒤에 포커스 없는 상태를 읽는다.
+      await expect(item).not.toBeFocused();
+      const unfocused = await item.evaluate(readRing);
+      expectRingShownOnFocus({ label, focused, unfocused });
+    }
+  });
+  test("키보드로 연 요일 선택기 메뉴에서 방향키로 옮겨 가는 7개 요일 항목마다 포커스 링이 보인다", async ({
+    page,
+  }) => {
+    await openWithBerlinWeekly(page);
+    await daySelector(page).focus();
+    await page.keyboard.press("Enter");
+    const items = menuItems(page);
+    await expect(items).toHaveCount(7);
+    await expect(items.first()).toBeFocused();
+
+    for (let index = 0; index < 7; index += 1) {
+      const item = items.nth(index);
+      await expect(item).toBeFocused();
+      const label = `요일 "${(await item.textContent())?.trim()}"`;
       const focused = await item.evaluate(readRing);
       await page.keyboard.press("ArrowDown");
       // 포커스가 실제로 다음 항목(마지막이면 첫 항목)으로 옮겨 간 뒤에 포커스 없는 상태를 읽는다.
