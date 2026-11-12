@@ -27,6 +27,7 @@ export const WeatherApp = () => {
   const searchingQuery = useRef<string | null>(null);
   const searchFailed = useRef(false);
   const announceWeather = useRef(false);
+  const pendingStatus = useRef<string | null>(null);
 
   useEffect(() => {
     if (!place) return;
@@ -37,6 +38,9 @@ export const WeatherApp = () => {
         setForecast(result);
         const announce = announceWeather.current;
         announceWeather.current = false;
+        if (announce && searchingQuery.current !== null) {
+          pendingStatus.current = `Weather for ${placeLabel(place)}`;
+        }
         setStatus((current) =>
           current === LOADING || (announce && current === "")
             ? `Weather for ${placeLabel(place)}`
@@ -57,6 +61,7 @@ export const WeatherApp = () => {
   const select = (selected: Place) => {
     searchingQuery.current = null;
     announceWeather.current = true;
+    pendingStatus.current = null;
     setNoResult(false);
     setForecast(null);
     setStatus(LOADING);
@@ -66,6 +71,7 @@ export const WeatherApp = () => {
   const showNoResult = () => {
     searchingQuery.current = null;
     announceWeather.current = false;
+    pendingStatus.current = null;
     setPlace(null);
     setForecast(null);
     setNoResult(true);
@@ -105,7 +111,8 @@ export const WeatherApp = () => {
             }}
             onResults={() => {
               searchingQuery.current = null;
-              setStatus("");
+              setStatus(pendingStatus.current ?? "");
+              pendingStatus.current = null;
             }}
             onError={(query) => {
               searchingQuery.current = null;
