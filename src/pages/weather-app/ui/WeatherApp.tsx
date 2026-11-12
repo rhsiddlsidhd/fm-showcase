@@ -82,7 +82,12 @@ export const WeatherApp = () => {
   const retryAfterError = () => {
     if (!error) return;
     searchFailed.current = false;
-    if (error.kind === "weather" || !forecast) setAttempt((count) => count + 1);
+    if (error.kind === "weather" || !forecast) {
+      announceWeather.current = true;
+      setAttempt((count) => count + 1);
+    } else if (place) {
+      pendingStatus.current = `Weather for ${placeLabel(place)}`;
+    }
     setRetry({ query: error.query });
     setError(null);
   };
