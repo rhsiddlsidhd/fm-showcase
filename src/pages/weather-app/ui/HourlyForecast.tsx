@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { Button } from "@/shared/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu";
+import { GHOST_BUTTON_CLASS } from "./buttonStyle";
 import { MENU_ITEM_CLASS, MENU_PANEL_CLASS } from "./menuStyle";
 import type { Forecast } from "../api/forecast";
 import { formatTemperature, formatWeekdayLong } from "../model/format";
@@ -34,7 +36,9 @@ const HourlyContent = ({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger
-          className={`${SELECTOR_CLASS} hover:bg-accent focus-visible:ring-ring focus-visible:ring-2`}
+          render={
+            <Button className={`${SELECTOR_CLASS} ${GHOST_BUTTON_CLASS}`} />
+          }
         >
           {formatWeekdayLong(date)}
           <img src="/weather-app/images/icon-dropdown.svg" alt="" />
