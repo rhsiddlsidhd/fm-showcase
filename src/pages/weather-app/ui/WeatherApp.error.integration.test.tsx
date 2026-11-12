@@ -424,3 +424,22 @@ describe("오류 화면이 나타날 때의 포커스", () => {
     await waitFor(() => expect(getRetryButton()).toHaveFocus());
   });
 });
+
+describe("Retry 뒤 날씨 알림", () => {
+  it("처음 날씨 요청이 실패한 뒤 Retry로 Berlin 날씨가 표시되면 알림 영역이 Weather for Berlin, Germany를 알린다", async () => {
+    stubOpenMeteo({ forecast: [reply("http400")] });
+    const user = renderApp();
+    await findErrorTitle();
+
+    await user.click(getRetryButton());
+
+    expect(
+      await screen.findByText("Berlin, Germany", OUTSIDE_STATUS),
+    ).toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.getByRole("status").textContent?.trim()).toBe(
+        "Weather for Berlin, Germany",
+      ),
+    );
+  });
+});
