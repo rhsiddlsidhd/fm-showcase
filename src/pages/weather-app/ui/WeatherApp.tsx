@@ -1,3 +1,4 @@
+import { MotionConfig } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { fetchForecast, type Forecast } from "../api/forecast";
 import type { Place } from "../api/geocoding";
@@ -93,69 +94,74 @@ export const WeatherApp = () => {
   };
 
   return (
-    <main className="theme-weather-app bg-background text-foreground min-h-dvh">
-      <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-4 lg:gap-12 lg:px-8 lg:py-12">
-        <header className="flex items-center justify-between">
-          <img
-            src="/weather-app/images/logo.svg"
-            alt="Weather Now"
-            className="h-7 lg:h-10"
-          />
-          <UnitsMenu units={units} onChange={setUnits} />
-        </header>
-        {!error && (
-          <h1 className="font-heading text-center text-5xl/tight font-bold lg:text-6xl">
-            How&apos;s the sky looking today?
-          </h1>
-        )}
-        {!error && (
-          <SearchBox
-            retry={retry}
-            onSearching={(query) => {
-              searchingQuery.current = query;
-              setStatus("Search in progress");
-            }}
-            onResults={() => {
-              searchingQuery.current = null;
-              setStatus(pendingStatus.current ?? "");
-              pendingStatus.current = null;
-              setNoResult(false);
-            }}
-            onError={(query) => {
-              searchingQuery.current = null;
-              searchFailed.current = true;
-              setError({ kind: "search", query });
-              setStatus("");
-            }}
-            onNoResult={showNoResult}
-            onSelect={select}
-          />
-        )}
-        <p role="status" className="sr-only">
-          {status}
-        </p>
-        {error ? (
-          <ErrorScreen onRetry={retryAfterError} />
-        ) : noResult ? (
-          <p className="pt-4 text-center text-2xl font-bold">
-            No search result found!
+    <MotionConfig reducedMotion="user">
+      <main className="theme-weather-app bg-background text-foreground min-h-dvh">
+        <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-4 lg:gap-12 lg:px-8 lg:py-12">
+          <header className="flex items-center justify-between">
+            <img
+              src="/weather-app/images/logo.svg"
+              alt="Weather Now"
+              className="h-7 lg:h-10"
+            />
+            <UnitsMenu units={units} onChange={setUnits} />
+          </header>
+          {!error && (
+            <h1 className="font-heading text-center text-5xl/tight font-bold lg:text-6xl">
+              How&apos;s the sky looking today?
+            </h1>
+          )}
+          {!error && (
+            <SearchBox
+              retry={retry}
+              onSearching={(query) => {
+                searchingQuery.current = query;
+                setStatus("Search in progress");
+              }}
+              onResults={() => {
+                searchingQuery.current = null;
+                setStatus(pendingStatus.current ?? "");
+                pendingStatus.current = null;
+                setNoResult(false);
+              }}
+              onError={(query) => {
+                searchingQuery.current = null;
+                searchFailed.current = true;
+                setError({ kind: "search", query });
+                setStatus("");
+              }}
+              onNoResult={showNoResult}
+              onSelect={select}
+            />
+          )}
+          <p role="status" className="sr-only">
+            {status}
           </p>
-        ) : (
-          place && (
-            <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
-              <div className="flex min-w-0 flex-col gap-8 lg:gap-12">
-                <CurrentWeather
-                  label={placeLabel(place)}
-                  current={forecast?.current ?? null}
-                  units={units}
-                />
-                <DailyForecast daily={forecast?.daily ?? null} units={units} />
+          {error ? (
+            <ErrorScreen onRetry={retryAfterError} />
+          ) : noResult ? (
+            <p className="pt-4 text-center text-2xl font-bold">
+              No search result found!
+            </p>
+          ) : (
+            place && (
+              <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
+                <div className="flex min-w-0 flex-col gap-8 lg:gap-12">
+                  <CurrentWeather
+                    label={placeLabel(place)}
+                    current={forecast?.current ?? null}
+                    units={units}
+                  />
+                  <DailyForecast
+                    daily={forecast?.daily ?? null}
+                    units={units}
+                  />
+                </div>
+                <HourlyForecast forecast={forecast} units={units} />
               </div>
-              <HourlyForecast forecast={forecast} units={units} />
-            </div>
-          )
-        )}
-      </div>
-    </main>
+            )
+          )}
+        </div>
+      </main>
+    </MotionConfig>
   );
 };
