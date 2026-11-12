@@ -5,6 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu";
+import { MENU_ITEM_CLASS, MENU_PANEL_CLASS } from "./menuStyle";
 import type { Forecast } from "../api/forecast";
 import { formatTemperature, formatWeekdayLong } from "../model/format";
 import { dayHourlyRows } from "../model/hourly";
@@ -38,14 +39,11 @@ const HourlyContent = ({
           {formatWeekdayLong(date)}
           <img src="/weather-app/images/icon-dropdown.svg" alt="" />
         </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align="end"
-          className="theme-weather-app bg-popover w-56 p-2"
-        >
+        <DropdownMenuContent align="end" className={MENU_PANEL_CLASS}>
           {forecast.daily.time.map((day) => (
             <DropdownMenuItem
               key={day}
-              className="focus:ring-ring px-2 py-2.5 text-(length:--weather-app-text-body) focus:ring-2"
+              className={MENU_ITEM_CLASS}
               onClick={() => setDate(day)}
             >
               {formatWeekdayLong(day)}

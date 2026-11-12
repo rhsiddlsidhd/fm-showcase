@@ -10,10 +10,41 @@ import {
   DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu";
 import { IMPERIAL, isImperial, METRIC, type Units } from "../model/units";
+import {
+  MENU_ITEM_CLASS,
+  MENU_LABEL_CLASS,
+  MENU_PANEL_CLASS,
+} from "./menuStyle";
 
-const ITEM_RING = "focus:ring-2 focus:ring-ring";
-const ITEM_CLASS = `${ITEM_RING} px-2 py-2.5 text-(length:--weather-app-text-body) data-checked:bg-accent`;
-const LABEL_CLASS = "px-2 pt-1.5 text-sm text-muted-foreground";
+const CHECKABLE_ITEM_CLASS = `${MENU_ITEM_CLASS} data-checked:bg-accent`;
+
+const UnitGroup = ({
+  label,
+  value,
+  onValueChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onValueChange: (value: string) => void;
+  options: [value: string, text: string][];
+}) => (
+  <DropdownMenuGroup>
+    <DropdownMenuLabel className={MENU_LABEL_CLASS}>{label}</DropdownMenuLabel>
+    <DropdownMenuRadioGroup value={value} onValueChange={onValueChange}>
+      {options.map(([optionValue, text]) => (
+        <DropdownMenuRadioItem
+          key={optionValue}
+          value={optionValue}
+          className={CHECKABLE_ITEM_CLASS}
+          closeOnClick
+        >
+          {text}
+        </DropdownMenuRadioItem>
+      ))}
+    </DropdownMenuRadioGroup>
+  </DropdownMenuGroup>
+);
 
 export const UnitsMenu = ({
   units,
@@ -30,99 +61,51 @@ export const UnitsMenu = ({
         Units
         <img src="/weather-app/images/icon-dropdown.svg" alt="" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="end"
-        className="theme-weather-app bg-popover w-56 p-2"
-      >
+      <DropdownMenuContent align="end" className={MENU_PANEL_CLASS}>
         <DropdownMenuItem
-          className={ITEM_CLASS}
+          className={CHECKABLE_ITEM_CLASS}
           onClick={() => onChange(imperial ? METRIC : IMPERIAL)}
         >
           {imperial ? "Switch to Metric" : "Switch to Imperial"}
         </DropdownMenuItem>
-        <DropdownMenuGroup>
-          <DropdownMenuLabel className={LABEL_CLASS}>
-            Temperature
-          </DropdownMenuLabel>
-          <DropdownMenuRadioGroup
-            value={units.temperature}
-            onValueChange={(value) =>
-              onChange({ ...units, temperature: value as Units["temperature"] })
-            }
-          >
-            <DropdownMenuRadioItem
-              value="celsius"
-              className={ITEM_CLASS}
-              closeOnClick
-            >
-              Celsius (°C)
-            </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem
-              value="fahrenheit"
-              className={ITEM_CLASS}
-              closeOnClick
-            >
-              Fahrenheit (°F)
-            </DropdownMenuRadioItem>
-          </DropdownMenuRadioGroup>
-        </DropdownMenuGroup>
+        <UnitGroup
+          label="Temperature"
+          value={units.temperature}
+          onValueChange={(value) =>
+            onChange({ ...units, temperature: value as Units["temperature"] })
+          }
+          options={[
+            ["celsius", "Celsius (°C)"],
+            ["fahrenheit", "Fahrenheit (°F)"],
+          ]}
+        />
         <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuLabel className={LABEL_CLASS}>
-            Wind Speed
-          </DropdownMenuLabel>
-          <DropdownMenuRadioGroup
-            value={units.wind}
-            onValueChange={(value) =>
-              onChange({ ...units, wind: value as Units["wind"] })
-            }
-          >
-            <DropdownMenuRadioItem
-              value="kmh"
-              className={ITEM_CLASS}
-              closeOnClick
-            >
-              km/h
-            </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem
-              value="mph"
-              className={ITEM_CLASS}
-              closeOnClick
-            >
-              mph
-            </DropdownMenuRadioItem>
-          </DropdownMenuRadioGroup>
-        </DropdownMenuGroup>
+        <UnitGroup
+          label="Wind Speed"
+          value={units.wind}
+          onValueChange={(value) =>
+            onChange({ ...units, wind: value as Units["wind"] })
+          }
+          options={[
+            ["kmh", "km/h"],
+            ["mph", "mph"],
+          ]}
+        />
         <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuLabel className={LABEL_CLASS}>
-            Precipitation
-          </DropdownMenuLabel>
-          <DropdownMenuRadioGroup
-            value={units.precipitation}
-            onValueChange={(value) =>
-              onChange({
-                ...units,
-                precipitation: value as Units["precipitation"],
-              })
-            }
-          >
-            <DropdownMenuRadioItem
-              value="mm"
-              className={ITEM_CLASS}
-              closeOnClick
-            >
-              Millimeters (mm)
-            </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem
-              value="in"
-              className={ITEM_CLASS}
-              closeOnClick
-            >
-              Inches (in)
-            </DropdownMenuRadioItem>
-          </DropdownMenuRadioGroup>
-        </DropdownMenuGroup>
+        <UnitGroup
+          label="Precipitation"
+          value={units.precipitation}
+          onValueChange={(value) =>
+            onChange({
+              ...units,
+              precipitation: value as Units["precipitation"],
+            })
+          }
+          options={[
+            ["mm", "Millimeters (mm)"],
+            ["in", "Inches (in)"],
+          ]}
+        />
       </DropdownMenuContent>
     </DropdownMenu>
   );
