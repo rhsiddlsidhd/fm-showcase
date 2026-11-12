@@ -248,4 +248,18 @@ test.describe("화면 폭 375px", () => {
       "Retry 버튼이 화면 가운데에 있다",
     );
   });
+
+  test("오류가 나면 오류 설명문의 글자가 가운데 정렬로 계산된다", async ({
+    page,
+  }) => {
+    await routeForecastToHttp400(page);
+    await page.goto("/weather-app");
+    const description = text(
+      page,
+      "We couldn't connect to the server (API error). Please try again in a few moments.",
+    );
+    await expect(description).toBeVisible();
+
+    await expect(description).toHaveCSS("text-align", "center");
+  });
 });
