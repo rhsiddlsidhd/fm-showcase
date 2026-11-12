@@ -44,7 +44,7 @@ const HourlyContent = ({
           {forecast.daily.time.map((day) => (
             <DropdownMenuItem
               key={day}
-              className="px-2 py-2.5 text-(length:--weather-app-text-body)"
+              className="focus:ring-ring px-2 py-2.5 text-(length:--weather-app-text-body) focus:ring-2"
               onClick={() => setDate(day)}
             >
               {formatWeekdayLong(day)}
