@@ -26,6 +26,7 @@ export const WeatherApp = () => {
   const [retry, setRetry] = useState<Retry | undefined>(undefined);
   const searchingQuery = useRef<string | null>(null);
   const searchFailed = useRef(false);
+  const announceWeather = useRef(false);
 
   useEffect(() => {
     if (!place) return;
@@ -34,8 +35,12 @@ export const WeatherApp = () => {
       .then((result) => {
         if (searchFailed.current) return;
         setForecast(result);
+        const announce = announceWeather.current;
+        announceWeather.current = false;
         setStatus((current) =>
-          current === LOADING ? `Weather for ${placeLabel(place)}` : current,
+          current === LOADING || (announce && current === "")
+            ? `Weather for ${placeLabel(place)}`
+            : current,
         );
       })
       .catch(() => {
@@ -51,6 +56,7 @@ export const WeatherApp = () => {
 
   const select = (selected: Place) => {
     searchingQuery.current = null;
+    announceWeather.current = true;
     setNoResult(false);
     setForecast(null);
     setStatus(LOADING);
@@ -59,6 +65,7 @@ export const WeatherApp = () => {
 
   const showNoResult = () => {
     searchingQuery.current = null;
+    announceWeather.current = false;
     setPlace(null);
     setForecast(null);
     setNoResult(true);
