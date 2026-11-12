@@ -14,7 +14,7 @@
 | [`docs/testing/README.md`](docs/testing/README.md)           | 테스트를 쓰거나 고칠 때. 테스트 층이나 대역 범위를 정할 때                                                                                       | 테스트 경계(층별 검증 범위, 대역 범위), 테스트 정책의 인덱스        |
 | [`docs/spec/README.md`](docs/spec/README.md)                 | 도메인 설계안(`.sdd/`)을 만들거나 고칠 때. 결정 기록(`adr/`)을 쓸 때. PR에 요구사항과 테스트의 대응을 쓸 때                                      | 설계안과 결정 기록의 위치와 작성 규칙의 인덱스                      |
 | [`docs/ui/README.md`](docs/ui/README.md)                     | 화면을 설계하거나 화면 컴포넌트·테마를 구현할 때                                                                                                 | 컴포넌트·테마·접근성·애니메이션·반응형 규칙의 인덱스                |
-| [`docs/code/README.md`](docs/code/README.md)                 | 문제를 해결할 자료구조나 알고리즘 구현 방식을 고를 때                                                                                             | 자료구조·알고리즘 선택 기준과 시간·공간 복잡도 및 가독성의 균형     |
+| [`docs/code/README.md`](docs/code/README.md)                 | 문제를 해결할 자료구조나 알고리즘 구현 방식을 고를 때                                                                                            | 자료구조·알고리즘 선택 기준과 시간·공간 복잡도 및 가독성의 균형     |
 | [`docs/glossary.md`](docs/glossary.md)                       | 용어의 정의를 찾을 때. 비슷한 용어 중 무엇을 가리키는지 헷갈릴 때. 용어를 새로 정의할 때                                                         | 용어별로 정의한 곳, 헷갈리기 쉬운 용어의 구분                       |
 | [`docs/interview/README.md`](docs/interview/README.md)       | AI를 써서 만든 코드를 외부 면접 문항으로 채점할 때                                                                                               | 동결된 면접 문항지 하나의 인덱스                                    |
 
