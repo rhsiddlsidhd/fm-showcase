@@ -320,3 +320,53 @@ describe("움직임 설정과 단위 전환", () => {
     await expectImperialCurrent();
   });
 });
+
+describe("개별 단위 선택 뒤 메뉴 닫힘", () => {
+  // Units 버튼으로 메뉴를 열고 개별 단위 항목을 고른다.
+  const openMenuAndChoose = async (user: User, name: string) => {
+    await user.click(getUnitsButton());
+    const menu = await screen.findByRole("menu");
+    await user.click(within(menu).getByRole("menuitemradio", { name }));
+  };
+
+  const expectMenuClosed = () =>
+    waitFor(() => {
+      expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+    });
+
+  it("Units 메뉴에서 Fahrenheit를 고르면 기온이 화씨로 바뀌고 메뉴가 닫힌다", async () => {
+    stubForecast();
+    const user = await renderApp();
+
+    await openMenuAndChoose(user, "Fahrenheit (°F)");
+
+    // 2.3°C → 36.14°F
+    expect(await findCurrentCard("36°")).toBeInTheDocument();
+    await expectMenuClosed();
+  });
+
+  it("Units 메뉴에서 mph를 고르면 풍속만 mph로 바뀌고 메뉴가 닫힌다", async () => {
+    stubForecast();
+    const user = await renderApp();
+
+    await openMenuAndChoose(user, "mph");
+
+    // 8.4 km/h → 5.22 mph
+    expect(await findMetric("Wind", "5 mph")).toBeInTheDocument();
+    expect(await findCurrentCard("2°")).toBeInTheDocument();
+    expect(await findMetric("Precipitation", "0 mm")).toBeInTheDocument();
+    await expectMenuClosed();
+  });
+
+  it("Units 메뉴에서 Inches를 고르면 강수량만 in으로 바뀌고 메뉴가 닫힌다", async () => {
+    stubForecast();
+    const user = await renderApp();
+
+    await openMenuAndChoose(user, "Inches (in)");
+
+    expect(await findMetric("Precipitation", "0 in")).toBeInTheDocument();
+    expect(await findCurrentCard("2°")).toBeInTheDocument();
+    expect(await findMetric("Wind", "8 km/h")).toBeInTheDocument();
+    await expectMenuClosed();
+  });
+});
