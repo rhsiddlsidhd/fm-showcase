@@ -1,6 +1,6 @@
 # 애니메이션 규칙
 
-- 우리가 만드는 애니메이션은 `motion` 라이브러리로만 구현한다. CSS `transition`, `@keyframes`, `tw-animate-css`를 직접 쓰지 않는다. 방식이 섞이면 움직임 줄이기 처리를 방식마다 따로 확인해야 한다.
+- 우리가 만드는 애니메이션은 `motion` 라이브러리로만 구현한다. CSS `transition`, `@keyframes`, `tw-animate-css`를 직접 쓰지 않는다. 방식이 섞이면 애니메이션 동작 줄이기 설정을 방식마다 따로 확인해야 한다.
 - shadcn/ui 부품 안에 들어 있는 효과는 건드리지 않는다. `src/shared/ui/`의 산출물을 고치지 않는다는 [컴포넌트 규칙](component.md)과 같은 이유다.
 - 움직임의 거리, 시간, 이징은 디자인 토큰이 아니다. `motion`은 이 값을 CSS 변수가 아닌 JS 값으로 받는다. 슬라이스 `ui/`의 상수로 두고, 컴포넌트에 숫자를 직접 쓰지 않는다.
 
@@ -15,9 +15,11 @@
 - 사라지는 요소는 트리에서 빼고 `AnimatePresence`의 `exit`으로 움직인다. `opacity: 0`으로 남겨 두지 않는다. 남은 요소는 자리를 차지하고 포커스를 받는다.
 - 이 규칙으로 표현할 수 없는 움직임은 이유를 설계안에 쓰고 [`(미결정)`](../spec/README.md#작성-규칙)으로 둔다.
 
-## 움직임 줄이기
+## 애니메이션 동작 줄이기 설정 대응
 
-움직임 줄이기를 `motion`으로 구현하는 방법이다.
+애니메이션 동작 줄이기 설정에 따라 움직임을 줄이거나 대체하는 방법이다.
 
-- `MotionConfig reducedMotion="user"`만으로는 hover·focus 효과와 진입 `opacity`가 남으므로 그것만으로 처리하지 않는다.
-- `useReducedMotion` 값으로 움직임을 만드는 모든 경로를 직접 끈다. 진입·상호작용·반복 움직임을 포함하고, 실제로 쓴 속성(`initial`, `animate`, `exit`, `whileHover`, `whileFocus`, `layout` 등)을 확인한다.
+- `MotionConfig reducedMotion="user"`로 사용자의 설정을 반영한다. 이 설정은 transform·layout 애니메이션을 끄지만 opacity·backgroundColor 애니메이션은 유지한다.
+- 설정이 켜졌을 때 남는 애니메이션은 설계안에 정한 목적과 대체 표현에 따라 줄이거나 끈다. 필요한 피드백은 움직임이 적은 표현으로 제공한다.
+- `MotionConfig`가 처리하지 않는 효과에 별도 대응이 필요하면 `useReducedMotion`으로 분기한다.
+- 애니메이션 자체가 필수인 경우는 애니메이션을 제거하면 기능이나 정보가 근본적으로 달라지고, 다른 적합한 표현으로도 제공할 수 없는 경우로 한정한다.
