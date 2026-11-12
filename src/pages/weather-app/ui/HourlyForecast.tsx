@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Button } from "@/shared/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,7 +35,11 @@ const HourlyContent = ({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger
-          className={`${SELECTOR_CLASS} hover:bg-accent focus-visible:ring-ring focus-visible:ring-2`}
+          render={
+            <Button
+              className={`${SELECTOR_CLASS} hover:bg-accent focus-visible:ring-ring h-auto justify-start border-0 bg-clip-border text-[length:inherit] leading-[inherit] font-normal whitespace-normal text-inherit select-text focus-visible:ring-2 focus-visible:[outline-style:auto] active:not-aria-[haspopup]:translate-y-0`}
+            />
+          }
         >
           {formatWeekdayLong(date)}
           <img src="/weather-app/images/icon-dropdown.svg" alt="" />

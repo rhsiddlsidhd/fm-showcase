@@ -1,5 +1,6 @@
 import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useId, useRef, useState } from "react";
+import { Button } from "@/shared/ui/button";
 import { searchPlaces, type Place } from "../api/geocoding";
 import { candidateLabel } from "../model/place";
 import { PANEL_ENTER, SEARCH_SPIN } from "./motion";
@@ -180,12 +181,12 @@ export const SearchBox = ({
           </p>
         )}
       </div>
-      <button
+      <Button
         type="submit"
-        className="bg-primary text-primary-foreground focus-visible:ring-ring rounded-xl px-6 py-4 text-(length:--weather-app-text-body) hover:bg-(--weather-app-primary-hover) focus-visible:ring-2"
+        className="bg-primary text-primary-foreground focus-visible:ring-ring h-auto rounded-xl border-0 bg-clip-border px-6 py-4 text-(length:--weather-app-text-body) leading-[inherit] font-normal whitespace-normal select-text hover:bg-(--weather-app-primary-hover) focus-visible:ring-2 focus-visible:[outline-style:auto] active:not-aria-[haspopup]:translate-y-0"
       >
         Search
-      </button>
+      </Button>
     </form>
   );
 };

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { Button } from "@/shared/ui/button";
 
 export const ErrorScreen = ({ onRetry }: { onRetry: () => void }) => {
   const retryRef = useRef<HTMLButtonElement>(null);
@@ -23,15 +24,15 @@ export const ErrorScreen = ({ onRetry }: { onRetry: () => void }) => {
           in a few moments.
         </p>
       </div>
-      <button
+      <Button
         ref={retryRef}
         type="button"
         onClick={onRetry}
-        className="bg-card hover:bg-accent focus-visible:ring-ring flex items-center gap-2.5 rounded-lg px-4 py-3 focus-visible:ring-2"
+        className="bg-card hover:bg-accent focus-visible:ring-ring flex h-auto justify-start gap-2.5 rounded-lg border-0 bg-clip-border px-4 py-3 text-[length:inherit] leading-[inherit] font-normal whitespace-normal text-inherit select-text focus-visible:ring-2 focus-visible:[outline-style:auto] active:not-aria-[haspopup]:translate-y-0"
       >
         <img src="/weather-app/images/icon-retry.svg" alt="" />
         Retry
-      </button>
+      </Button>
     </section>
   );
 };
