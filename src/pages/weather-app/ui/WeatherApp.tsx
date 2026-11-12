@@ -36,14 +36,15 @@ export const WeatherApp = () => {
       .then((result) => {
         if (searchFailed.current) return;
         setForecast(result);
+        const weatherStatus = `Weather for ${placeLabel(place)}`;
         const announce = announceWeather.current;
         announceWeather.current = false;
         if (announce && searchingQuery.current !== null) {
-          pendingStatus.current = `Weather for ${placeLabel(place)}`;
+          pendingStatus.current = weatherStatus;
         }
         setStatus((current) =>
           current === LOADING || (announce && current === "")
-            ? `Weather for ${placeLabel(place)}`
+            ? weatherStatus
             : current,
         );
       })
@@ -139,7 +140,7 @@ export const WeatherApp = () => {
             <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
               <div className="flex min-w-0 flex-col gap-8 lg:gap-12">
                 <CurrentWeather
-                  label={place ? placeLabel(place) : ""}
+                  label={placeLabel(place)}
                   current={forecast?.current ?? null}
                   units={units}
                 />
