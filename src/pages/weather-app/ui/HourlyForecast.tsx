@@ -1,5 +1,4 @@
 import { useState } from "react";
-import styles from "./HourlyForecast.module.css";
 import { Button } from "@/shared/ui/button";
 import {
   DropdownMenu,
@@ -21,7 +20,8 @@ const ROWS = 8;
 const SELECTOR_CLASS =
   "flex items-center gap-3 rounded-lg bg-(--weather-app-day-selector) px-4 py-2";
 const ROW_CLASS = "rounded-lg border border-border bg-secondary";
-const LIST_CLASS = `${styles.list} col-span-2 flex flex-col gap-4 lg:max-h-150 lg:overflow-y-auto`;
+const LIST_CLASS =
+  "col-span-2 flex flex-col gap-4 lg:max-h-150 lg:overflow-y-auto";
 
 const HourlyContent = ({
   forecast,

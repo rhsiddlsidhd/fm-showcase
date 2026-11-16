@@ -1,7 +1,0 @@
-.list {
-  scrollbar-width: none;
-}
-
-.list::-webkit-scrollbar {
-  display: none;
-}
