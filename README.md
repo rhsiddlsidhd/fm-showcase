@@ -100,6 +100,24 @@ Frontend Mentor 챌린지 구현물을 모은 단일 페이지 쇼케이스.
 
 ## 시작하기
 
+### Docker로 개발 서버 실행
+
+```bash
+docker compose up
+```
+
+`http://localhost:5173`에 접속한다. 종료는 `docker compose down`이다.
+
+`package.json`이나 `package-lock.json`이 바뀌면(`git pull` 포함):
+
+```bash
+docker compose build
+docker compose down -v
+docker compose up
+```
+
+### 호스트에서 직접 실행
+
 ```bash
 nvm use    # .nvmrc: 24.17.0
 npm ci
