@@ -8,3 +8,4 @@ playwright-report/
 .env.local
 _workspace*/
 .challenge
+.playwright-cli/
