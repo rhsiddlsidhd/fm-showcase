@@ -12,8 +12,7 @@
     "lint": "eslint .",
     "lint:fsd": "steiger ./src",
     "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "prepare": "git rev-parse --git-dir >/dev/null 2>&1 && git config core.hooksPath scripts/features/git-hooks || true"
+    "format:check": "prettier --check ."
   },
   "devDependencies": {
     "@babel/core": "^7.29.13",
