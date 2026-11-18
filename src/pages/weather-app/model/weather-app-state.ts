@@ -16,6 +16,9 @@ export type Announcement =
   | { kind: "noResult" }
   | { kind: "weather"; label: string };
 
+// 알림 영역에 지역 날씨를 알릴 시점. 두 시점은 함께 참이 될 수 없다.
+type WeatherNotice = "none" | "onForecast" | "onSearchResults";
+
 export type AppError = { kind: "search" | "weather"; query: string | null };
 
 // 검색창이 알리는 검색 한 번의 진행 단계.
@@ -42,10 +45,9 @@ export type WeatherAppState = {
   retry: { query: string | null } | undefined;
   // 진행 중인 검색의 검색어. 검색 중이 아니면 null.
   searchingQuery: string | null;
-  // 다음 날씨 응답이 도착하면 알림 영역에 그 지역 날씨를 알린다.
-  announceWeather: boolean;
-  // 진행 중인 검색이 후보를 받으면 알릴 내용.
-  pendingAnnouncement: Announcement | null;
+  // 현재 지역의 날씨를 알림 영역에 언제 알릴지.
+  // onForecast는 다음 날씨 응답이 도착할 때, onSearchResults는 진행 중인 검색이 후보를 받을 때.
+  weatherNotice: WeatherNotice;
 };
 
 export const initialWeatherAppState: WeatherAppState = {
@@ -55,8 +57,7 @@ export const initialWeatherAppState: WeatherAppState = {
   forecastAttempt: 0,
   retry: undefined,
   searchingQuery: null,
-  announceWeather: false,
-  pendingAnnouncement: null,
+  weatherNotice: "none",
 };
 
 const NONE: Announcement = { kind: "none" };
@@ -84,8 +85,15 @@ export const weatherAppReducer = (
       return {
         ...state,
         searchingQuery: null,
-        announcement: state.pendingAnnouncement ?? NONE,
-        pendingAnnouncement: null,
+        announcement:
+          state.weatherNotice === "onSearchResults" &&
+          state.content.kind === "place"
+            ? weatherOf(state.content.place)
+            : NONE,
+        weatherNotice:
+          state.weatherNotice === "onSearchResults"
+            ? "none"
+            : state.weatherNotice,
         content:
           state.content.kind === "noResult" ? { kind: "empty" } : state.content,
       };
@@ -93,8 +101,7 @@ export const weatherAppReducer = (
       return {
         ...state,
         searchingQuery: null,
-        announceWeather: false,
-        pendingAnnouncement: null,
+        weatherNotice: "none",
         content: { kind: "noResult" },
         announcement: { kind: "noResult" },
       };
@@ -109,8 +116,7 @@ export const weatherAppReducer = (
       return {
         ...state,
         searchingQuery: null,
-        announceWeather: true,
-        pendingAnnouncement: null,
+        weatherNotice: "onForecast",
         content: { kind: "place", place: event.place, forecast: null },
         announcement: { kind: "loading" },
       };
@@ -119,16 +125,16 @@ export const weatherAppReducer = (
       if (state.error?.kind === "search") return state;
       if (state.content.kind !== "place") return state;
       const weather = weatherOf(event.place);
-      const announce = state.announceWeather;
+      const announce = state.weatherNotice === "onForecast";
       const { announcement } = state;
       return {
         ...state,
         content: { ...state.content, forecast: event.forecast },
-        announceWeather: false,
-        pendingAnnouncement:
-          announce && state.searchingQuery !== null
-            ? weather
-            : state.pendingAnnouncement,
+        weatherNotice: !announce
+          ? state.weatherNotice
+          : state.searchingQuery !== null
+            ? "onSearchResults"
+            : "none",
         announcement:
           announcement.kind === "loading" ||
           (announce && announcement.kind === "none")
@@ -150,14 +156,14 @@ export const weatherAppReducer = (
       const refetch = error.kind === "weather" || !forecast;
       return {
         ...state,
-        announceWeather: refetch ? true : state.announceWeather,
+        weatherNotice: refetch
+          ? "onForecast"
+          : content.kind === "place"
+            ? "onSearchResults"
+            : state.weatherNotice,
         forecastAttempt: refetch
           ? state.forecastAttempt + 1
           : state.forecastAttempt,
-        pendingAnnouncement:
-          !refetch && content.kind === "place"
-            ? weatherOf(content.place)
-            : state.pendingAnnouncement,
         retry: { query: error.query },
         error: null,
       };
