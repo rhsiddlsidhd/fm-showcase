@@ -1,8 +1,10 @@
 import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useId, useRef, useState } from "react";
 import { Button } from "@/shared/ui/button";
-import { searchPlaces, type Place } from "../api/geocoding";
+import type { Place } from "../api/geocoding";
 import { candidateLabel } from "../model/place";
+import { usePlaceSearch } from "../model/use-place-search";
+import type { SearchEvent } from "../model/weather-app-state";
 import { PANEL_ENTER, SEARCH_SPIN } from "./motion";
 import { BUTTON_RESET_CLASS } from "./buttonStyle";
 
@@ -11,37 +13,28 @@ const PANEL_CLASS =
 
 type Props = {
   retry?: { query: string | null };
-  onSearching: (query: string) => void;
-  onError: (query: string) => void;
-  onNoResult: () => void;
-  onResults: () => void;
+  searching: boolean;
+  onEvent: (event: SearchEvent) => void;
   onSelect: (place: Place) => void;
 };
 
-export const SearchBox = ({
-  retry,
-  onSearching,
-  onError,
-  onNoResult,
-  onResults,
-  onSelect,
-}: Props) => {
+export const SearchBox = ({ retry, searching, onEvent, onSelect }: Props) => {
   const listId = useId();
   const reduceMotion = useReducedMotion();
   const [query, setQuery] = useState(retry?.query ?? "");
-  const [searching, setSearching] = useState(false);
-  const [candidates, setCandidates] = useState<Place[]>([]);
   const [active, setActive] = useState(-1);
-  const controllerRef = useRef<AbortController | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => () => controllerRef.current?.abort(), []);
+  const {
+    candidates,
+    search: searchPlace,
+    clearCandidates,
+  } = usePlaceSearch(onEvent);
 
   const open = candidates.length > 0;
   const optionId = (index: number) => `${listId}-option-${index}`;
 
   const close = () => {
-    setCandidates([]);
+    clearCandidates();
     setActive(-1);
   };
 
@@ -53,27 +46,8 @@ export const SearchBox = ({
   const search = async (override?: string) => {
     const name = (override ?? query).trim();
     if (!name) return;
-    controllerRef.current?.abort();
-    const controller = new AbortController();
-    controllerRef.current = controller;
-    close();
-    setSearching(true);
-    onSearching(name);
-    try {
-      const places = await searchPlaces(name, controller.signal);
-      if (controller.signal.aborted) return;
-      setSearching(false);
-      if (places.length === 0) {
-        onNoResult();
-        return;
-      }
-      setCandidates(places);
-      onResults();
-    } catch {
-      if (controller.signal.aborted) return;
-      setSearching(false);
-      onError(name);
-    }
+    setActive(-1);
+    await searchPlace(name);
   };
 
   useEffect(() => {

@@ -20,20 +20,25 @@ import {
 
 const CHECKABLE_ITEM_CLASS = `${MENU_ITEM_CLASS} data-checked:bg-accent`;
 
-const UnitGroup = ({
+const UnitGroup = <K extends keyof Units>({
   label,
-  value,
-  onValueChange,
+  unit,
+  units,
+  onChange,
   options,
 }: {
   label: string;
-  value: string;
-  onValueChange: (value: string) => void;
-  options: [value: string, text: string][];
+  unit: K;
+  units: Units;
+  onChange: (units: Units) => void;
+  options: [value: Units[K], text: string][];
 }) => (
   <DropdownMenuGroup>
     <DropdownMenuLabel className={MENU_LABEL_CLASS}>{label}</DropdownMenuLabel>
-    <DropdownMenuRadioGroup value={value} onValueChange={onValueChange}>
+    <DropdownMenuRadioGroup
+      value={units[unit]}
+      onValueChange={(value) => onChange({ ...units, [unit]: value })}
+    >
       {options.map(([optionValue, text]) => (
         <DropdownMenuRadioItem
           key={optionValue}
@@ -78,10 +83,9 @@ export const UnitsMenu = ({
         </DropdownMenuItem>
         <UnitGroup
           label="Temperature"
-          value={units.temperature}
-          onValueChange={(value) =>
-            onChange({ ...units, temperature: value as Units["temperature"] })
-          }
+          unit="temperature"
+          units={units}
+          onChange={onChange}
           options={[
             ["celsius", "Celsius (°C)"],
             ["fahrenheit", "Fahrenheit (°F)"],
@@ -90,10 +94,9 @@ export const UnitsMenu = ({
         <DropdownMenuSeparator />
         <UnitGroup
           label="Wind Speed"
-          value={units.wind}
-          onValueChange={(value) =>
-            onChange({ ...units, wind: value as Units["wind"] })
-          }
+          unit="wind"
+          units={units}
+          onChange={onChange}
           options={[
             ["kmh", "km/h"],
             ["mph", "mph"],
@@ -102,13 +105,9 @@ export const UnitsMenu = ({
         <DropdownMenuSeparator />
         <UnitGroup
           label="Precipitation"
-          value={units.precipitation}
-          onValueChange={(value) =>
-            onChange({
-              ...units,
-              precipitation: value as Units["precipitation"],
-            })
-          }
+          unit="precipitation"
+          units={units}
+          onChange={onChange}
           options={[
             ["mm", "Millimeters (mm)"],
             ["in", "Inches (in)"],

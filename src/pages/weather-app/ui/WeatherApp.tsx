@@ -1,9 +1,9 @@
 import { MotionConfig } from "motion/react";
-import { useEffect, useRef, useState } from "react";
-import { fetchForecast, type Forecast } from "../api/forecast";
-import type { Place } from "../api/geocoding";
-import { BERLIN, placeLabel } from "../model/place";
+import { useState } from "react";
+import { placeLabel } from "../model/place";
 import { METRIC, type Units } from "../model/units";
+import { useWeatherApp } from "../model/use-weather-app";
+import type { Announcement } from "../model/weather-app-state";
 import { CurrentWeather } from "./CurrentWeather";
 import { DailyForecast } from "./DailyForecast";
 import { ErrorScreen } from "./ErrorScreen";
@@ -11,87 +11,27 @@ import { HourlyForecast } from "./HourlyForecast";
 import { SearchBox } from "./SearchBox";
 import { UnitsMenu } from "./UnitsMenu";
 
-const LOADING = "Loading...";
+const NO_RESULT = "No search result found!";
 
-type Retry = { query: string | null };
-type AppError = { kind: "search" | "weather"; query: string | null };
+const announcementText = (announcement: Announcement) => {
+  switch (announcement.kind) {
+    case "none":
+      return "";
+    case "searching":
+      return "Search in progress";
+    case "loading":
+      return "Loading...";
+    case "noResult":
+      return NO_RESULT;
+    case "weather":
+      return `Weather for ${announcement.label}`;
+  }
+};
 
 export const WeatherApp = () => {
-  const [place, setPlace] = useState<Place | null>(BERLIN);
-  const [forecast, setForecast] = useState<Forecast | null>(null);
-  const [noResult, setNoResult] = useState(false);
-  const [status, setStatus] = useState("");
+  const { state, dispatch } = useWeatherApp();
   const [units, setUnits] = useState<Units>(METRIC);
-  const [error, setError] = useState<AppError | null>(null);
-  const [attempt, setAttempt] = useState(0);
-  const [retry, setRetry] = useState<Retry | undefined>(undefined);
-  const searchingQuery = useRef<string | null>(null);
-  const searchFailed = useRef(false);
-  const announceWeather = useRef(false);
-  const pendingStatus = useRef<string | null>(null);
-
-  useEffect(() => {
-    if (!place) return;
-    const controller = new AbortController();
-    fetchForecast(place, controller.signal)
-      .then((result) => {
-        if (searchFailed.current) return;
-        setForecast(result);
-        const weatherStatus = `Weather for ${placeLabel(place)}`;
-        const announce = announceWeather.current;
-        announceWeather.current = false;
-        if (announce && searchingQuery.current !== null) {
-          pendingStatus.current = weatherStatus;
-        }
-        setStatus((current) =>
-          current === LOADING || (announce && current === "")
-            ? weatherStatus
-            : current,
-        );
-      })
-      .catch(() => {
-        if (controller.signal.aborted) return;
-        setError(
-          (current) =>
-            current ?? { kind: "weather", query: searchingQuery.current },
-        );
-        setStatus("");
-      });
-    return () => controller.abort();
-  }, [place, attempt]);
-
-  const select = (selected: Place) => {
-    searchingQuery.current = null;
-    announceWeather.current = true;
-    pendingStatus.current = null;
-    setNoResult(false);
-    setForecast(null);
-    setStatus(LOADING);
-    setPlace(selected);
-  };
-
-  const showNoResult = () => {
-    searchingQuery.current = null;
-    announceWeather.current = false;
-    pendingStatus.current = null;
-    setPlace(null);
-    setForecast(null);
-    setNoResult(true);
-    setStatus("No search result found!");
-  };
-
-  const retryAfterError = () => {
-    if (!error) return;
-    searchFailed.current = false;
-    if (error.kind === "weather" || !forecast) {
-      announceWeather.current = true;
-      setAttempt((count) => count + 1);
-    } else if (place) {
-      pendingStatus.current = `Weather for ${placeLabel(place)}`;
-    }
-    setRetry({ query: error.query });
-    setError(null);
-  };
+  const { content, error } = state;
 
   return (
     <MotionConfig reducedMotion="user">
@@ -112,51 +52,34 @@ export const WeatherApp = () => {
           )}
           {!error && (
             <SearchBox
-              retry={retry}
-              onSearching={(query) => {
-                searchingQuery.current = query;
-                setStatus("Search in progress");
-              }}
-              onResults={() => {
-                searchingQuery.current = null;
-                setStatus(pendingStatus.current ?? "");
-                pendingStatus.current = null;
-                setNoResult(false);
-              }}
-              onError={(query) => {
-                searchingQuery.current = null;
-                searchFailed.current = true;
-                setError({ kind: "search", query });
-                setStatus("");
-              }}
-              onNoResult={showNoResult}
-              onSelect={select}
+              retry={state.retry}
+              searching={state.searchingQuery !== null}
+              onEvent={dispatch}
+              onSelect={(place) => dispatch({ type: "placeSelected", place })}
             />
           )}
           <p role="status" className="sr-only">
-            {status}
+            {announcementText(state.announcement)}
           </p>
           {error ? (
-            <ErrorScreen onRetry={retryAfterError} />
-          ) : noResult ? (
-            <p className="pt-4 text-center text-2xl font-bold">
-              No search result found!
-            </p>
+            <ErrorScreen onRetry={() => dispatch({ type: "retried" })} />
+          ) : content.kind === "noResult" ? (
+            <p className="pt-4 text-center text-2xl font-bold">{NO_RESULT}</p>
           ) : (
-            place && (
+            content.kind === "place" && (
               <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
                 <div className="flex min-w-0 flex-col gap-8 lg:gap-12">
                   <CurrentWeather
-                    label={placeLabel(place)}
-                    current={forecast?.current ?? null}
+                    label={placeLabel(content.place)}
+                    current={content.forecast?.current ?? null}
                     units={units}
                   />
                   <DailyForecast
-                    daily={forecast?.daily ?? null}
+                    daily={content.forecast?.daily ?? null}
                     units={units}
                   />
                 </div>
-                <HourlyForecast forecast={forecast} units={units} />
+                <HourlyForecast forecast={content.forecast} units={units} />
               </div>
             )
           )}
