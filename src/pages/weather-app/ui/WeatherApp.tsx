@@ -53,6 +53,7 @@ export const WeatherApp = () => {
           {!error && (
             <SearchBox
               retry={state.retry}
+              searching={state.searchingQuery !== null}
               onEvent={dispatch}
               onSelect={(place) => dispatch({ type: "placeSelected", place })}
             />

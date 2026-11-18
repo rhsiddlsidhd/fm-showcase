@@ -140,6 +140,7 @@ export const weatherAppReducer = (
       return {
         ...state,
         error: state.error ?? { kind: "weather", query: state.searchingQuery },
+        searchingQuery: null,
         announcement: NONE,
       };
     case "retried": {
