@@ -3,6 +3,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { Button } from "@/shared/ui/button";
 import { searchPlaces, type Place } from "../api/geocoding";
 import { candidateLabel } from "../model/place";
+import type { SearchEvent } from "../model/weather-app-state";
 import { PANEL_ENTER, SEARCH_SPIN } from "./motion";
 import { BUTTON_RESET_CLASS } from "./buttonStyle";
 
@@ -11,21 +12,11 @@ const PANEL_CLASS =
 
 type Props = {
   retry?: { query: string | null };
-  onSearching: (query: string) => void;
-  onError: (query: string) => void;
-  onNoResult: () => void;
-  onResults: () => void;
+  onEvent: (event: SearchEvent) => void;
   onSelect: (place: Place) => void;
 };
 
-export const SearchBox = ({
-  retry,
-  onSearching,
-  onError,
-  onNoResult,
-  onResults,
-  onSelect,
-}: Props) => {
+export const SearchBox = ({ retry, onEvent, onSelect }: Props) => {
   const listId = useId();
   const reduceMotion = useReducedMotion();
   const [query, setQuery] = useState(retry?.query ?? "");
@@ -58,21 +49,21 @@ export const SearchBox = ({
     controllerRef.current = controller;
     close();
     setSearching(true);
-    onSearching(name);
+    onEvent({ type: "searchStarted", query: name });
     try {
       const places = await searchPlaces(name, controller.signal);
       if (controller.signal.aborted) return;
       setSearching(false);
       if (places.length === 0) {
-        onNoResult();
+        onEvent({ type: "searchNoResult" });
         return;
       }
       setCandidates(places);
-      onResults();
+      onEvent({ type: "searchResults" });
     } catch {
       if (controller.signal.aborted) return;
       setSearching(false);
-      onError(name);
+      onEvent({ type: "searchFailed", query: name });
     }
   };
 
