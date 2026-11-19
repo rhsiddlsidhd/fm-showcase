@@ -1,10 +1,10 @@
+import cardSurface from "./card-surface.module.css";
+
 export const EmptyChallengeCard = () => (
   <div
     role="status"
-    className="showcase-card text-card-foreground flex aspect-(--showcase-card-aspect-ratio) flex-col items-center justify-center gap-(--showcase-card-content-gap) overflow-hidden rounded-(--showcase-card-radius) p-(--showcase-card-padding) text-center shadow-(--showcase-card-shadow)"
+    className={`${cardSurface.surface} text-card-foreground flex aspect-(--card-aspect-ratio) scroll-my-(--rail-inset) flex-col items-center justify-center gap-(--card-content-gap) overflow-hidden rounded-(--card-radius) p-(--card-padding) text-center shadow-(--card-shadow)`}
   >
-    <p className="text-muted-foreground text-(length:--showcase-body-size) leading-(--showcase-body-leading)">
-      챌린지들 등록해주세요.
-    </p>
+    <p className="text-muted-foreground">챌린지들 등록해주세요.</p>
   </div>
 );

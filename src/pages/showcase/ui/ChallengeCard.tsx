@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { useId, type ComponentProps } from "react";
 import { Link } from "react-router";
 import { motion, useReducedMotion } from "motion/react";
 import { Badge } from "@/shared/ui/badge";
@@ -10,13 +10,22 @@ import {
   CARD_FLOAT_Y,
   CARD_SHEEN_POSITIONS,
 } from "./card-motion";
+import cardSurface from "./card-surface.module.css";
 
 interface ChallengeCardProps {
   challenge: Challenge;
 }
 
-const BADGE_CLASS =
-  "h-auto rounded-(--showcase-chip-radius) px-(--showcase-badge-inline-padding) py-(--showcase-badge-block-padding) text-(length:--showcase-badge-size) leading-(--showcase-badge-leading) tracking-(--showcase-badge-tracking) uppercase";
+const ChipBadge = ({
+  className = "",
+  ...props
+}: ComponentProps<typeof Badge>) => (
+  <Badge
+    variant="secondary"
+    className={`h-auto rounded-[999px] px-2.5 py-1 tracking-[0.06em] uppercase ${className}`}
+    {...props}
+  />
+);
 
 const MotionLink = motion.create(Link);
 
@@ -27,7 +36,8 @@ export const ChallengeCard = ({ challenge }: ChallengeCardProps) => {
     <MotionLink
       to={challengePath(challenge.slug)}
       aria-labelledby={titleId}
-      className="showcase-card text-card-foreground outline-ring mx-auto flex aspect-(--showcase-card-aspect-ratio) w-full max-w-(--showcase-card-max-width) flex-col gap-(--showcase-card-content-gap) overflow-hidden rounded-(--showcase-card-radius) p-(--showcase-card-padding) shadow-(--showcase-card-shadow) outline-offset-(--showcase-focus-offset) focus-visible:outline-(length:--showcase-focus-width)"
+      // 카드 높이가 포커스 표시 여유를 포함해 화면 높이를 넘지 않도록 폭을 제한한다.
+      className={`${cardSurface.surface} text-card-foreground outline-ring mx-auto flex aspect-(--card-aspect-ratio) w-full max-w-[calc((100dvh-2*(var(--focus-offset)+var(--focus-width)))/var(--card-height-ratio))] scroll-my-(--rail-inset) flex-col gap-(--card-content-gap) overflow-hidden rounded-(--card-radius) p-(--card-padding) shadow-(--card-shadow) outline-offset-(--focus-offset) focus-visible:outline-(length:--focus-width)`}
       animate={
         shouldReduceMotion
           ? { y: 0, backgroundPosition: CARD_SHEEN_POSITIONS[0] }
@@ -46,23 +56,19 @@ export const ChallengeCard = ({ challenge }: ChallengeCardProps) => {
     >
       <h2
         id={titleId}
-        className="line-clamp-(--showcase-card-title-lines) text-(length:--showcase-card-title-size) leading-(--showcase-card-title-leading) font-(--showcase-card-title-weight) tracking-(--showcase-card-title-tracking)"
+        className="line-clamp-2 text-xl font-bold tracking-[-0.015em]"
       >
         {challenge.title}
       </h2>
-      <Badge variant="secondary" className={`${BADGE_CLASS} self-start`}>
-        {challenge.difficulty}
-      </Badge>
+      <ChipBadge className="self-start">{challenge.difficulty}</ChipBadge>
       <ul className="flex flex-wrap gap-2">
         {challenge.stack.map((stack) => (
           <li key={stack}>
-            <Badge variant="secondary" className={BADGE_CLASS}>
-              {stack}
-            </Badge>
+            <ChipBadge>{stack}</ChipBadge>
           </li>
         ))}
       </ul>
-      <p className="text-muted-foreground line-clamp-(--showcase-card-description-lines) text-(length:--showcase-body-size) leading-(--showcase-body-leading)">
+      <p className="text-muted-foreground line-clamp-3">
         {challenge.description}
       </p>
     </MotionLink>
