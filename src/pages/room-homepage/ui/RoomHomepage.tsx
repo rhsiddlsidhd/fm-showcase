@@ -58,7 +58,7 @@ export const RoomHomepage = () => {
           <div className="absolute right-0 bottom-0 flex">
             <button
               aria-label="이전 슬라이드"
-              className="bg-black p-4 text-white"
+              className="bg-black p-4 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               onClick={() => changeSlide(-1)}
               type="button"
             >
@@ -66,7 +66,7 @@ export const RoomHomepage = () => {
             </button>
             <button
               aria-label="다음 슬라이드"
-              className="bg-black p-4 text-white"
+              className="bg-black p-4 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               onClick={() => changeSlide(1)}
               type="button"
             >
