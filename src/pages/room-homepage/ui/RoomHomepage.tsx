@@ -1,4 +1,15 @@
 import { useEffect, useRef, useState } from "react";
+import {
+  ABOUT_DARK_IMAGE,
+  ABOUT_LIGHT_IMAGE,
+  CLOSE_ICON,
+  HERO_IMAGES,
+  MENU_ICON,
+  NEXT_ICON,
+  PREVIOUS_ICON,
+  ROOM_LOGO,
+  SHOP_ARROW,
+} from "./assets";
 import "./theme.css";
 
 const slides = [
@@ -76,92 +87,117 @@ export const RoomHomepage = () => {
   }, [menuOpen]);
 
   return (
-    <div className="theme-room-homepage min-h-dvh bg-white font-sans text-black">
+    <div className="theme-room-homepage bg-background text-foreground min-h-dvh font-sans text-base">
       <main
         inert={menuOpen}
-        className="min-h-dvh bg-white font-sans text-black"
+        className="bg-background text-foreground min-h-dvh font-sans text-base"
       >
         <section
           aria-label="Featured furniture"
-          className="grid md:grid-cols-2"
+          className="relative grid md:min-h-[535px] md:grid-cols-[7fr_5fr]"
         >
-          <div className="relative flex min-h-80 flex-col justify-between p-8 text-white md:min-h-[32rem] md:p-12">
-            <picture>
+          <div className="text-primary-foreground relative min-h-[360px] md:min-h-0">
+            <picture className="absolute inset-0">
               <source
                 media="(max-width: 767px)"
-                srcSet={`/room-homepage/mobile-image-hero-${slideIndex + 1}.jpg`}
+                srcSet={HERO_IMAGES[slideIndex].mobile}
               />
               <img
                 alt="Room interior"
-                className="absolute inset-0 h-full w-full object-cover"
-                src={`/room-homepage/desktop-image-hero-${slideIndex + 1}.jpg`}
+                className="h-full w-full object-cover"
+                src={HERO_IMAGES[slideIndex].desktop}
               />
             </picture>
+            <img
+              alt="room"
+              className="absolute top-12 left-1/2 w-[62px] -translate-x-1/2 md:top-16 md:left-16 md:translate-x-0"
+              src={ROOM_LOGO}
+            />
             <nav
               aria-label="Main menu"
-              className="relative hidden gap-8 text-sm md:flex"
+              className="absolute top-[63px] left-44 hidden gap-8 text-base font-semibold text-white md:flex"
             >
-              <span>home</span>
-              <span>shop</span>
-              <span>about</span>
-              <span>contact</span>
+              {(["home", "shop", "about", "contact"] as const).map((item) => (
+                <span
+                  key={item}
+                  className="hover:underline hover:underline-offset-8"
+                >
+                  {item}
+                </span>
+              ))}
             </nav>
-            <div className="absolute right-0 bottom-0 flex">
-              <button
-                aria-label="이전 슬라이드"
-                className="bg-black p-4 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                onClick={() => changeSlide(-1)}
-                ref={previousButtonRef}
-                type="button"
-              >
-                ←
-              </button>
-              <button
-                aria-label="다음 슬라이드"
-                className="bg-black p-4 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                onClick={() => changeSlide(1)}
-                type="button"
-              >
-                →
-              </button>
-            </div>
           </div>
-          <div className="flex flex-col justify-center gap-5 p-8 md:p-16">
-            <h1 className="text-4xl font-semibold tracking-tight">
+          <div className="flex min-h-[410px] flex-col justify-center gap-5 px-8 pt-14 pb-14 md:min-h-0 md:translate-y-2 md:px-[clamp(3rem,6.9vw,100px)] md:pt-0 md:pb-14">
+            <h1 className="font-heading text-[38px] leading-[0.98] font-bold tracking-[-0.035em] md:text-[44px]">
               {slide.title}
             </h1>
-            <p className="text-sm leading-6 text-neutral-500">
+            <p className="text-muted-foreground text-base leading-[1.38] font-medium">
               {slide.description}
             </p>
-            <p className="text-xs font-semibold tracking-[0.7em] uppercase">
-              Shop now
+            <p className="hover:text-muted-foreground flex items-center gap-6 text-base font-semibold tracking-[0.65em] uppercase">
+              <span>Shop now</span>
+              <img
+                alt=""
+                aria-hidden="true"
+                className="w-10"
+                src={SHOP_ARROW}
+              />
             </p>
             <div aria-live="polite" className="sr-only" role="status">
               {announcement}
             </div>
           </div>
+          <div className="absolute top-[304px] right-0 flex md:top-auto md:right-auto md:bottom-0 md:left-[58.333%]">
+            <button
+              aria-label="이전 슬라이드"
+              className="bg-primary hover:bg-secondary flex h-14 w-14 items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white md:h-20 md:w-20"
+              onClick={() => changeSlide(-1)}
+              ref={previousButtonRef}
+              type="button"
+            >
+              <img
+                alt=""
+                aria-hidden="true"
+                className="h-6 w-[14px]"
+                src={PREVIOUS_ICON}
+              />
+            </button>
+            <button
+              aria-label="다음 슬라이드"
+              className="bg-primary hover:bg-secondary flex h-14 w-14 items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white md:h-20 md:w-20"
+              onClick={() => changeSlide(1)}
+              type="button"
+            >
+              <img
+                alt=""
+                aria-hidden="true"
+                className="h-6 w-[14px]"
+                src={NEXT_ICON}
+              />
+            </button>
+          </div>
         </section>
-        <section className="grid md:grid-cols-[1fr_1.5fr_1fr]">
-          <div className="relative min-h-48">
+        <section className="grid md:min-h-[265px] md:grid-cols-[29fr_40fr_31fr]">
+          <div className="relative min-h-[240px] md:min-h-0">
             <img
               alt="Dark room interior with a sofa"
               className="absolute inset-0 h-full w-full object-cover"
-              src="/room-homepage/image-about-dark.jpg"
+              src={ABOUT_DARK_IMAGE}
             />
           </div>
-          <div className="flex flex-col justify-center gap-4 p-8">
-            <h2 className="text-sm font-bold tracking-[0.35em] uppercase">
+          <div className="flex min-h-[300px] flex-col justify-center gap-4 px-8 py-12 md:min-h-0 md:px-12 md:py-8">
+            <h2 className="text-base font-bold tracking-[0.35em] uppercase">
               About our furniture
             </h2>
-            <p className="text-sm leading-6 text-neutral-500">
+            <p className="text-muted-foreground text-base leading-[1.38] font-medium">
               {aboutDescription}
             </p>
           </div>
-          <div className="relative min-h-48">
+          <div className="relative min-h-[265px] md:min-h-0">
             <img
               alt="A light colored chair"
               className="absolute inset-0 h-full w-full object-cover"
-              src="/room-homepage/image-about-light.jpg"
+              src={ABOUT_LIGHT_IMAGE}
             />
           </div>
         </section>
@@ -169,14 +205,12 @@ export const RoomHomepage = () => {
           aria-controls="room-homepage-menu"
           aria-expanded={menuOpen}
           aria-label="메뉴 열기"
-          className="absolute top-8 left-1/2 z-10 -translate-x-1/2 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white md:hidden"
+          className="absolute top-12 left-6 z-10 flex h-5 w-5 items-center justify-center hover:opacity-65 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white md:hidden"
           onClick={() => setMenuOpen(true)}
           ref={menuButtonRef}
           type="button"
         >
-          <span aria-hidden="true" className="text-2xl">
-            ☰
-          </span>
+          <img alt="" aria-hidden="true" src={MENU_ICON} />
         </button>
       </main>
       {menuOpen && (
@@ -188,24 +222,28 @@ export const RoomHomepage = () => {
           role="dialog"
           style={{ backgroundColor: "var(--menu-scrim)" }}
         >
-          <div className="flex h-24 items-center justify-between bg-white px-6 text-black">
+          <div className="bg-background text-foreground flex h-[110px] items-center justify-between px-6">
             <button
               aria-label="메뉴 닫기"
-              className="text-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black"
+              className="flex h-5 w-5 items-center justify-center hover:opacity-65 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black"
               onClick={() => setMenuOpen(false)}
               ref={closeButtonRef}
               type="button"
             >
-              <span aria-hidden="true">×</span>
+              <img alt="" aria-hidden="true" src={CLOSE_ICON} />
             </button>
             <nav
               aria-label="모바일 메뉴"
-              className="flex gap-5 text-sm font-semibold"
+              className="flex gap-5 text-base font-semibold"
             >
-              <span>home</span>
-              <span>shop</span>
-              <span>about</span>
-              <span>contact</span>
+              {(["home", "shop", "about", "contact"] as const).map((item) => (
+                <span
+                  key={item}
+                  className="hover:underline hover:underline-offset-4"
+                >
+                  {item}
+                </span>
+              ))}
             </nav>
           </div>
         </div>
