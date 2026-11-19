@@ -5,7 +5,7 @@
   --grey-800: hsl(0 0% 27%);
   --black: hsl(0 0% 0%);
 
-  --sans-font: "League Spartan", sans-serif;
+  --sans-font: "League Spartan Variable", sans-serif;
   --heading-font: var(--sans-font);
   --text-base: 16px;
   /* 제목 단계는 JPG의 시각적 추정치이며 원본에 수치가 없다. */
