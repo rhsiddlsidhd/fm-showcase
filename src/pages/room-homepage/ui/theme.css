@@ -1,0 +1,45 @@
+/* Room 원본 스타일 가이드의 팔레트와 글꼴. 배치와 움직임은 컴포넌트가 맡는다. */
+.theme-room-homepage {
+  --white: hsl(0 100% 100%);
+  --grey-500: hsl(0 0% 63%);
+  --grey-800: hsl(0 0% 27%);
+  --black: hsl(0 0% 0%);
+
+  --sans-font: "League Spartan", sans-serif;
+  --heading-font: var(--sans-font);
+  --text-base: 16px;
+  /* 제목 단계는 JPG의 시각적 추정치이며 원본에 수치가 없다. */
+  --text-4xl: 36px;
+  --text-4xl--line-height: 1;
+  --text-5xl: 48px;
+  --text-5xl--line-height: 1;
+
+  /* JPG의 메뉴 가림막을 기준으로 한 반투명도 추정치. */
+  --menu-scrim: hsl(0 0% 0% / 50%);
+  --hero-focus-ring: var(--white);
+
+  --background: var(--white);
+  --foreground: var(--black);
+  --card: var(--white);
+  --card-foreground: var(--black);
+  --popover: var(--white);
+  --popover-foreground: var(--black);
+  --primary: var(--black);
+  --primary-foreground: var(--white);
+  --secondary: var(--grey-800);
+  --secondary-foreground: var(--white);
+  --muted: var(--white);
+  --muted-foreground: var(--grey-500);
+  --accent: var(--grey-800);
+  --accent-foreground: var(--white);
+  --border: var(--grey-500);
+  --input: var(--grey-500);
+  --ring: var(--black);
+  --radius: 0;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .theme-room-homepage {
+    --menu-scrim: var(--black);
+  }
+}
