@@ -12,6 +12,9 @@ import {
 } from "./assets";
 import "./theme.css";
 
+const menuItems = ["home", "shop", "about", "contact"] as const;
+const desktopMediaQuery = "(min-width: 768px)";
+
 const slides = [
   {
     title: "Discover innovative ways to decorate",
@@ -54,7 +57,7 @@ export const RoomHomepage = () => {
     if (menuOpen) {
       closeButtonRef.current?.focus();
     } else if (wasMenuOpen.current) {
-      if (window.matchMedia("(min-width: 768px)").matches) {
+      if (window.matchMedia(desktopMediaQuery).matches) {
         previousButtonRef.current?.focus();
       } else {
         menuButtonRef.current?.focus();
@@ -64,7 +67,7 @@ export const RoomHomepage = () => {
   }, [menuOpen]);
 
   useEffect(() => {
-    const media = window.matchMedia("(min-width: 768px)");
+    const media = window.matchMedia(desktopMediaQuery);
     const closeOnDesktop = (event: MediaQueryListEvent) => {
       if (event.matches) setMenuOpen(false);
     };
@@ -117,7 +120,7 @@ export const RoomHomepage = () => {
               aria-label="Main menu"
               className="absolute top-[63px] left-44 hidden gap-8 text-base font-semibold text-white md:flex"
             >
-              {(["home", "shop", "about", "contact"] as const).map((item) => (
+              {menuItems.map((item) => (
                 <span
                   key={item}
                   className="hover:underline hover:underline-offset-8"
@@ -236,7 +239,7 @@ export const RoomHomepage = () => {
               aria-label="모바일 메뉴"
               className="flex gap-5 text-base font-semibold"
             >
-              {(["home", "shop", "about", "contact"] as const).map((item) => (
+              {menuItems.map((item) => (
                 <span
                   key={item}
                   className="hover:underline hover:underline-offset-4"
