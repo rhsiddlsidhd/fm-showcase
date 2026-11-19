@@ -1,7 +1,7 @@
 import type { Forecast } from "../api/forecast";
 import { formatTemperature, formatWeekdayShort } from "../model/format";
 import { toTemperature, type Units } from "../model/units";
-import { CELL_CLASS, PlaceholderItem } from "./surface";
+import { Cell } from "./Cell";
 import { UnitValue } from "./UnitValue";
 import { WeatherIconImage } from "./WeatherIconImage";
 
@@ -19,13 +19,11 @@ export const DailyForecast = ({
     <ul className="grid grid-cols-3 gap-4 lg:grid-cols-7">
       {daily
         ? daily.time.map((date, i) => (
-            <li
+            <Cell
               key={date}
-              className={`${CELL_CLASS} flex flex-col items-center gap-4 px-2.5 py-4`}
+              className="flex flex-col items-center gap-4 px-2.5 py-4"
             >
-              <span className="text-(length:--weather-app-text-body)">
-                {formatWeekdayShort(date)}
-              </span>
+              <span className="text-base">{formatWeekdayShort(date)}</span>
               <WeatherIconImage
                 code={daily.weather_code[i]}
                 className="size-15"
@@ -37,20 +35,16 @@ export const DailyForecast = ({
                   )}
                 />
                 <UnitValue
-                  className="text-(--weather-app-text-subtle)"
+                  className="text-(--subtle-text)"
                   value={formatTemperature(
                     toTemperature(daily.temperature_2m_min[i], units),
                   )}
                 />
               </div>
-            </li>
+            </Cell>
           ))
         : Array.from({ length: DAYS }, (_, i) => (
-            <PlaceholderItem
-              key={i}
-              testId="daily-placeholder"
-              className={`${CELL_CLASS} h-40`}
-            />
+            <Cell key={i} data-testid="daily-placeholder" className="h-40" />
           ))}
     </ul>
   </section>

@@ -4,6 +4,7 @@ import { placeLabel } from "../model/place";
 import { METRIC, type Units } from "../model/units";
 import { useWeatherApp } from "../model/use-weather-app";
 import type { Announcement } from "../model/weather-app-state";
+import { LOGO } from "./assets";
 import { CurrentWeather } from "./CurrentWeather";
 import { DailyForecast } from "./DailyForecast";
 import { ErrorScreen } from "./ErrorScreen";
@@ -35,14 +36,10 @@ export const WeatherApp = () => {
 
   return (
     <MotionConfig reducedMotion="user">
-      <main className="theme-weather-app bg-background text-foreground min-h-dvh">
+      <main className="theme-weather-app dark bg-background text-foreground min-h-dvh font-sans text-base">
         <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-4 lg:gap-12 lg:px-8 lg:py-12">
           <header className="flex items-center justify-between">
-            <img
-              src="/weather-app/images/logo.svg"
-              alt="Weather Now"
-              className="h-7 lg:h-10"
-            />
+            <img src={LOGO} alt="Weather Now" className="h-7 lg:h-10" />
             <UnitsMenu units={units} onChange={setUnits} />
           </header>
           {!error && (

@@ -1,3 +1,4 @@
+import type { ComponentProps, CSSProperties } from "react";
 import type { Forecast } from "../api/forecast";
 import { formatCurrentDate, formatTemperature } from "../model/format";
 import {
@@ -6,15 +7,26 @@ import {
   toTemperature,
   type Units,
 } from "../model/units";
-import { CELL_CLASS, SUBTLE_TEXT_CLASS } from "./surface";
+import { BG_TODAY_LARGE, BG_TODAY_SMALL } from "./assets";
+import { Cell } from "./Cell";
 import { LoadingDots } from "./LoadingDots";
 import { UnitValue } from "./UnitValue";
 import { WeatherIconImage } from "./WeatherIconImage";
 
 const PENDING = "—";
 
-const CARD_CLASS =
-  "flex min-h-72 flex-col items-center justify-center gap-4 rounded-3xl p-6 text-center lg:flex-row lg:justify-between lg:text-left";
+const TodayCard = ({ className = "", ...props }: ComponentProps<"div">) => (
+  <div
+    className={`flex min-h-72 flex-col items-center justify-center gap-4 rounded-3xl p-6 text-center lg:flex-row lg:justify-between lg:text-left ${className}`}
+    {...props}
+  />
+);
+
+// Tailwind 클래스에는 TS 상수를 넣을 수 없어, 반응형 배경 이미지를 CSS 변수로 넘긴다.
+const TODAY_BACKGROUND = {
+  "--today-image-small": `url(${BG_TODAY_SMALL})`,
+  "--today-image-large": `url(${BG_TODAY_LARGE})`,
+} as CSSProperties;
 
 export const CurrentWeather = ({
   label,
@@ -45,12 +57,13 @@ export const CurrentWeather = ({
   return (
     <section className="flex flex-col gap-5 lg:gap-8">
       {current ? (
-        <div
-          className={`${CARD_CLASS} bg-(--weather-app-current-card-from) bg-(image:--weather-app-current-card-image-small) bg-cover bg-center bg-no-repeat sm:bg-(image:--weather-app-current-card-image-large)`}
+        <TodayCard
+          style={TODAY_BACKGROUND}
+          className="bg-(--current-card-from) bg-(image:--today-image-small) bg-cover bg-center bg-no-repeat sm:bg-(image:--today-image-large)"
         >
           <div className="flex flex-col gap-3">
             <p className="text-3xl font-bold">{label}</p>
-            <p className={SUBTLE_TEXT_CLASS}>
+            <p className="text-(--subtle-text)">
               {formatCurrentDate(current.time)}
             </p>
           </div>
@@ -63,21 +76,21 @@ export const CurrentWeather = ({
               )}
             />
           </div>
-        </div>
+        </TodayCard>
       ) : (
-        <div className={`${CARD_CLASS} bg-card lg:justify-center`}>
+        <TodayCard className="bg-card lg:justify-center">
           <div className="flex flex-col items-center gap-4">
             <LoadingDots />
-            <p className={SUBTLE_TEXT_CLASS}>Loading...</p>
+            <p className="text-(--subtle-text)">Loading...</p>
           </div>
-        </div>
+        </TodayCard>
       )}
       <ul className="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6">
         {metrics.map(([name, value]) => (
-          <li key={name} className={`${CELL_CLASS} flex flex-col gap-6 p-5`}>
-            <span className={SUBTLE_TEXT_CLASS}>{name}</span>
+          <Cell key={name} className="flex flex-col gap-6 p-5">
+            <span className="text-(--subtle-text)">{name}</span>
             <UnitValue className="text-3xl font-light" value={value} />
-          </li>
+          </Cell>
         ))}
       </ul>
     </section>
