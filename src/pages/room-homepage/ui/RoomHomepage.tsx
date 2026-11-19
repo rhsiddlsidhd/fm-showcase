@@ -76,10 +76,10 @@ export const RoomHomepage = () => {
   }, [menuOpen]);
 
   return (
-    <>
+    <div className="theme-room-homepage min-h-dvh bg-white font-sans text-black">
       <main
         inert={menuOpen}
-        className="theme-room-homepage min-h-dvh bg-white font-sans text-black"
+        className="min-h-dvh bg-white font-sans text-black"
       >
         <section
           aria-label="Featured furniture"
@@ -142,7 +142,13 @@ export const RoomHomepage = () => {
           </div>
         </section>
         <section className="grid md:grid-cols-[1fr_1.5fr_1fr]">
-          <div aria-hidden="true" className="min-h-48 bg-neutral-800" />
+          <div className="relative min-h-48">
+            <img
+              alt="Dark room interior with a sofa"
+              className="absolute inset-0 h-full w-full object-cover"
+              src="/room-homepage/image-about-dark.jpg"
+            />
+          </div>
           <div className="flex flex-col justify-center gap-4 p-8">
             <h2 className="text-sm font-bold tracking-[0.35em] uppercase">
               About our furniture
@@ -151,7 +157,13 @@ export const RoomHomepage = () => {
               {aboutDescription}
             </p>
           </div>
-          <div aria-hidden="true" className="min-h-48 bg-neutral-300" />
+          <div className="relative min-h-48">
+            <img
+              alt="A light colored chair"
+              className="absolute inset-0 h-full w-full object-cover"
+              src="/room-homepage/image-about-light.jpg"
+            />
+          </div>
         </section>
         <button
           aria-controls="room-homepage-menu"
@@ -171,9 +183,10 @@ export const RoomHomepage = () => {
         <div
           aria-label="메뉴"
           aria-modal="true"
-          className="fixed inset-0 z-20 bg-black/50 md:hidden"
+          className="fixed inset-0 z-20 md:hidden"
           id="room-homepage-menu"
           role="dialog"
+          style={{ backgroundColor: "var(--menu-scrim)" }}
         >
           <div className="flex h-24 items-center justify-between bg-white px-6 text-black">
             <button
@@ -197,6 +210,6 @@ export const RoomHomepage = () => {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };
