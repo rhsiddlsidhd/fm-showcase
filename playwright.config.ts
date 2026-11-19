@@ -27,6 +27,11 @@ export default defineConfig({
       testMatch: /weather-app.*\.spec\.ts$/,
       use: { ...devices["Desktop Chrome"], baseURL: "http://localhost:4173" },
     },
+    {
+      name: "chromium-room-homepage",
+      testMatch: /room-homepage.*\.spec\.ts$/,
+      use: { ...devices["Desktop Chrome"], baseURL: "http://localhost:4173" },
+    },
   ],
   webServer: [
     {
