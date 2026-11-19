@@ -19,7 +19,7 @@ interface ChallengeCardProps {
 const ChipBadge = ({
   className = "",
   ...props
-}: ComponentProps<typeof Badge>) => (
+}: Omit<ComponentProps<typeof Badge>, "variant">) => (
   <Badge
     variant="secondary"
     className={`h-auto rounded-[999px] px-2.5 py-1 tracking-[0.06em] uppercase ${className}`}
@@ -37,7 +37,7 @@ export const ChallengeCard = ({ challenge }: ChallengeCardProps) => {
       to={challengePath(challenge.slug)}
       aria-labelledby={titleId}
       // 카드 높이가 포커스 표시 여유를 포함해 화면 높이를 넘지 않도록 폭을 제한한다.
-      className={`${cardSurface.surface} text-card-foreground outline-ring mx-auto flex aspect-(--card-aspect-ratio) w-full max-w-[calc((100dvh-2*(var(--focus-offset)+var(--focus-width)))/var(--card-height-ratio))] scroll-my-(--rail-inset) flex-col gap-(--card-content-gap) overflow-hidden rounded-(--card-radius) p-(--card-padding) shadow-(--card-shadow) outline-offset-(--focus-offset) focus-visible:outline-(length:--focus-width)`}
+      className={`${cardSurface.surface} text-card-foreground outline-ring mx-auto flex aspect-(--card-aspect-ratio) w-full max-w-[calc((100dvh-2*(var(--focus-offset)+var(--focus-width)))/var(--card-height-ratio))] scroll-my-(--rail-inset) flex-col gap-(--card-content-gap) overflow-hidden rounded-(--card-radius) p-(--card-padding) outline-offset-(--focus-offset) focus-visible:outline-(length:--focus-width)`}
       animate={
         shouldReduceMotion
           ? { y: 0, backgroundPosition: CARD_SHEEN_POSITIONS[0] }
@@ -56,7 +56,7 @@ export const ChallengeCard = ({ challenge }: ChallengeCardProps) => {
     >
       <h2
         id={titleId}
-        className="line-clamp-2 text-xl font-bold tracking-[-0.015em]"
+        className="font-heading line-clamp-2 text-xl font-bold tracking-[-0.015em]"
       >
         {challenge.title}
       </h2>
