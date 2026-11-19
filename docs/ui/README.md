@@ -18,7 +18,7 @@
 
 | 문서 | 읽는 조건 | 다루는 내용 |
 | --- | --- | --- |
-| [`component.md`](component.md) | 컴포넌트를 설계하거나 구현할 때 | shadcn/ui 후보 탐색, 사용·직접 제작 기준, 스타일 재사용(컴포넌트·인라인) |
+| [`component.md`](component.md) | 컴포넌트를 설계하거나 구현할 때 | shadcn/ui 후보 탐색, 사용·직접 제작 기준, 스타일 재사용(컴포넌트·인라인·CSS Module) |
 | [`component-design.md`](component-design.md) | 컴포넌트를 설계하거나 구현하거나 리팩토링할 때. 컴포넌트의 책임, 상태를 소유할 곳, 컴포넌트 사이의 의존성을 정할 때 | 책임, 상태의 소유권, 의존성 원칙과 원칙이 충돌할 때의 판단 |
 | [`accessibility.md`](accessibility.md) | 화면 컴포넌트를 설계하거나 구현할 때. `theme.css`의 색이나 반투명 효과를 정할 때 | 키보드 포커스, 화면 낭독기 알림, 명암비, 애니메이션 동작 줄이기 설정·투명도 줄이기 |
 | [`animation.md`](animation.md) | 애니메이션을 설계하거나 구현할 때 | `motion` 사용, 움직임 값의 위치, 성능, 애니메이션 동작 줄이기 설정 대응 |
