@@ -19,7 +19,7 @@ interface ChallengeCardProps {
 const ChipBadge = ({
   className = "",
   ...props
-}: ComponentProps<typeof Badge>) => (
+}: Omit<ComponentProps<typeof Badge>, "variant">) => (
   <Badge
     variant="secondary"
     className={`h-auto rounded-[999px] px-2.5 py-1 tracking-[0.06em] uppercase ${className}`}
@@ -56,7 +56,7 @@ export const ChallengeCard = ({ challenge }: ChallengeCardProps) => {
     >
       <h2
         id={titleId}
-        className="line-clamp-2 text-xl font-bold tracking-[-0.015em]"
+        className="font-heading line-clamp-2 text-xl font-bold tracking-[-0.015em]"
       >
         {challenge.title}
       </h2>
