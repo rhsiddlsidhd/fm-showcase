@@ -1,19 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { weatherIcon } from "./weather-icon";
 
-const icon = (file: string, name: string) => ({
-  src: `/weather-app/images/${file}.webp`,
-  name,
-});
+const icon = (kind: string, name: string) => ({ kind, name });
 
-const CLEAR = icon("icon-sunny", "Clear");
-const PARTLY_CLOUDY = icon("icon-partly-cloudy", "Partly cloudy");
-const OVERCAST = icon("icon-overcast", "Overcast");
-const FOG = icon("icon-fog", "Fog");
-const DRIZZLE = icon("icon-drizzle", "Drizzle");
-const RAIN = icon("icon-rain", "Rain");
-const SNOW = icon("icon-snow", "Snow");
-const THUNDERSTORM = icon("icon-storm", "Thunderstorm");
+const CLEAR = icon("sunny", "Clear");
+const PARTLY_CLOUDY = icon("partly-cloudy", "Partly cloudy");
+const OVERCAST = icon("overcast", "Overcast");
+const FOG = icon("fog", "Fog");
+const DRIZZLE = icon("drizzle", "Drizzle");
+const RAIN = icon("rain", "Rain");
+const SNOW = icon("snow", "Snow");
+const THUNDERSTORM = icon("storm", "Thunderstorm");
 
 const MAPPED_CODES: Array<[number, ReturnType<typeof icon>]> = [
   [0, CLEAR],

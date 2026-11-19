@@ -1,4 +1,5 @@
 import { weatherIcon } from "../model/weather-icon";
+import { weatherIconSrc } from "./assets";
 
 export const WeatherIconImage = ({
   code,
@@ -7,6 +8,6 @@ export const WeatherIconImage = ({
   code: number;
   className?: string;
 }) => {
-  const { src, name } = weatherIcon(code);
-  return <img src={src} alt={name} className={className} />;
+  const { kind, name } = weatherIcon(code);
+  return <img src={weatherIconSrc(kind)} alt={name} className={className} />;
 };

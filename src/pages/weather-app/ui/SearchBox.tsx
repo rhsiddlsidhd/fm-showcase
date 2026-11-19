@@ -1,15 +1,12 @@
 import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useId, useRef, useState } from "react";
-import { Button } from "@/shared/ui/button";
 import type { Place } from "../api/geocoding";
 import { candidateLabel } from "../model/place";
 import { usePlaceSearch } from "../model/use-place-search";
 import type { SearchEvent } from "../model/weather-app-state";
+import { ICON_LOADING, ICON_SEARCH } from "./assets";
+import { BareButton } from "./BareButton";
 import { PANEL_ENTER, SEARCH_SPIN } from "./motion";
-import { BUTTON_RESET_CLASS } from "./buttonStyle";
-
-const PANEL_CLASS =
-  "absolute inset-x-0 top-full z-10 mt-2.5 rounded-xl border border-border bg-popover p-2 text-popover-foreground shadow-lg";
 
 type Props = {
   retry?: { query: string | null };
@@ -88,12 +85,12 @@ export const SearchBox = ({ retry, searching, onEvent, onSelect }: Props) => {
     >
       <div className="relative min-w-0 lg:flex-1">
         <img
-          src="/weather-app/images/icon-search.svg"
+          src={ICON_SEARCH}
           alt=""
           className="pointer-events-none absolute top-1/2 left-6 -translate-y-1/2"
         />
         <input
-          className="bg-input hover:bg-accent focus-visible:ring-ring w-full rounded-xl py-4 pr-6 pl-15 text-(length:--weather-app-text-body) placeholder:text-(--weather-app-text-subtle) focus-visible:ring-2"
+          className="bg-input hover:bg-accent focus-visible:ring-ring w-full rounded-xl py-4 pr-6 pl-15 text-base placeholder:text-(--subtle-text) focus-visible:ring-2"
           ref={inputRef}
           type="search"
           role="combobox"
@@ -114,7 +111,7 @@ export const SearchBox = ({ retry, searching, onEvent, onSelect }: Props) => {
             id={listId}
             role="listbox"
             aria-label="Search results"
-            className={`${PANEL_CLASS} flex flex-col gap-1`}
+            className="border-border bg-popover text-popover-foreground absolute inset-x-0 top-full z-10 mt-2.5 flex flex-col gap-1 rounded-xl border p-2 shadow-lg"
             initial={
               reduceMotion
                 ? { opacity: 0 }
@@ -141,9 +138,9 @@ export const SearchBox = ({ retry, searching, onEvent, onSelect }: Props) => {
           </motion.ul>
         )}
         {searching && (
-          <p className={`${PANEL_CLASS} flex items-center gap-2.5 px-4 py-3`}>
+          <p className="border-border bg-popover text-popover-foreground absolute inset-x-0 top-full z-10 mt-2.5 flex items-center gap-2.5 rounded-xl border px-4 py-3 shadow-lg">
             <motion.img
-              src="/weather-app/images/icon-loading.svg"
+              src={ICON_LOADING}
               alt=""
               animate={{ rotate: 360 }}
               transition={SEARCH_SPIN.transition}
@@ -152,12 +149,12 @@ export const SearchBox = ({ retry, searching, onEvent, onSelect }: Props) => {
           </p>
         )}
       </div>
-      <Button
+      <BareButton
         type="submit"
-        className={`bg-primary text-primary-foreground rounded-xl px-6 py-4 text-(length:--weather-app-text-body) ${BUTTON_RESET_CLASS} hover:bg-(--weather-app-primary-hover)`}
+        className="bg-primary text-primary-foreground rounded-xl px-6 py-4 text-base hover:bg-(--primary-hover)"
       >
         Search
-      </Button>
+      </BareButton>
     </form>
   );
 };
