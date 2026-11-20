@@ -9,10 +9,10 @@
   --heading-font: var(--sans-font);
   --text-base: 16px;
   /* 제목 단계는 JPG의 시각적 추정치이며 원본에 수치가 없다. */
-  --text-4xl: 36px;
-  --text-4xl--line-height: 1;
-  --text-5xl: 48px;
-  --text-5xl--line-height: 1;
+  --text-4xl: 38px;
+  --text-4xl--line-height: 0.98;
+  --text-5xl: 44px;
+  --text-5xl--line-height: 0.98;
 
   /* JPG의 메뉴 가림막을 기준으로 한 반투명도 추정치. */
   --menu-scrim: hsl(0 0% 0% / 50%);

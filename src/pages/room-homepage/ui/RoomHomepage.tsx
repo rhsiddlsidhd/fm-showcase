@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Button } from "@/shared/ui/button";
 import {
   ABOUT_DARK_IMAGE,
   ABOUT_LIGHT_IMAGE,
@@ -10,7 +11,6 @@ import {
   ROOM_LOGO,
   SHOP_ARROW,
 } from "./assets";
-import "./theme.css";
 
 const menuItems = ["home", "shop", "about", "contact"] as const;
 const desktopMediaQuery = "(min-width: 768px)";
@@ -131,7 +131,7 @@ export const RoomHomepage = () => {
             </nav>
           </div>
           <div className="flex min-h-[410px] flex-col justify-center gap-5 px-8 pt-14 pb-14 md:min-h-0 md:translate-y-2 md:px-[clamp(3rem,6.9vw,100px)] md:pt-0 md:pb-14">
-            <h1 className="font-heading text-[38px] leading-[0.98] font-bold tracking-[-0.035em] md:text-[44px]">
+            <h1 className="font-heading text-4xl font-bold tracking-[-0.035em] md:text-5xl">
               {slide.title}
             </h1>
             <p className="text-muted-foreground text-base leading-[1.38] font-medium">
@@ -151,11 +151,12 @@ export const RoomHomepage = () => {
             </div>
           </div>
           <div className="absolute top-[304px] right-0 flex md:top-auto md:right-auto md:bottom-0 md:left-[58.333%]">
-            <button
+            <Button
               aria-label="이전 슬라이드"
-              className="bg-primary hover:bg-secondary flex h-14 w-14 items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white md:h-20 md:w-20"
+              className="bg-primary text-primary-foreground hover:bg-secondary size-14 rounded-none border-0 transition-none focus-visible:ring-3 focus-visible:ring-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:not-aria-[haspopup]:translate-y-0 md:size-20"
               onClick={() => changeSlide(-1)}
               ref={previousButtonRef}
+              size="icon"
               type="button"
             >
               <img
@@ -164,11 +165,12 @@ export const RoomHomepage = () => {
                 className="h-6 w-[14px]"
                 src={PREVIOUS_ICON}
               />
-            </button>
-            <button
+            </Button>
+            <Button
               aria-label="다음 슬라이드"
-              className="bg-primary hover:bg-secondary flex h-14 w-14 items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white md:h-20 md:w-20"
+              className="bg-primary text-primary-foreground hover:bg-secondary size-14 rounded-none border-0 transition-none focus-visible:ring-3 focus-visible:ring-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:not-aria-[haspopup]:translate-y-0 md:size-20"
               onClick={() => changeSlide(1)}
+              size="icon"
               type="button"
             >
               <img
@@ -177,7 +179,7 @@ export const RoomHomepage = () => {
                 className="h-6 w-[14px]"
                 src={NEXT_ICON}
               />
-            </button>
+            </Button>
           </div>
         </section>
         <section className="grid md:min-h-[265px] md:grid-cols-[29fr_40fr_31fr]">
@@ -204,17 +206,19 @@ export const RoomHomepage = () => {
             />
           </div>
         </section>
-        <button
+        <Button
           aria-controls="room-homepage-menu"
           aria-expanded={menuOpen}
           aria-label="메뉴 열기"
-          className="absolute top-12 left-6 z-10 flex h-5 w-5 items-center justify-center hover:opacity-65 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white md:hidden"
+          className="absolute top-12 left-6 z-10 size-5 rounded-none border-0 bg-transparent p-0 text-white transition-none hover:bg-transparent hover:opacity-65 focus-visible:ring-3 focus-visible:ring-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white active:not-aria-[haspopup]:translate-y-0 md:hidden"
           onClick={() => setMenuOpen(true)}
           ref={menuButtonRef}
+          size="icon"
           type="button"
+          variant="ghost"
         >
           <img alt="" aria-hidden="true" src={MENU_ICON} />
-        </button>
+        </Button>
       </main>
       {menuOpen && (
         <div
@@ -226,15 +230,17 @@ export const RoomHomepage = () => {
           style={{ backgroundColor: "var(--menu-scrim)" }}
         >
           <div className="bg-background text-foreground flex h-[110px] items-center justify-between px-6">
-            <button
+            <Button
               aria-label="메뉴 닫기"
-              className="flex h-5 w-5 items-center justify-center hover:opacity-65 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black"
+              className="text-foreground size-5 rounded-none border-0 bg-transparent p-0 transition-none hover:bg-transparent hover:opacity-65 focus-visible:ring-3 focus-visible:ring-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black active:not-aria-[haspopup]:translate-y-0"
               onClick={() => setMenuOpen(false)}
               ref={closeButtonRef}
+              size="icon"
               type="button"
+              variant="ghost"
             >
               <img alt="" aria-hidden="true" src={CLOSE_ICON} />
-            </button>
+            </Button>
             <nav
               aria-label="모바일 메뉴"
               className="flex gap-5 text-base font-semibold"
