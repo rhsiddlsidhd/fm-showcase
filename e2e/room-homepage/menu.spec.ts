@@ -72,7 +72,7 @@ test.beforeEach(async ({ page }) => {
   await expect(openButton(page)).toBeVisible();
 });
 
-test("모바일 메뉴를 열면 펼침 상태와 네 정적 메뉴 문구가 모달에 표시된다", async ({
+test("모바일 메뉴를 열면 탭 정지점 없는 네 메뉴 버튼이 표시되고 클릭해도 상태가 유지된다", async ({
   page,
 }) => {
   const opener = openButton(page);
@@ -92,15 +92,14 @@ test("모바일 메뉴를 열면 펼침 상태와 네 정적 메뉴 문구가 �
   await expect(dialog).toHaveAttribute("id", controlledId ?? "");
 
   for (const label of menuLabels) {
-    const text = dialog.getByText(label, { exact: true });
-    await expect(text).toBeVisible();
+    const button = dialog.getByRole("button", { name: label, exact: true });
+    await expect(button).toBeVisible();
+    await expect(button).toHaveJSProperty("tagName", "BUTTON");
+    await expect(button).toHaveAttribute("tabindex", "-1");
     await expect(
       dialog.getByRole("link", { name: label, exact: true }),
     ).toHaveCount(0);
-    await expect(
-      dialog.getByRole("button", { name: label, exact: true }),
-    ).toHaveCount(0);
-    await text.click();
+    await button.click();
     await expect(dialog).toBeVisible();
     await expect(page).toHaveURL(/\/room-homepage$/);
     await expect(

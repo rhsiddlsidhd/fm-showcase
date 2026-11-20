@@ -77,20 +77,21 @@ describe("Room 홈페이지 첫 화면", () => {
     expect(screen.getByText(aboutDescription)).toBeVisible();
   });
 
-  it("넓은 화면에서 네 메뉴 문구가 링크 역할과 탭 정지점 없이 보인다", () => {
+  it("넓은 화면에서 네 메뉴가 링크 역할과 탭 정지점 없는 버튼으로 보인다", () => {
     render(<RoomHomepagePage />);
 
     for (const name of ["home", "shop", "about", "contact"]) {
-      const menuText = screen.getByText(name, { exact: true });
+      const menuButton = screen.getByRole("button", { name });
 
-      expect(menuText).toBeVisible();
+      expect(menuButton).toBeVisible();
+      expect(menuButton).toHaveProperty("tagName", "BUTTON");
+      expect(menuButton).toHaveAttribute("tabindex", "-1");
       expect(screen.queryByRole("link", { name })).toBeNull();
-      expect(screen.queryByRole("button", { name })).toBeNull();
 
-      let element: HTMLElement | null = menuText;
+      let element: HTMLElement | null = menuButton;
       while (element) {
         expect(element.tabIndex).toBeLessThan(0);
-        // 일반 텍스트를 감싼 요소의 탭 정지점은 역할 쿼리로 찾을 수 없다.
+        // 버튼 조상에 별도의 탭 정지점이 생기지 않는지도 확인한다.
         // eslint-disable-next-line testing-library/no-node-access
         element = element.parentElement;
       }

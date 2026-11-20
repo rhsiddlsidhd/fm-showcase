@@ -138,26 +138,33 @@ for (const label of ["home", "shop", "about", "contact", "Shop now"]) {
     await expect(
       page.getByRole("link", { name: label, exact: true }),
     ).toHaveCount(0);
-    await expect(
-      page.getByRole("button", { name: label, exact: true }),
-    ).toHaveCount(0);
+    const isNavigationItem = label !== "Shop now";
+    const button = page.getByRole("button", { name: label, exact: true });
+    if (isNavigationItem) {
+      await expect(button).toBeVisible();
+      await expect(button).toHaveJSProperty("tagName", "BUTTON");
+      await expect(button).toHaveAttribute("tabindex", "-1");
+    } else {
+      await expect(button).toHaveCount(0);
+    }
     expect(
-      await text.evaluate((element) => {
+      await text.evaluate((element, allowButton) => {
         for (
           let node: Element | null = element;
           node;
           node = node.parentElement
         ) {
           if (
-            node.matches('a[href], button, [role="link"], [role="button"]') ||
+            node.matches('a[href], [role="link"]') ||
+            (!allowButton && node.matches('button, [role="button"]')) ||
             (node instanceof HTMLElement && node.tabIndex >= 0)
           ) {
             return false;
           }
         }
         return true;
-      }),
-      "문구와 그 조상은 링크·버튼·탭 정지점이 아니다",
+      }, isNavigationItem),
+      "메뉴 버튼과 Shop now 문구에 링크 역할과 탭 정지점이 없다",
     ).toBe(true);
 
     await text.click();
@@ -170,7 +177,7 @@ for (const label of ["home", "shop", "about", "contact", "Shop now"]) {
       visits.some((visit) =>
         visit.label.toLowerCase().includes(`"${label.toLowerCase()}"`),
       ),
-      "실제 Tab 순회에서도 정적 문구에 초점이 머물지 않는다",
+      "실제 Tab 순회에서도 메뉴 버튼과 Shop now 문구에 초점이 머물지 않는다",
     ).toBe(false);
     for (const menu of ["home", "shop", "about", "contact"]) {
       await expect(page.getByText(menu, { exact: true })).toBeVisible();
