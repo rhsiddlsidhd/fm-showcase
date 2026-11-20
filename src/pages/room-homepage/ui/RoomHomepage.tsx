@@ -123,7 +123,7 @@ export const RoomHomepage = () => {
               {menuItems.map((item) => (
                 <Button
                   key={item}
-                  className="h-auto cursor-pointer rounded-none border-0 bg-transparent p-0 text-base font-semibold text-white transition-none hover:bg-transparent hover:text-white hover:underline hover:underline-offset-8"
+                  className="h-auto cursor-pointer rounded-none border-0 bg-transparent p-0 text-base font-semibold text-white transition-none hover:bg-transparent hover:text-white hover:underline hover:underline-offset-8 active:not-aria-[haspopup]:translate-y-0"
                   tabIndex={-1}
                   type="button"
                   variant="ghost"
@@ -251,7 +251,7 @@ export const RoomHomepage = () => {
               {menuItems.map((item) => (
                 <Button
                   key={item}
-                  className="h-auto cursor-pointer rounded-none border-0 bg-transparent p-0 text-base font-semibold transition-none hover:bg-transparent hover:underline hover:underline-offset-4"
+                  className="h-auto cursor-pointer rounded-none border-0 bg-transparent p-0 text-base font-semibold transition-none hover:bg-transparent hover:underline hover:underline-offset-4 active:not-aria-[haspopup]:translate-y-0"
                   tabIndex={-1}
                   type="button"
                   variant="ghost"
