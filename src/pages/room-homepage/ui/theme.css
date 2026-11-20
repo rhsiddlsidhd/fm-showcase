@@ -17,6 +17,7 @@
   /* JPG의 메뉴 가림막을 기준으로 한 반투명도 추정치. */
   --menu-scrim: hsl(0 0% 0% / 50%);
   --hero-focus-ring: var(--white);
+  --hero-foreground: var(--white);
 
   --background: var(--white);
   --foreground: var(--black);

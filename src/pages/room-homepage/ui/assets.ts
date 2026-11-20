@@ -1,17 +1,15 @@
-export const HERO_IMAGES = [
-  {
-    desktop: "/room-homepage/desktop-image-hero-1.jpg",
-    mobile: "/room-homepage/mobile-image-hero-1.jpg",
-  },
-  {
-    desktop: "/room-homepage/desktop-image-hero-2.jpg",
-    mobile: "/room-homepage/mobile-image-hero-2.jpg",
-  },
-  {
-    desktop: "/room-homepage/desktop-image-hero-3.jpg",
-    mobile: "/room-homepage/mobile-image-hero-3.jpg",
-  },
-];
+export const HERO_IMAGE_1 = {
+  desktop: "/room-homepage/desktop-image-hero-1.jpg",
+  mobile: "/room-homepage/mobile-image-hero-1.jpg",
+};
+export const HERO_IMAGE_2 = {
+  desktop: "/room-homepage/desktop-image-hero-2.jpg",
+  mobile: "/room-homepage/mobile-image-hero-2.jpg",
+};
+export const HERO_IMAGE_3 = {
+  desktop: "/room-homepage/desktop-image-hero-3.jpg",
+  mobile: "/room-homepage/mobile-image-hero-3.jpg",
+};
 
 export const ROOM_LOGO = "/room-homepage/logo.svg";
 export const MENU_ICON = "/room-homepage/icon-hamburger.svg";
