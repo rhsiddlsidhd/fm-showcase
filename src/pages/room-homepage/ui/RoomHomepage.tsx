@@ -121,12 +121,15 @@ export const RoomHomepage = () => {
               className="absolute top-[63px] left-44 hidden gap-8 text-base font-semibold text-white md:flex"
             >
               {menuItems.map((item) => (
-                <span
+                <Button
                   key={item}
-                  className="hover:underline hover:underline-offset-8"
+                  className="h-auto cursor-pointer rounded-none border-0 bg-transparent p-0 text-base font-semibold text-white transition-none hover:bg-transparent hover:text-white hover:underline hover:underline-offset-8"
+                  tabIndex={-1}
+                  type="button"
+                  variant="ghost"
                 >
                   {item}
-                </span>
+                </Button>
               ))}
             </nav>
           </div>
@@ -137,7 +140,7 @@ export const RoomHomepage = () => {
             <p className="text-muted-foreground text-base leading-[1.38] font-medium">
               {slide.description}
             </p>
-            <p className="hover:text-muted-foreground flex items-center gap-6 text-base font-semibold tracking-[0.65em] uppercase">
+            <p className="hover:text-muted-foreground flex cursor-pointer items-center gap-6 text-base font-semibold tracking-[0.65em] uppercase">
               <span>Shop now</span>
               <img
                 alt=""
@@ -153,7 +156,7 @@ export const RoomHomepage = () => {
           <div className="absolute top-[304px] right-0 flex md:top-auto md:right-auto md:bottom-0 md:left-[58.333%]">
             <Button
               aria-label="이전 슬라이드"
-              className="bg-primary text-primary-foreground hover:bg-secondary size-14 rounded-none border-0 transition-none focus-visible:ring-3 focus-visible:ring-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:not-aria-[haspopup]:translate-y-0 md:size-20"
+              className="bg-primary text-primary-foreground hover:bg-secondary size-14 cursor-pointer rounded-none border-0 transition-none focus-visible:ring-3 focus-visible:ring-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:not-aria-[haspopup]:translate-y-0 md:size-20"
               onClick={() => changeSlide(-1)}
               ref={previousButtonRef}
               size="icon"
@@ -168,7 +171,7 @@ export const RoomHomepage = () => {
             </Button>
             <Button
               aria-label="다음 슬라이드"
-              className="bg-primary text-primary-foreground hover:bg-secondary size-14 rounded-none border-0 transition-none focus-visible:ring-3 focus-visible:ring-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:not-aria-[haspopup]:translate-y-0 md:size-20"
+              className="bg-primary text-primary-foreground hover:bg-secondary size-14 cursor-pointer rounded-none border-0 transition-none focus-visible:ring-3 focus-visible:ring-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:not-aria-[haspopup]:translate-y-0 md:size-20"
               onClick={() => changeSlide(1)}
               size="icon"
               type="button"
@@ -210,7 +213,7 @@ export const RoomHomepage = () => {
           aria-controls="room-homepage-menu"
           aria-expanded={menuOpen}
           aria-label="메뉴 열기"
-          className="absolute top-12 left-6 z-10 size-5 rounded-none border-0 bg-transparent p-0 text-white transition-none hover:bg-transparent hover:opacity-65 focus-visible:ring-3 focus-visible:ring-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white active:not-aria-[haspopup]:translate-y-0 md:hidden"
+          className="absolute top-12 left-6 z-10 size-5 cursor-pointer rounded-none border-0 bg-transparent p-0 text-white transition-none hover:bg-transparent hover:opacity-65 focus-visible:ring-3 focus-visible:ring-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white active:not-aria-[haspopup]:translate-y-0 md:hidden"
           onClick={() => setMenuOpen(true)}
           ref={menuButtonRef}
           size="icon"
@@ -232,7 +235,7 @@ export const RoomHomepage = () => {
           <div className="bg-background text-foreground flex h-[110px] items-center justify-between px-6">
             <Button
               aria-label="메뉴 닫기"
-              className="text-foreground size-5 rounded-none border-0 bg-transparent p-0 transition-none hover:bg-transparent hover:opacity-65 focus-visible:ring-3 focus-visible:ring-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black active:not-aria-[haspopup]:translate-y-0"
+              className="text-foreground size-5 cursor-pointer rounded-none border-0 bg-transparent p-0 transition-none hover:bg-transparent hover:opacity-65 focus-visible:ring-3 focus-visible:ring-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-black active:not-aria-[haspopup]:translate-y-0"
               onClick={() => setMenuOpen(false)}
               ref={closeButtonRef}
               size="icon"
@@ -246,12 +249,15 @@ export const RoomHomepage = () => {
               className="flex gap-5 text-base font-semibold"
             >
               {menuItems.map((item) => (
-                <span
+                <Button
                   key={item}
-                  className="hover:underline hover:underline-offset-4"
+                  className="h-auto cursor-pointer rounded-none border-0 bg-transparent p-0 text-base font-semibold transition-none hover:bg-transparent hover:underline hover:underline-offset-4"
+                  tabIndex={-1}
+                  type="button"
+                  variant="ghost"
                 >
                   {item}
-                </span>
+                </Button>
               ))}
             </nav>
           </div>
