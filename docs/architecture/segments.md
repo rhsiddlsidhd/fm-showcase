@@ -7,7 +7,7 @@
 > Slices are the second level in the organizational hierarchy of Feature-Sliced Design. Their main purpose is to group code by its meaning for the product, business, or just the application.
 
 - 이름은 FSD가 표준화하지 않는다("The names of slices are not standardized"). 도메인이 정한다.
-- 이 저장소는 **kebab-case 소문자**로 쓴다. 공식 예시가 그 형태다 (`article-reader`, `sign-in`, `home`). Steiger에 대소문자 규칙이 없다.
+- 이 저장소는 **kebab-case 소문자**로 쓴다. 공식 예시가 그 형태다 (`article-reader`, `sign-in`, `home`). Steiger에 대소문자 규칙이 없어 `eslint.config.js`가 판정한다.
 - `app`과 `shared`는 슬라이스가 없다.
 
 ## 세그먼트
@@ -41,6 +41,8 @@ ui  model  api  lib
 예외가 하나 더 있다. 전역 테스트 준비 코드는 `shared/test`에 둔다. FSD에 테스트 세그먼트 규약이 없어서 관용 이름을 쓸 수 없고, 커스텀 세그먼트는 `shared`에서 허용된다("Custom segments are permissible, particularly in App and Shared layers"). 이 세그먼트는 검증 대상이 아니라 검증을 준비하는 코드이므로 동결 집합의 판정표에 넣지 않는다.
 
 동결하는 이유는 경로를 기계가 읽기 때문이다. 이름이 열려 있으면 구조 검사에서 분류되지 않은 경로가 조용히 빠질 수 있다. 집합 밖의 세그먼트가 나타나면 **검사 면제가 아니라 검사 대상으로 취급한다.**
+
+슬라이스가 있는 레이어의 세그먼트는 `eslint.config.js`가 판정한다. `app`과 `shared`의 관용 세그먼트는 목록이 닫혀 있지 않아 판정하지 않는다. 판정은 ESLint가 읽는 `.ts`·`.tsx` 파일 기준이라, 그 파일이 없는 세그먼트는 판정되지 않는다.
 
 이 동결은 FSD 위반이 아니다. 스펙이 이름을 제약하지 않았으므로, 저장소가 고르는 것이 스펙 준수다.
 
