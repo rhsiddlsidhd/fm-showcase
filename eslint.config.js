@@ -1,4 +1,6 @@
 import js from "@eslint/js";
+import betterTailwindcss from "eslint-plugin-better-tailwindcss";
+import checkFile from "eslint-plugin-check-file";
 import jsxA11y from "eslint-plugin-jsx-a11y";
 import reactHooks from "eslint-plugin-react-hooks";
 import testingLibrary from "eslint-plugin-testing-library";
@@ -44,6 +46,60 @@ export default tseslint.config(
       "no-restricted-imports": [
         "error",
         { patterns: [sharedModuleImport, sliceThemeImport] },
+      ],
+    },
+  },
+  {
+    files: ["src/{pages,widgets,features,entities}/**/*.tsx"],
+    ignores: ["src/**/*.test.tsx"],
+    plugins: { "better-tailwindcss": betterTailwindcss },
+    rules: {
+      // Patterns match the whole class, so "(^|:)" also covers variants (md:, hover:).
+      "better-tailwindcss/no-restricted-classes": [
+        "error",
+        {
+          restrict: [
+            {
+              pattern:
+                "(^|:)!?text-\\[(length:)?([\\d.]|(calc|clamp|min|max)\\()",
+              message:
+                "Redefine a --text-* step in theme.css instead of an arbitrary font size.",
+            },
+            {
+              pattern: "(^|:)dark:",
+              message:
+                "Change colors by redefining tokens in theme.css, not with dark:.",
+            },
+            {
+              pattern:
+                "(^|:)!?(transition(?![\\w-])|transition-(?!none!?$)|animate-|\\[(-webkit-)?(transition|animation))",
+              message:
+                "Animate with motion, not CSS transition or animation utilities.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    plugins: { "check-file": checkFile },
+    rules: {
+      "check-file/folder-naming-convention": [
+        "error",
+        { "src/{pages,widgets,features,entities}/*/": "KEBAB_CASE" },
+      ],
+    },
+  },
+  {
+    // Only files outside the frozen segments reach this block.
+    files: ["src/{pages,widgets,features,entities}/*/*/**/*.{ts,tsx}"],
+    ignores: ["src/{pages,widgets,features,entities}/*/{ui,model,api,lib}/**"],
+    rules: {
+      "check-file/filename-blocklist": [
+        "error",
+        { "**/*": "*" },
+        { errorMessage: "Slice segments are ui, model, api and lib only." },
       ],
     },
   },
