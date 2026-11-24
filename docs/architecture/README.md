@@ -2,7 +2,7 @@
 
 `src/`의 디렉토리 구조는 [Feature-Sliced Design](https://feature-sliced.design/)(FSD)을 따른다. 이 README는 인덱스이자 공통 원칙이고, 상세는 아래 문서에 둔다. 앱의 경계는 [`boundary.md`](./boundary.md)에 있다.
 
-FSD를 고른 이유는 취향이 아니다. 이 저장소는 경로를 기계가 읽어 규칙을 판정하려 한다([기준과 검증](../../README.md#기준과-검증)). 그러려면 경로 규약이 **외부에 명세되어 있고 린터가 검사할 수 있어야** 한다. FSD는 둘 다 갖췄다.
+FSD를 고른 이유는 취향이 아니다. 이 저장소는 경로를 기계가 읽어 규칙을 판정하려 한다([ADR 0003](../../adr/0003-criteria-config-and-verification-code-first.md)). 그러려면 경로 규약이 **외부에 명세되어 있고 린터가 검사할 수 있어야** 한다. FSD는 둘 다 갖췄다.
 
 ## 문서
 
@@ -45,7 +45,7 @@ FSD가 정의한 레이어는 **7개**다. 공식 문서 원문:
 
 ## 설정과 문서
 
-[프로젝트 README](../../README.md#기준과-검증)의 구분을 따른다.
+[ADR 0003](../../adr/0003-criteria-config-and-verification-code-first.md)의 결정과 [`docs/README.md`](../README.md#용어)의 구분을 따른다.
 
 설정으로 판정되는 규칙은 `steiger.config.js`와 `eslint.config.js`가 정한다. 여기에 다시 쓰지 않는다. 아래는 설정으로 판정되지 않고 문서에만 있는 기준이다. 리뷰가 확인한다.
 
