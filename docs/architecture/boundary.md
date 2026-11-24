@@ -5,7 +5,7 @@
 ## 외부 API
 
 - 키가 필요 없고 CORS를 허용하는 외부 API는 브라우저에서 직접 호출한다.
-- 키가 필요하거나 CORS를 막아 둔 외부 API는 Vercel Functions로 중계한다. 별도 서버를 배포하지 않는다([ADR 0001](../../adr/0001-relay-external-api-with-vercel-functions.md)).
+- 키가 필요하거나 CORS를 막아 둔 외부 API는 Vercel Functions로 중계한다. 별도 서버를 배포하지 않는다([ADR 0001](../../adr/0001-external-api-vercel-functions.md)).
 
 ## Vercel Functions
 
