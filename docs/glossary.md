@@ -7,7 +7,7 @@
 | 용어 | 정의한 곳 |
 | --- | --- |
 | 설정, 검증 코드, CI, 문서 | [`docs/README.md`](README.md#용어) |
-| 증거 | [`README.md`](../README.md#증거) |
+| 증거 | [`evidence.md`](evidence.md) |
 | 도메인 | [`spec/README.md`](spec/README.md) |
 | 설계안 | [`spec/README.md`](spec/README.md#산출-위치) |
 | 결정 기록(ADR) | [`spec/adr.md`](spec/adr.md) |
