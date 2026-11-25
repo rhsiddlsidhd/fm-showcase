@@ -23,13 +23,9 @@ export default defineConfig({
     },
     {
       // 챌린지 페이지는 운영 빌드에 그대로 있다. 외부 API는 스펙에서 경로 가로채기로 대역 처리한다.
-      name: "chromium-weather-app",
-      testMatch: /weather-app.*\.spec\.ts$/,
-      use: { ...devices["Desktop Chrome"], baseURL: "http://localhost:4173" },
-    },
-    {
-      name: "chromium-room-homepage",
-      testMatch: /room-homepage.*\.spec\.ts$/,
+      // 쇼케이스 스펙을 뺀 모든 스펙을 실행해, 새 챌린지 스펙이 등록 없이도 빠지지 않게 한다.
+      name: "chromium-challenges",
+      testIgnore: /showcase\.(production|fixture)\.spec\.ts$/,
       use: { ...devices["Desktop Chrome"], baseURL: "http://localhost:4173" },
     },
   ],
