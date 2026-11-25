@@ -9,7 +9,7 @@ type ReportInput = {
   githubToken: string;
   webhookUrl: string;
   now: Date;
-  date?: string;
+  date?: string | undefined;
 };
 
 export async function reportDailyClose({

@@ -43,16 +43,16 @@ export const ChallengeCard = ({ challenge }: ChallengeCardProps) => {
           ? { y: 0, backgroundPosition: CARD_SHEEN_POSITIONS[0] }
           : { y: CARD_FLOAT_Y, backgroundPosition: CARD_SHEEN_POSITIONS }
       }
-      transition={
-        shouldReduceMotion
-          ? undefined
-          : {
+      {...(shouldReduceMotion
+        ? {}
+        : {
+            transition: {
               duration: CARD_FLOAT_DURATION,
               ease: CARD_FLOAT_EASE,
               repeat: Infinity,
               repeatType: "loop",
-            }
-      }
+            },
+          })}
     >
       <h2
         id={titleId}

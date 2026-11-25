@@ -54,7 +54,7 @@ const createGate = (): Gate => {
 type ReplyKind = "ok" | "http400" | "network" | "notJson";
 
 // 요청 하나에 줄 응답. wait가 있으면 그 약속이 풀린 뒤 응답한다.
-type Reply = { kind: ReplyKind; wait?: Promise<void> };
+type Reply = { kind: ReplyKind; wait?: Promise<void> | undefined };
 
 const reply = (kind: ReplyKind, wait?: Promise<void>): Reply => ({
   kind,

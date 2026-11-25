@@ -38,7 +38,7 @@ export async function fetchForecast(
     timezone: "auto",
     forecast_days: "7",
   }).toString();
-  const response = await fetch(url, { signal });
+  const response = await fetch(url, { signal: signal ?? null });
   if (!response.ok) {
     throw new Error(`Forecast request failed: ${response.status}`);
   }

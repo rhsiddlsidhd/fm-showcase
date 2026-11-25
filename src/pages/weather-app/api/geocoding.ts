@@ -19,7 +19,7 @@ export async function searchPlaces(
     language: "en",
     format: "json",
   }).toString();
-  const response = await fetch(url, { signal });
+  const response = await fetch(url, { signal: signal ?? null });
   if (!response.ok) {
     throw new Error(`Geocoding request failed: ${response.status}`);
   }
