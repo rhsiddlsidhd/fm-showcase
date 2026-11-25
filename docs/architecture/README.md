@@ -52,8 +52,10 @@ FSD가 정의한 레이어는 **7개**다. 공식 문서 원문:
 | 기준 | 정의한 곳 | 판정되지 않는 이유 |
 | ---- | --------- | ------------------ |
 | 무엇을 한 슬라이스로 볼지 | [`layers.md`](./layers.md) | 의미 판단이다 |
-| 조건부 레이어를 만들 시점 | [`layers.md`](./layers.md) | 의미 판단이다 |
+| 조건부 레이어를 만들 시점 | [`layers.md`](./layers.md) | 의미 판단이다. 다만 만든 슬라이스를 참조하는 곳이 하나 이하면 Steiger `insignificant-slice`가 실패한다 |
 | 페이지 컴포넌트에 값 가공 로직을 두지 않는다 | [`layers.md`](./layers.md) | 코드의 의미 판단이다 |
+| 페이지가 내보내는 이름이 슬라이스 이름과 같다 | [`segments.md`](./segments.md#public-api) | `Page` 접미사의 named export인지만 `eslint.config.js`가 판정한다. 슬라이스 이름과 맞는지는 판정하지 않는다 |
+| `shared/ui`와 `shared/lib`는 하위 폴더 없이 평면으로 둔다 | [`segments.md`](./segments.md#public-api) | ESLint는 shadcn 산출물인 `shared/ui`를 검사하지 않는다. Steiger는 하위 폴더에 index를 요구할 뿐 하위 폴더 자체를 막지 않는다 |
 
 ## 미결정
 

@@ -158,6 +158,34 @@ export default defineConfig(
     },
   },
   {
+    // A slice has one index; its segments have none.
+    files: [
+      "src/{pages,widgets,features,entities}/*/{ui,model,api,lib}/index.{ts,tsx}",
+    ],
+    rules: {
+      "check-file/filename-blocklist": [
+        "error",
+        { "**/index.{ts,tsx}": "*" },
+        { errorMessage: "A slice has one index; segments have none." },
+      ],
+    },
+  },
+  {
+    // Steiger skips folders that are not layers, so they would go unchecked.
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: ["src/{app,pages,widgets,features,entities,shared}/**"],
+    rules: {
+      "check-file/filename-blocklist": [
+        "error",
+        { "**/*": "*" },
+        {
+          errorMessage:
+            "src/ holds only the layers app, pages, widgets, features, entities and shared.",
+        },
+      ],
+    },
+  },
+  {
     files: ["src/pages/*/index.tsx"],
     rules: {
       "no-restricted-syntax": [
@@ -169,6 +197,31 @@ export default defineConfig(
         {
           selector: "CallExpression[callee.property.name=/^use[A-Z]/]",
           message: "Move hooks into a ui/ component; the page only arranges.",
+        },
+        {
+          selector: "JSXAttribute[name.name=/^on[A-Z]/]",
+          message:
+            "Move event handlers into a ui/ component; the page only arranges.",
+        },
+        {
+          selector:
+            "JSXExpressionContainer > :matches(ConditionalExpression, LogicalExpression)",
+          message:
+            "Move conditional display into a ui/ component; the page only arranges.",
+        },
+        {
+          selector: "ExportDefaultDeclaration",
+          message: "Export the page as a named <Slice>Page component.",
+        },
+        {
+          selector:
+            "ExportNamedDeclaration > VariableDeclaration > VariableDeclarator[id.name!=/Page$/]",
+          message: "Export the page as a named <Slice>Page component.",
+        },
+        {
+          selector:
+            "ExportNamedDeclaration > FunctionDeclaration[id.name!=/Page$/]",
+          message: "Export the page as a named <Slice>Page component.",
         },
       ],
     },
