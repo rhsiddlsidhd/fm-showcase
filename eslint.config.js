@@ -4,6 +4,7 @@ import checkFile from "eslint-plugin-check-file";
 import jsxA11y from "eslint-plugin-jsx-a11y";
 import reactHooks from "eslint-plugin-react-hooks";
 import testingLibrary from "eslint-plugin-testing-library";
+import vitest from "@vitest/eslint-plugin";
 import { defineConfig } from "eslint/config";
 import globals from "globals";
 import tseslint from "typescript-eslint";
@@ -188,6 +189,20 @@ export default defineConfig(
           selector: "CallExpression[callee.property.name='dispatchEvent']",
           message: "Use user-event instead of dispatching events directly.",
         },
+      ],
+    },
+  },
+  {
+    // A test with no assertion, or a focused or skipped test, passes CI
+    // without checking anything (docs/testing/test-policy.md).
+    files: ["src/**/*.test.{ts,tsx}", "scripts/**/*.test.ts"],
+    plugins: { vitest },
+    rules: {
+      "vitest/no-focused-tests": "error",
+      "vitest/no-disabled-tests": "error",
+      "vitest/expect-expect": [
+        "error",
+        { assertFunctionNames: ["expect", "expect*"] },
       ],
     },
   },
