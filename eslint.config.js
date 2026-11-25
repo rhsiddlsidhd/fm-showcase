@@ -41,6 +41,13 @@ export default tseslint.config(
     languageOptions: { globals: { ...globals.browser, ...globals.node } },
   },
   {
+    // Production code checks values before use. Tests may assert with "!"
+    // because a missing value makes the test fail at that line.
+    files: ["**/*.{ts,tsx}"],
+    ignores: ["**/*.test.{ts,tsx}", "e2e/**"],
+    rules: { "@typescript-eslint/no-non-null-assertion": "error" },
+  },
+  {
     files: ["src/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-imports": [
