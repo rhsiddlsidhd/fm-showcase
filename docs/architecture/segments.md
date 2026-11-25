@@ -40,6 +40,8 @@ ui  model  api  lib
 
 예외가 하나 더 있다. 전역 테스트 준비 코드는 `shared/test`에 둔다. FSD에 테스트 세그먼트 규약이 없어서 관용 이름을 쓸 수 없고, 커스텀 세그먼트는 `shared`에서 허용된다("Custom segments are permissible, particularly in App and Shared layers"). 이 세그먼트는 검증 대상이 아니라 검증을 준비하는 코드이므로 동결 집합의 판정표에 넣지 않는다.
 
+챌린지 하나만 쓰는 fixture는 전역 준비 코드가 아니므로 `shared/test`에 두지 않고 그 슬라이스의 `api` 세그먼트(`api/fixtures/`)에 둔다. fixture는 JSON이라 ESLint가 읽지 않으므로, `shared/test/fixtures` 아래에 하위 폴더가 생기면 `src/shared/test/fixtures-layout.test.ts`가 실패한다.
+
 동결하는 이유는 경로를 기계가 읽기 때문이다. 이름이 열려 있으면 구조 검사에서 분류되지 않은 경로가 조용히 빠질 수 있다. 집합 밖의 세그먼트가 나타나면 **검사 면제가 아니라 검사 대상으로 취급한다.**
 
 슬라이스가 있는 레이어의 세그먼트는 `eslint.config.js`가 판정한다. `app`과 `shared`의 관용 세그먼트는 목록이 닫혀 있지 않아 판정하지 않는다. 판정은 ESLint가 읽는 `.ts`·`.tsx` 파일 기준이라, 그 파일이 없는 세그먼트는 판정되지 않는다.

@@ -2,13 +2,11 @@ import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { afterEach, describe, expect, it } from "vitest";
-import {
-  forecastBerlin7d,
-  geocodingBerlin,
-  geocodingNoResults,
-  geocodingSingapore,
-  setupTestServer,
-} from "@/shared/test";
+import forecastBerlin7d from "../api/fixtures/forecast-berlin-7d.json";
+import geocodingBerlin from "../api/fixtures/geocoding-berlin.json";
+import geocodingNoResults from "../api/fixtures/geocoding-no-results.json";
+import geocodingSingapore from "../api/fixtures/geocoding-singapore.json";
+import { setupTestServer } from "@/shared/test";
 import { WeatherAppPage } from "../index";
 
 const server = setupTestServer();
