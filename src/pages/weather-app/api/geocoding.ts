@@ -23,6 +23,7 @@ export async function searchPlaces(
   if (!response.ok) {
     throw new Error(`Geocoding request failed: ${response.status}`);
   }
-  const body: { results?: Place[] } = await response.json();
+  // 응답 형태는 Open-Meteo 계약을 믿는다. 런타임 검증은 하지 않는다.
+  const body = (await response.json()) as { results?: Place[] };
   return body.results ?? [];
 }

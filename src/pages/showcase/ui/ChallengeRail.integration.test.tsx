@@ -42,6 +42,7 @@ const challenges: readonly Challenge[] = [
 ];
 
 // jsdom은 scrollIntoView를 구현하지 않는다. 카드 포커스 노출은 E2E에서 확인한다.
+// eslint-disable-next-line @typescript-eslint/unbound-method -- 호출하지 않고 afterAll에서 되돌리려고 보관만 한다.
 const originalScrollIntoView = Element.prototype.scrollIntoView;
 beforeAll(() => {
   Element.prototype.scrollIntoView = () => {};
@@ -127,6 +128,7 @@ describe("ChallengeRail 카드 목록", () => {
     renderList();
 
     expect(screen.getAllByRole("link").map((link) => link.textContent)).toEqual(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- 비대칭 매처는 타입상 any를 돌려준다.
       challenges.map((challenge) => expect.stringContaining(challenge.title)),
     );
   });

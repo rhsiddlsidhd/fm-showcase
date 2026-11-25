@@ -2,8 +2,11 @@ import js from "@eslint/js";
 import betterTailwindcss from "eslint-plugin-better-tailwindcss";
 import checkFile from "eslint-plugin-check-file";
 import jsxA11y from "eslint-plugin-jsx-a11y";
+import playwright from "eslint-plugin-playwright";
 import reactHooks from "eslint-plugin-react-hooks";
 import testingLibrary from "eslint-plugin-testing-library";
+import vitest from "@vitest/eslint-plugin";
+import { defineConfig } from "eslint/config";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
@@ -28,17 +31,35 @@ const assetConstantsImport = {
   message: "Verify asset paths as strings instead of importing ui/assets.",
 };
 
-export default tseslint.config(
-  { ignores: ["dist", "node_modules", "_workspace", "src/shared/ui"] },
+export default defineConfig(
+  {
+    ignores: [
+      "dist",
+      "dist-e2e",
+      "test-results",
+      "playwright-report",
+      "node_modules",
+      "_workspace",
+      "src/shared/ui",
+    ],
+  },
   {
     files: ["**/*.{ts,tsx}"],
     extends: [
       js.configs.recommended,
-      tseslint.configs.recommended,
+      // Type-aware rules catch unawaited promises (Playwright actions,
+      // user-event calls, fetch) and any leaking into typed code.
+      tseslint.configs.recommendedTypeChecked,
       reactHooks.configs.flat.recommended,
       jsxA11y.flatConfigs.recommended,
     ],
-    languageOptions: { globals: { ...globals.browser, ...globals.node } },
+    languageOptions: {
+      globals: { ...globals.browser, ...globals.node },
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
   },
   {
     // Production code checks values before use. Tests may assert with "!"
@@ -75,7 +96,18 @@ export default tseslint.config(
     files: ["src/{pages,widgets,features,entities}/**/*.tsx"],
     ignores: ["src/**/*.test.tsx"],
     plugins: { "better-tailwindcss": betterTailwindcss },
+    settings: {
+      "better-tailwindcss": { entryPoint: "src/app/styles/index.css" },
+    },
     rules: {
+      "better-tailwindcss/no-conflicting-classes": "error",
+      "better-tailwindcss/no-duplicate-classes": "error",
+      "better-tailwindcss/no-deprecated-classes": "error",
+      // theme-* scopes a slice's tokens and dark switches its color set; neither is a utility.
+      "better-tailwindcss/no-unknown-classes": [
+        "error",
+        { ignore: ["^theme-", "^dark$"] },
+      ],
       // Patterns match the whole class, so "(^|:)" also covers variants (md:, hover:).
       "better-tailwindcss/no-restricted-classes": [
         "error",
@@ -170,9 +202,32 @@ export default tseslint.config(
     },
   },
   {
+    // A test with no assertion, or a focused or skipped test, passes CI
+    // without checking anything (docs/testing/test-policy.md).
+    files: ["src/**/*.test.{ts,tsx}", "scripts/**/*.test.ts"],
+    plugins: { vitest },
+    rules: {
+      "vitest/no-focused-tests": "error",
+      "vitest/no-disabled-tests": "error",
+      "vitest/expect-expect": [
+        "error",
+        { assertFunctionNames: ["expect", "expect*"] },
+      ],
+    },
+  },
+  {
     files: ["e2e/**/*.ts"],
+    plugins: { playwright },
     rules: {
       "no-restricted-imports": ["error", { patterns: [assetConstantsImport] }],
+      "playwright/missing-playwright-await": "error",
+      "playwright/no-focused-test": "error",
+      "playwright/no-skipped-test": "error",
+      "playwright/expect-expect": [
+        "error",
+        { assertFunctionPatterns: ["^expect"] },
+      ],
+      "playwright/no-wait-for-timeout": "error",
     },
   },
   {

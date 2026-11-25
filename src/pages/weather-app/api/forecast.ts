@@ -42,5 +42,6 @@ export async function fetchForecast(
   if (!response.ok) {
     throw new Error(`Forecast request failed: ${response.status}`);
   }
-  return response.json();
+  // 응답 형태는 Open-Meteo 계약을 믿는다. 런타임 검증은 하지 않는다.
+  return (await response.json()) as Forecast;
 }

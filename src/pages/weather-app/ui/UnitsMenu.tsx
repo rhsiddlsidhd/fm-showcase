@@ -27,7 +27,11 @@ const UnitGroup = <K extends keyof Units>({
     <MenuLabel>{label}</MenuLabel>
     <DropdownMenuRadioGroup
       value={units[unit]}
-      onValueChange={(value) => onChange({ ...units, [unit]: value })}
+      onValueChange={(value) => {
+        // 라이브러리는 값을 any로 넘긴다. 이 그룹의 선택지 중 하나일 때만 반영한다.
+        const option = options.find(([optionValue]) => optionValue === value);
+        if (option) onChange({ ...units, [unit]: option[0] });
+      }}
     >
       {options.map(([optionValue, text]) => (
         <MenuRadioItem key={optionValue} value={optionValue} closeOnClick>
