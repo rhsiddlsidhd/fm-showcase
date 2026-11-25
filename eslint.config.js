@@ -2,6 +2,7 @@ import js from "@eslint/js";
 import betterTailwindcss from "eslint-plugin-better-tailwindcss";
 import checkFile from "eslint-plugin-check-file";
 import jsxA11y from "eslint-plugin-jsx-a11y";
+import playwright from "eslint-plugin-playwright";
 import reactHooks from "eslint-plugin-react-hooks";
 import testingLibrary from "eslint-plugin-testing-library";
 import vitest from "@vitest/eslint-plugin";
@@ -208,8 +209,17 @@ export default defineConfig(
   },
   {
     files: ["e2e/**/*.ts"],
+    plugins: { playwright },
     rules: {
       "no-restricted-imports": ["error", { patterns: [assetConstantsImport] }],
+      "playwright/missing-playwright-await": "error",
+      "playwright/no-focused-test": "error",
+      "playwright/no-skipped-test": "error",
+      "playwright/expect-expect": [
+        "error",
+        { assertFunctionPatterns: ["^expect"] },
+      ],
+      "playwright/no-wait-for-timeout": "error",
     },
   },
   {

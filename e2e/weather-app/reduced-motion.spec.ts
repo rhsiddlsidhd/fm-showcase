@@ -166,6 +166,7 @@ test.describe("움직임 줄이기", () => {
   }) => {
     const count = await showSearchSpinner(page);
     // 일반 모션의 한 바퀴(800ms)보다 길게 지켜본다.
+    // eslint-disable-next-line playwright/no-wait-for-timeout -- 움직이지 않음은 기다릴 상태가 없어 일정 시간 지켜본다.
     await page.waitForTimeout(1000);
     await expect(page.locator(searchSpinner)).toBeVisible();
 
@@ -177,6 +178,7 @@ test.describe("움직임 줄이기", () => {
   }) => {
     const count = await showCandidatePanel(page);
     // 일반 모션의 열림 시간(150ms)보다 길게 지켜본다.
+    // eslint-disable-next-line playwright/no-wait-for-timeout -- 움직이지 않음은 기다릴 상태가 없어 일정 시간 지켜본다.
     await page.waitForTimeout(400);
 
     expectTransformsUnchanged(await recordedSamples(page), count, 300);
@@ -187,6 +189,7 @@ test.describe("움직임 줄이기", () => {
   }) => {
     const count = await showLoadingDots(page);
     // 일반 모션의 한 주기(600ms)와 점 사이 지연(150ms × 2)보다 길게 지켜본다.
+    // eslint-disable-next-line playwright/no-wait-for-timeout -- 움직이지 않음은 기다릴 상태가 없어 일정 시간 지켜본다.
     await page.waitForTimeout(1000);
     await expect(page.locator(loadingDot)).toHaveCount(3);
 

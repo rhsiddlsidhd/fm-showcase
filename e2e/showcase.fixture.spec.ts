@@ -360,6 +360,7 @@ test.describe("움직임 줄이기 설정", () => {
     const top = async () => Math.round((await card.boundingBox())!.y);
     const before = await top();
     // 부유 주기(4.5초)의 절반 가까이 기다린 뒤에도 같은 자리에 있어야 한다.
+    // eslint-disable-next-line playwright/no-wait-for-timeout -- 움직이지 않음은 기다릴 상태가 없어 일정 시간 지켜본다.
     await page.waitForTimeout(2500);
     expect(await top()).toBe(before);
   });
