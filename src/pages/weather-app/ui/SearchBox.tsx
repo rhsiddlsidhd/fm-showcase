@@ -92,7 +92,7 @@ export const SearchBox = ({ retry, searching, onEvent, onSelect }: Props) => {
           className="pointer-events-none absolute top-1/2 left-6 -translate-y-1/2"
         />
         <input
-          className="bg-input hover:bg-accent focus-visible:ring-ring w-full rounded-xl py-4 pr-6 pl-15 text-base placeholder:text-(--subtle-text) focus-visible:ring-2"
+          className="w-full rounded-xl bg-input py-4 pr-6 pl-15 text-base placeholder:text-(--subtle-text) hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring"
           ref={inputRef}
           type="search"
           role="combobox"
@@ -113,7 +113,7 @@ export const SearchBox = ({ retry, searching, onEvent, onSelect }: Props) => {
             id={listId}
             role="listbox"
             aria-label="Search results"
-            className="border-border bg-popover text-popover-foreground absolute inset-x-0 top-full z-10 mt-2.5 flex flex-col gap-1 rounded-xl border p-2 shadow-lg"
+            className="absolute inset-x-0 top-full z-10 mt-2.5 flex flex-col gap-1 rounded-xl border border-border bg-popover p-2 text-popover-foreground shadow-lg"
             initial={
               reduceMotion
                 ? { opacity: 0 }
@@ -128,7 +128,7 @@ export const SearchBox = ({ retry, searching, onEvent, onSelect }: Props) => {
                 id={optionId(index)}
                 role="option"
                 aria-selected={index === active}
-                className="hover:bg-accent aria-selected:border-border aria-selected:bg-accent cursor-pointer rounded-lg px-2 py-2.5 aria-selected:border"
+                className="cursor-pointer rounded-lg px-2 py-2.5 hover:bg-accent aria-selected:border aria-selected:border-border aria-selected:bg-accent"
                 onMouseDown={(event) => {
                   event.preventDefault();
                   choose(place);
@@ -140,7 +140,7 @@ export const SearchBox = ({ retry, searching, onEvent, onSelect }: Props) => {
           </motion.ul>
         )}
         {searching && (
-          <p className="border-border bg-popover text-popover-foreground absolute inset-x-0 top-full z-10 mt-2.5 flex items-center gap-2.5 rounded-xl border px-4 py-3 shadow-lg">
+          <p className="absolute inset-x-0 top-full z-10 mt-2.5 flex items-center gap-2.5 rounded-xl border border-border bg-popover px-4 py-3 text-popover-foreground shadow-lg">
             <motion.img
               src={ICON_LOADING}
               alt=""
@@ -153,7 +153,7 @@ export const SearchBox = ({ retry, searching, onEvent, onSelect }: Props) => {
       </div>
       <BareButton
         type="submit"
-        className="bg-primary text-primary-foreground rounded-xl px-6 py-4 text-base hover:bg-(--primary-hover)"
+        className="rounded-xl bg-primary px-6 py-4 text-base text-primary-foreground hover:bg-(--primary-hover)"
       >
         Search
       </BareButton>

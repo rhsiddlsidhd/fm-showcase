@@ -21,7 +21,7 @@ const HourlyList = (props: ComponentProps<"ul">) => (
 
 const HourlyRow = ({ className = "", ...props }: ComponentProps<"li">) => (
   <li
-    className={`border-border bg-secondary rounded-lg border ${className}`}
+    className={`rounded-lg border border-border bg-secondary ${className}`}
     {...props}
   />
 );
@@ -80,7 +80,7 @@ export const HourlyForecast = ({
   forecast: Forecast | null;
   units: Units;
 }) => (
-  <section className="bg-card grid grid-cols-[1fr_auto] content-start items-center gap-4 rounded-3xl p-6">
+  <section className="grid grid-cols-[1fr_auto] content-start items-center gap-4 rounded-3xl bg-card p-6">
     <h2 className="text-xl font-semibold">Hourly forecast</h2>
     {forecast ? (
       <HourlyContent

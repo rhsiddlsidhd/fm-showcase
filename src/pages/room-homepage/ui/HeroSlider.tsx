@@ -34,7 +34,7 @@ const SlideButton = (
   props: Omit<ComponentProps<typeof BareButton>, "className" | "size" | "type">,
 ) => (
   <BareButton
-    className="bg-primary text-primary-foreground hover:bg-secondary size-14 focus-visible:ring-3 focus-visible:ring-(--hero-focus-ring) md:size-20"
+    className="size-14 bg-primary text-primary-foreground hover:bg-secondary focus-visible:ring-3 focus-visible:ring-(--hero-focus-ring) md:size-20"
     size="icon"
     type="button"
     {...props}
@@ -64,7 +64,7 @@ export const HeroSlider = ({
       aria-label="Featured furniture"
       className="relative grid md:min-h-[535px] md:grid-cols-[7fr_5fr]"
     >
-      <div className="text-primary-foreground relative min-h-[360px] md:min-h-0">
+      <div className="relative min-h-[360px] text-primary-foreground md:min-h-0">
         <picture className="absolute inset-0">
           <source media="(max-width: 767px)" srcSet={slide.image.mobile} />
           <img
@@ -79,10 +79,10 @@ export const HeroSlider = ({
         <h1 className="font-heading text-4xl font-bold tracking-[-0.035em] md:text-5xl">
           {slide.title}
         </h1>
-        <p className="text-muted-foreground text-base leading-[1.38] font-medium">
+        <p className="text-base leading-[1.38] font-medium text-muted-foreground">
           {slide.description}
         </p>
-        <p className="hover:text-muted-foreground flex cursor-pointer items-center gap-6 text-base font-semibold tracking-[0.65em] uppercase">
+        <p className="flex cursor-pointer items-center gap-6 text-base font-semibold tracking-[0.65em] uppercase hover:text-muted-foreground">
           <span>Shop now</span>
           <img alt="" aria-hidden="true" className="w-10" src={SHOP_ARROW} />
         </p>

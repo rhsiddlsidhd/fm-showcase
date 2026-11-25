@@ -12,7 +12,7 @@ export const MenuPanel = ({
   ...props
 }: ComponentProps<typeof DropdownMenuContent>) => (
   <DropdownMenuContent
-    className={`theme-weather-app dark bg-popover w-56 p-2 font-sans text-base ${className}`}
+    className={`theme-weather-app dark w-56 bg-popover p-2 font-sans text-base ${className}`}
     {...props}
   />
 );
@@ -22,7 +22,7 @@ export const MenuItem = ({
   ...props
 }: ComponentProps<typeof DropdownMenuItem>) => (
   <DropdownMenuItem
-    className={`focus:ring-ring px-2 py-2.5 text-base focus:ring-2 ${className}`}
+    className={`px-2 py-2.5 text-base focus:ring-2 focus:ring-ring ${className}`}
     {...props}
   />
 );
@@ -32,7 +32,7 @@ export const MenuRadioItem = ({
   ...props
 }: ComponentProps<typeof DropdownMenuRadioItem>) => (
   <DropdownMenuRadioItem
-    className={`focus:ring-ring data-checked:bg-accent px-2 py-2.5 text-base focus:ring-2 ${className}`}
+    className={`px-2 py-2.5 text-base focus:ring-2 focus:ring-ring data-checked:bg-accent ${className}`}
     {...props}
   />
 );
@@ -42,7 +42,7 @@ export const MenuLabel = ({
   ...props
 }: ComponentProps<typeof DropdownMenuLabel>) => (
   <DropdownMenuLabel
-    className={`text-muted-foreground px-2 pt-1.5 text-sm ${className}`}
+    className={`px-2 pt-1.5 text-sm text-muted-foreground ${className}`}
     {...props}
   />
 );
