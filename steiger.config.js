@@ -4,21 +4,9 @@ import { defineConfig } from "steiger";
 export default defineConfig([
   ...fsd.configs.recommended,
   {
+    // A slice index names what it exposes (docs/architecture/segments.md#public-api).
     rules: {
-      "fsd/import-locality": "error",
       "fsd/no-wildcard-exports": "error",
-    },
-  },
-  {
-    files: ["./src/shared/ui/**"],
-    rules: {
-      "fsd/import-locality": "off",
-    },
-  },
-  {
-    files: ["./src/shared/test/**"],
-    rules: {
-      "fsd/public-api": "off",
     },
   },
 ]);

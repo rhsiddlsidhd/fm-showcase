@@ -16,7 +16,7 @@ const fixtureRegistryPath = fileURLToPath(
 );
 
 // E2E 전용 빌드(mode e2e)에서만 운영 등록 목록을 가상 데이터로 바꾼다.
-// 페이지는 같은 슬라이스 안이라 상대 경로로 가져오므로(fsd/import-locality),
+// 페이지는 같은 슬라이스 안이라 상대 경로로 가져오므로,
 // import 문자열이 아니라 해석된 파일 경로로 맞춘다.
 const swapShowcaseRegistry = (): Plugin => ({
   name: "e2e-showcase-registry",
