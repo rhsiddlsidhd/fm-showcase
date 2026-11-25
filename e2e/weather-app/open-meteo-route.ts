@@ -2,7 +2,7 @@ import type { Page } from "@playwright/test";
 
 // 외부 API(Open-Meteo)는 통제할 수 없어 경로 가로채기로 fixture를 돌려준다.
 // fixture는 jsdom 테스트와 같은 파일을 쓴다.
-const fixtureDir = "src/shared/test/fixtures/weather-app";
+const fixtureDir = "src/pages/weather-app/api/fixtures";
 
 const corsHeaders = { "access-control-allow-origin": "*" };
 
