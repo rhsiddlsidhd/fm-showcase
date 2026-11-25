@@ -17,6 +17,12 @@ const sliceThemeImport = {
   regex: "(^|/)theme\\.css$",
   message: "Import the slice theme.css only from the slice index.tsx.",
 };
+// Steiger allows same-layer cross-imports through an @x public API. Here the
+// pages slices are challenges, so that path would let challenges share code.
+const crossImportPublicApi = {
+  regex: "(^|/)@x(/|$)",
+  message: "Slices on one layer do not import each other, even through @x.",
+};
 const assetConstantsImport = {
   regex: "(^|/)assets$",
   message: "Verify asset paths as strings instead of importing ui/assets.",
@@ -37,7 +43,10 @@ export default tseslint.config(
   {
     files: ["src/**/*.{ts,tsx}"],
     rules: {
-      "no-restricted-imports": ["error", { patterns: [sharedModuleImport] }],
+      "no-restricted-imports": [
+        "error",
+        { patterns: [sharedModuleImport, crossImportPublicApi] },
+      ],
     },
   },
   {
@@ -45,7 +54,13 @@ export default tseslint.config(
     rules: {
       "no-restricted-imports": [
         "error",
-        { patterns: [sharedModuleImport, sliceThemeImport] },
+        {
+          patterns: [
+            sharedModuleImport,
+            sliceThemeImport,
+            crossImportPublicApi,
+          ],
+        },
       ],
     },
   },
@@ -133,6 +148,7 @@ export default tseslint.config(
           patterns: [
             sharedModuleImport,
             sliceThemeImport,
+            crossImportPublicApi,
             assetConstantsImport,
           ],
         },
