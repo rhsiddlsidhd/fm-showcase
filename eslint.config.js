@@ -54,6 +54,21 @@ export default defineConfig(
     languageOptions: { globals: { ...globals.browser, ...globals.node } },
   },
   {
+    // Playwright actions, user-event calls and fetch return promises. A
+    // missing await lets the next line run early or drops a rejection.
+    files: ["**/*.{ts,tsx}"],
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+    rules: {
+      "@typescript-eslint/no-floating-promises": "error",
+      "@typescript-eslint/no-misused-promises": "error",
+    },
+  },
+  {
     // Production code checks values before use. Tests may assert with "!"
     // because a missing value makes the test fail at that line.
     files: ["**/*.{ts,tsx}"],
