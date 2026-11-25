@@ -126,3 +126,20 @@ describe("시간별 예보 오늘의 시작 시점", () => {
     expect(labels).toEqual(["10 PM", "11 PM"]);
   });
 });
+
+describe("시간별 예보 값 누락", () => {
+  it("기온이나 날씨 코드가 빠진 시각은 건너뛴다", () => {
+    const forecast = forecastAt("2026-11-11T06:00");
+    // 전체 72시간 중 2026-11-12 22시(인덱스 70)는 날씨 코드가, 23시(인덱스 71)는 기온이 빠진 응답
+    forecast.hourly.weather_code = forecast.hourly.weather_code.slice(0, 70);
+    forecast.hourly.temperature_2m = forecast.hourly.temperature_2m.slice(
+      0,
+      71,
+    );
+
+    const labels = labelsOf(forecast, "2026-11-12");
+
+    expect(labels).toHaveLength(22);
+    expect(labels.at(-1)).toBe("9 PM");
+  });
+});
