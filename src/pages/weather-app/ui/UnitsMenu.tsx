@@ -50,7 +50,7 @@ export const UnitsMenu = ({
     <DropdownMenu>
       <DropdownMenuTrigger
         render={
-          <GhostButton className="bg-card flex gap-2.5 rounded-lg px-4 py-3" />
+          <GhostButton className="flex gap-2.5 rounded-lg bg-card px-4 py-3" />
         }
       >
         <img src={ICON_UNITS} alt="" />

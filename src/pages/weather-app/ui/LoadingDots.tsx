@@ -10,7 +10,7 @@ export const LoadingDots = () => {
         <motion.span
           key={dot}
           data-testid="loading-dot"
-          className="bg-foreground size-2.5 rounded-full"
+          className="size-2.5 rounded-full bg-foreground"
           animate={{ y: [0, LOADING_DOT.liftY, 0] }}
           transition={{
             ...LOADING_DOT.transition,

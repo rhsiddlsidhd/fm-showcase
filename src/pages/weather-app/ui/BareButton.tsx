@@ -8,7 +8,7 @@ export const BareButton = ({
   ...props
 }: ComponentProps<typeof Button>) => (
   <Button
-    className={`${className} focus-visible:ring-ring h-auto border-0 bg-clip-border leading-[inherit] font-normal whitespace-normal select-text focus-visible:ring-2 focus-visible:[outline-style:auto] active:not-aria-[haspopup]:translate-y-0`}
+    className={`${className} h-auto border-0 bg-clip-border leading-[inherit] font-normal whitespace-normal select-text focus-visible:ring-2 focus-visible:ring-ring focus-visible:[outline-style:auto] active:not-aria-[haspopup]:translate-y-0`}
     {...props}
   />
 );
@@ -18,7 +18,7 @@ export const GhostButton = ({
   ...props
 }: ComponentProps<typeof Button>) => (
   <BareButton
-    className={`hover:bg-accent justify-start text-[length:inherit] text-inherit ${className}`}
+    className={`justify-start text-[length:inherit] text-inherit hover:bg-accent ${className}`}
     {...props}
   />
 );

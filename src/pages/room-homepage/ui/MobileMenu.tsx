@@ -97,7 +97,7 @@ export const MobileMenu = ({
           id="room-homepage-menu"
           role="dialog"
         >
-          <div className="bg-background text-foreground flex h-[110px] items-center justify-between px-6">
+          <div className="flex h-[110px] items-center justify-between bg-background px-6 text-foreground">
             <MenuIconButton
               aria-label="메뉴 닫기"
               className="text-foreground focus-visible:ring-ring"

@@ -25,7 +25,7 @@ export const ErrorScreen = ({ onRetry }: { onRetry: () => void }) => {
         ref={retryRef}
         type="button"
         onClick={onRetry}
-        className="bg-card flex gap-2.5 rounded-lg px-4 py-3"
+        className="flex gap-2.5 rounded-lg bg-card px-4 py-3"
       >
         <img src={ICON_RETRY} alt="" />
         Retry

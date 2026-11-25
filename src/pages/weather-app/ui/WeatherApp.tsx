@@ -36,14 +36,14 @@ export const WeatherApp = () => {
 
   return (
     <MotionConfig reducedMotion="user">
-      <main className="theme-weather-app dark bg-background text-foreground min-h-dvh font-sans text-base">
+      <main className="theme-weather-app dark min-h-dvh bg-background font-sans text-base text-foreground">
         <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-4 lg:gap-12 lg:px-8 lg:py-12">
           <header className="flex items-center justify-between">
             <img src={LOGO} alt="Weather Now" className="h-7 lg:h-10" />
             <UnitsMenu units={units} onChange={setUnits} />
           </header>
           {!error && (
-            <h1 className="font-heading text-center text-5xl/tight font-bold lg:text-6xl">
+            <h1 className="text-center font-heading text-5xl/tight font-bold lg:text-6xl">
               How&apos;s the sky looking today?
             </h1>
           )}

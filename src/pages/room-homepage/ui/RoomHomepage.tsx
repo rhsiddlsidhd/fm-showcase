@@ -11,7 +11,7 @@ export const RoomHomepage = () => {
   const previousButtonRef = useRef<HTMLButtonElement>(null);
 
   return (
-    <div className="theme-room-homepage bg-background text-foreground min-h-dvh font-sans text-base">
+    <div className="theme-room-homepage min-h-dvh bg-background font-sans text-base text-foreground">
       <MobileMenu desktopReturnFocusRef={previousButtonRef}>
         <HeroSlider previousButtonRef={previousButtonRef}>
           <img
@@ -38,7 +38,7 @@ export const RoomHomepage = () => {
             <h2 className="text-base font-bold tracking-[0.35em] uppercase">
               About our furniture
             </h2>
-            <p className="text-muted-foreground text-base leading-[1.38] font-medium">
+            <p className="text-base leading-[1.38] font-medium text-muted-foreground">
               {aboutDescription}
             </p>
           </div>
