@@ -30,7 +30,17 @@ const assetConstantsImport = {
 };
 
 export default defineConfig(
-  { ignores: ["dist", "node_modules", "_workspace", "src/shared/ui"] },
+  {
+    ignores: [
+      "dist",
+      "dist-e2e",
+      "test-results",
+      "playwright-report",
+      "node_modules",
+      "_workspace",
+      "src/shared/ui",
+    ],
+  },
   {
     files: ["**/*.{ts,tsx}"],
     extends: [
