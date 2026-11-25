@@ -93,9 +93,9 @@ describe("reportClosedIssue", () => {
     await report();
 
     expect(sent).toHaveLength(1);
-    expect(sent[0].content).toContain("**작업 완료 기록**");
-    expect(sent[0].content).toContain("[#44]");
-    expect(sent[0].content).toContain("[#60]");
+    expect(sent[0]!.content).toContain("**작업 완료 기록**");
+    expect(sent[0]!.content).toContain("[#44]");
+    expect(sent[0]!.content).toContain("[#60]");
   });
 
   it("PR 없이 닫힌 Issue도 보낸다", async () => {
@@ -104,7 +104,7 @@ describe("reportClosedIssue", () => {
     await report();
 
     expect(sent).toHaveLength(1);
-    expect(sent[0].content).not.toContain("**PR**");
+    expect(sent[0]!.content).not.toContain("**PR**");
   });
 
   it("완료가 아닌 사유로 닫히면 보내지 않는다", async () => {
@@ -120,7 +120,7 @@ describe("reportClosedIssue", () => {
 
     await report();
 
-    expect(sent[0].allowed_mentions).toEqual({ parse: [] });
+    expect(sent[0]!.allowed_mentions).toEqual({ parse: [] });
   });
 
   it("저장되지 않은 메시지도 실패로 알도록 전송 결과를 기다린다", async () => {

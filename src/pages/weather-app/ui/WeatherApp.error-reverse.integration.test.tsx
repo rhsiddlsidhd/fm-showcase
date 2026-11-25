@@ -110,7 +110,9 @@ const OUTSIDE_STATUS = { ignore: '[role="status"]' };
 const findErrorTitle = () => screen.findByText(ERROR_TITLE, OUTSIDE_STATUS);
 
 // 대역이 응답을 돌려준 뒤 앱이 응답을 처리할 시간을 준다.
-const settle = async (served: Promise<void>) => {
+// 응답 기록이 없으면 기다릴 것이 없어 조용히 넘어가므로, 기록이 있는지부터 확인한다.
+const settle = async (served: Promise<void> | undefined) => {
+  expect(served, "대역이 응답한 기록이 있다").toBeDefined();
   await served;
   await act(() => new Promise((resolve) => setTimeout(resolve, 50)));
 };
@@ -157,8 +159,8 @@ describe("날씨를 불러오는 중 검색 실패", () => {
       geocodingRequests.map((url) => url.searchParams.get("name")),
     ).toEqual(["Berlin", "Berlin"]);
     expect(forecastRequests).toHaveLength(2);
-    expect(forecastRequests[1].searchParams.get("latitude")).toBe("52.52437");
-    expect(forecastRequests[1].searchParams.get("longitude")).toBe("13.41053");
+    expect(forecastRequests[1]!.searchParams.get("latitude")).toBe("52.52437");
+    expect(forecastRequests[1]!.searchParams.get("longitude")).toBe("13.41053");
   });
 
   it("그 상태에서 Retry 때 날씨 요청이 다시 실패하면 오류 화면이 다시 나온다", async () => {

@@ -132,7 +132,7 @@ describe("지역 검색 요청", () => {
     await searchAndWaitForCandidates(user, "Berlin");
 
     expect(geocodingRequests).toHaveLength(1);
-    const params = geocodingRequests[0].searchParams;
+    const params = geocodingRequests[0]!.searchParams;
     expect(params.get("name")).toBe("Berlin");
     expect(params.get("count")).toBe("5");
     expect(params.get("language")).toBe("en");
@@ -148,7 +148,7 @@ describe("지역 검색 요청", () => {
     await screen.findByRole("listbox");
 
     expect(geocodingRequests).toHaveLength(1);
-    expect(geocodingRequests[0].searchParams.get("name")).toBe("Berlin");
+    expect(geocodingRequests[0]!.searchParams.get("name")).toBe("Berlin");
   });
 });
 
@@ -296,10 +296,10 @@ describe("후보 목록 키보드 조작", () => {
 
     await user.keyboard("{ArrowDown}{ArrowDown}");
 
-    expect(options[1].id).not.toBe("");
+    expect(options[1]!.id).not.toBe("");
     expect(getSearchInput()).toHaveAttribute(
       "aria-activedescendant",
-      options[1].id,
+      options[1]!.id,
     );
   });
 
@@ -311,10 +311,10 @@ describe("후보 목록 키보드 조작", () => {
 
     await user.keyboard("{ArrowDown}{ArrowDown}{ArrowUp}");
 
-    expect(options[0].id).not.toBe("");
+    expect(options[0]!.id).not.toBe("");
     expect(getSearchInput()).toHaveAttribute(
       "aria-activedescendant",
-      options[0].id,
+      options[0]!.id,
     );
   });
 
@@ -331,8 +331,10 @@ describe("후보 목록 키보드 조작", () => {
     ).toBeInTheDocument();
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
     expect(forecastRequests).toHaveLength(2);
-    expect(forecastRequests[1].searchParams.get("latitude")).toBe("44.46867");
-    expect(forecastRequests[1].searchParams.get("longitude")).toBe("-71.18508");
+    expect(forecastRequests[1]!.searchParams.get("latitude")).toBe("44.46867");
+    expect(forecastRequests[1]!.searchParams.get("longitude")).toBe(
+      "-71.18508",
+    );
   });
 
   it("Esc를 누르면 목록만 닫히고 날씨 영역과 검색창 포커스는 그대로다", async () => {
@@ -375,8 +377,8 @@ describe("후보 선택", () => {
       screen.queryByText("Loading...", OUTSIDE_STATUS),
     ).not.toBeInTheDocument();
     expect(forecastRequests).toHaveLength(2);
-    expect(forecastRequests[1].searchParams.get("latitude")).toBe("52.52437");
-    expect(forecastRequests[1].searchParams.get("longitude")).toBe("13.41053");
+    expect(forecastRequests[1]!.searchParams.get("latitude")).toBe("52.52437");
+    expect(forecastRequests[1]!.searchParams.get("longitude")).toBe("13.41053");
   });
 
   it("후보 Berlin, New Hampshire, United States를 고르면 카드에 Berlin, United States를 보여준다", async () => {

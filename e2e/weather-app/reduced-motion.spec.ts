@@ -65,6 +65,7 @@ function expectTransformsUnchanged(
   ).toBeGreaterThan(1);
   const [first] = samples;
   const last = samples[samples.length - 1];
+  if (!first || !last) throw new Error("기록이 없다");
   expect(
     last.time - first.time,
     `기록이 ${durationMs}ms 넘게 이어졌다`,
@@ -82,10 +83,8 @@ function expectTransformsUnchanged(
 
 // 대상이 보인 동안 요소마다 변형 값이 처음 기록과 달라진 적이 있다.
 function transformsChanged(samples: Sample[], expectedCount: number) {
-  if (samples.length === 0 || samples[0].transforms.length !== expectedCount) {
-    return false;
-  }
   const [first] = samples;
+  if (!first || first.transforms.length !== expectedCount) return false;
   return first.transforms.every((initial, index) =>
     samples.some((sample) => sample.transforms[index] !== initial),
   );

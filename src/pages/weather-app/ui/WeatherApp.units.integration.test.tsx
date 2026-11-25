@@ -81,7 +81,7 @@ const findGroup = (parts: string[], { withImage = false } = {}) => {
         (group) => !withImage || within(group).queryAllByRole("img").length > 0,
       );
     expect(groups.length).toBeGreaterThan(0);
-    return groups[groups.length - 1];
+    return groups[groups.length - 1]!;
   });
 };
 
@@ -442,13 +442,13 @@ describe("Units 드롭다운 구조", () => {
     );
     groups.slice(1).forEach((group, index) => {
       expect(
-        groups[index].compareDocumentPosition(group) &
+        groups[index]!.compareDocumentPosition(group) &
           Node.DOCUMENT_POSITION_FOLLOWING,
       ).toBeTruthy();
     });
     GROUPS.forEach(([, items], index) => {
       expect(
-        within(groups[index])
+        within(groups[index]!)
           .getAllByRole("menuitemradio")
           .map((item) => item.textContent),
       ).toEqual(items);

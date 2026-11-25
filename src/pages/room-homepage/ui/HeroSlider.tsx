@@ -28,7 +28,7 @@ const slides = [
       "Our modern furniture store provide a high level of quality. Our company has invested in advanced technology to ensure that every product is made as perfect and as consistent as possible. With three decades of experience in this industry, we understand what customers want for their home and office.",
     image: HERO_IMAGE_3,
   },
-];
+] as const;
 
 const SlideButton = (
   props: Omit<ComponentProps<typeof BareButton>, "className" | "size" | "type">,
@@ -50,7 +50,8 @@ export const HeroSlider = ({
 }) => {
   const [movedTo, setMovedTo] = useState<number | null>(null);
   const slideIndex = movedTo ?? 0;
-  const slide = slides[slideIndex];
+  // slideIndex는 나머지 연산으로 범위 안에 있어 ?? 뒤에는 닿지 않는다.
+  const slide = slides[slideIndex] ?? slides[0];
   const announcement =
     movedTo === null
       ? ""

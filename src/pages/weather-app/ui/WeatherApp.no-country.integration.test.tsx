@@ -35,7 +35,7 @@ const selectNowhere = async () => {
   const options = within(listbox).getAllByRole("option");
   expect(options).toHaveLength(1);
 
-  await user.click(options[0]);
+  await user.click(options[0]!);
   await waitFor(() =>
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument(),
   );

@@ -4,7 +4,10 @@ import { RouterProvider } from "react-router";
 import { router } from "./routes";
 import "./styles/index.css";
 
-createRoot(document.getElementById("root")!).render(
+const root = document.getElementById("root");
+if (!root) throw new Error("index.html에 #root가 없다");
+
+createRoot(root).render(
   <StrictMode>
     <RouterProvider router={router} />
   </StrictMode>,

@@ -117,7 +117,7 @@ describe("날씨 앱 최초 진입", () => {
 
     expect(geocodingRequests).toHaveLength(0);
     expect(forecastRequests).toHaveLength(1);
-    const params = forecastRequests[0].searchParams;
+    const params = forecastRequests[0]!.searchParams;
     expect(params.get("latitude")).toBe("52.52437");
     expect(params.get("longitude")).toBe("13.41053");
     expect(params.get("current")).toBe(
@@ -180,7 +180,7 @@ describe("현재 날씨 카드", () => {
     await waitForBerlinWeather();
 
     const card = getCurrentCard("Wednesday, Nov 11, 2026", "2°");
-    const icon = within(card).getByRole("img", { name: "Overcast" });
+    const icon = within(card!).getByRole("img", { name: "Overcast" });
 
     expect(icon).toHaveAttribute(
       "src",
@@ -231,7 +231,7 @@ describe("Daily forecast", () => {
       const cell = getDailyCell(abbreviation, max, min);
 
       expect(
-        within(cell).getByRole("img", { name: iconName }),
+        within(cell!).getByRole("img", { name: iconName }),
       ).toBeInTheDocument();
     },
   );
@@ -283,7 +283,7 @@ describe("Hourly forecast", () => {
     for (const [hour, temperature, iconName] of expected) {
       const row = getHourlyRow(hourLabel(hour), temperature);
       expect(
-        within(row).getByRole("img", { name: iconName }),
+        within(row!).getByRole("img", { name: iconName }),
       ).toBeInTheDocument();
     }
   });
@@ -311,7 +311,9 @@ describe("Hourly forecast", () => {
 
     const row = getHourlyRow("10 AM", "3°");
 
-    expect(within(row).getByRole("img", { name: "Clear" })).toBeInTheDocument();
+    expect(
+      within(row!).getByRole("img", { name: "Clear" }),
+    ).toBeInTheDocument();
   });
 });
 

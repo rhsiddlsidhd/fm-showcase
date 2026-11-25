@@ -16,9 +16,10 @@ export function readRing(element: Element): Ring {
     if (color === "transparent") return true;
     const inner = color.slice(color.indexOf("(") + 1, color.lastIndexOf(")"));
     const slash = inner.split("/");
-    if (slash.length === 2) return parseFloat(slash[1]) === 0;
+    // 길이를 먼저 확인하므로 ?? ""에는 닿지 않는다.
+    if (slash.length === 2) return parseFloat(slash[1] ?? "") === 0;
     const parts = inner.split(",");
-    return parts.length === 4 && parseFloat(parts[3]) === 0;
+    return parts.length === 4 && parseFloat(parts[3] ?? "") === 0;
   };
 
   const splitTopLevel = (value: string) => {
