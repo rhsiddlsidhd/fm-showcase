@@ -6,7 +6,7 @@ import { afterAll, afterEach, beforeAll } from "vitest";
 // msw는 요청을 쓰기 전에 읽기부터 시작한 연결을 onUnhandledFrame을 거치지 않고 실제 네트워크로 넘긴다.
 // Undici는 요청이 중단된 뒤 keep-alive 풀에 요청 없는 연결을 하나 더 열기도 해서, 그 연결이 실제 서버로 나간다.
 // 대역이 켜져 있는 동안 실제 이름 조회를 실패시켜, 넘어간 연결이 외부에 닿기 전에 끊기게 한다.
-const dns: { lookup: unknown } = nodeDns;
+const dns = nodeDns as { lookup: unknown };
 
 const failLookup = (hostname: string, ...args: unknown[]) => {
   const callback = args[args.length - 1] as (error: Error) => void;

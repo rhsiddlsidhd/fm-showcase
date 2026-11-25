@@ -41,7 +41,7 @@ async function measureRail(page: Page) {
     const box = scroller.getBoundingClientRect();
     const viewLeft = box.left + scroller.clientLeft;
     const viewRight = viewLeft + scroller.clientWidth;
-    const rects = cards.map((card) => card!.getBoundingClientRect());
+    const rects = cards.map((card) => card.getBoundingClientRect());
     return {
       fullyVisible: rects
         .map((rect, index) => ({ rect, index }))
@@ -123,7 +123,7 @@ async function measureGrid(page: Page) {
     titles.map((title) => cardLink(page, title).elementHandle()),
   );
   return page.evaluate((cards) => {
-    const rects = cards.map((card) => card!.getBoundingClientRect());
+    const rects = cards.map((card) => card.getBoundingClientRect());
     const firstTop = Math.round(rects[0]!.top);
     const hasHorizontalScroller = (element: Element) => {
       let node: Element | null = element.parentElement;
@@ -147,7 +147,7 @@ async function measureGrid(page: Page) {
       horizontalOverflow:
         document.documentElement.scrollWidth >
           document.documentElement.clientWidth ||
-        cards.some((card) => hasHorizontalScroller(card!)),
+        cards.some((card) => hasHorizontalScroller(card)),
     };
   }, handles);
 }
