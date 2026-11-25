@@ -55,7 +55,7 @@ async function requestLabels(
       authorization: `Bearer ${token}`,
       "content-type": "application/json",
     },
-    body: body === undefined ? undefined : JSON.stringify(body),
+    body: body === undefined ? null : JSON.stringify(body),
   });
   if (!response.ok) {
     throw new Error(`라벨 변경 실패: HTTP ${response.status}`);

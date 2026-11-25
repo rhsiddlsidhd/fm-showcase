@@ -9,7 +9,7 @@ import { BareButton } from "./BareButton";
 import { PANEL_ENTER, SEARCH_SPIN } from "./motion";
 
 type Props = {
-  retry?: { query: string | null };
+  retry?: { query: string | null } | undefined;
   searching: boolean;
   onEvent: (event: SearchEvent) => void;
   onSelect: (place: Place) => void;
