@@ -2,11 +2,14 @@ import babel from "@rolldown/plugin-babel";
 import tailwindcss from "@tailwindcss/vite";
 import react, { reactCompilerPreset } from "@vitejs/plugin-react";
 import { fileURLToPath } from "node:url";
-import type { Plugin } from "vite";
+import { normalizePath, type Plugin } from "vite";
 import { configDefaults, defineConfig } from "vitest/config";
 
-const registryPath = fileURLToPath(
-  new URL("./src/pages/showcase/model/challenges.ts", import.meta.url),
+// Vite가 해석한 id는 슬래시 경로라, Windows의 역슬래시 경로와 맞추려고 정규화한다.
+const registryPath = normalizePath(
+  fileURLToPath(
+    new URL("./src/pages/showcase/model/challenges.ts", import.meta.url),
+  ),
 );
 const fixtureRegistryPath = fileURLToPath(
   new URL("./e2e/fixtures/showcase-registry.ts", import.meta.url),
