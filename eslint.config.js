@@ -4,6 +4,7 @@ import checkFile from "eslint-plugin-check-file";
 import jsxA11y from "eslint-plugin-jsx-a11y";
 import reactHooks from "eslint-plugin-react-hooks";
 import testingLibrary from "eslint-plugin-testing-library";
+import { defineConfig } from "eslint/config";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
@@ -28,7 +29,7 @@ const assetConstantsImport = {
   message: "Verify asset paths as strings instead of importing ui/assets.",
 };
 
-export default tseslint.config(
+export default defineConfig(
   { ignores: ["dist", "node_modules", "_workspace", "src/shared/ui"] },
   {
     files: ["**/*.{ts,tsx}"],
