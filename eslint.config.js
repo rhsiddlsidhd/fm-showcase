@@ -86,7 +86,18 @@ export default defineConfig(
     files: ["src/{pages,widgets,features,entities}/**/*.tsx"],
     ignores: ["src/**/*.test.tsx"],
     plugins: { "better-tailwindcss": betterTailwindcss },
+    settings: {
+      "better-tailwindcss": { entryPoint: "src/app/styles/index.css" },
+    },
     rules: {
+      "better-tailwindcss/no-conflicting-classes": "error",
+      "better-tailwindcss/no-duplicate-classes": "error",
+      "better-tailwindcss/no-deprecated-classes": "error",
+      // theme-* scopes a slice's tokens and dark switches its color set; neither is a utility.
+      "better-tailwindcss/no-unknown-classes": [
+        "error",
+        { ignore: ["^theme-", "^dark$"] },
+      ],
       // Patterns match the whole class, so "(^|:)" also covers variants (md:, hover:).
       "better-tailwindcss/no-restricted-classes": [
         "error",
