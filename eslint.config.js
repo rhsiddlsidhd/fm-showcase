@@ -47,25 +47,18 @@ export default defineConfig(
     files: ["**/*.{ts,tsx}"],
     extends: [
       js.configs.recommended,
-      tseslint.configs.recommended,
+      // Type-aware rules catch unawaited promises (Playwright actions,
+      // user-event calls, fetch) and any leaking into typed code.
+      tseslint.configs.recommendedTypeChecked,
       reactHooks.configs.flat.recommended,
       jsxA11y.flatConfigs.recommended,
     ],
-    languageOptions: { globals: { ...globals.browser, ...globals.node } },
-  },
-  {
-    // Playwright actions, user-event calls and fetch return promises. A
-    // missing await lets the next line run early or drops a rejection.
-    files: ["**/*.{ts,tsx}"],
     languageOptions: {
+      globals: { ...globals.browser, ...globals.node },
       parserOptions: {
         projectService: true,
         tsconfigRootDir: import.meta.dirname,
       },
-    },
-    rules: {
-      "@typescript-eslint/no-floating-promises": "error",
-      "@typescript-eslint/no-misused-promises": "error",
     },
   },
   {
