@@ -1,4 +1,5 @@
 import type { Forecast } from "../api/forecast";
+import { dailyRows } from "../model/daily";
 import { formatTemperature, formatWeekdayShort } from "../model/format";
 import { toTemperature, type Units } from "../model/units";
 import { Cell } from "./Cell";
@@ -18,27 +19,20 @@ export const DailyForecast = ({
     <h2 className="text-xl font-semibold">Daily forecast</h2>
     <ul className="grid grid-cols-3 gap-4 lg:grid-cols-7">
       {daily
-        ? daily.time.map((date, i) => (
+        ? dailyRows(daily).map(({ date, code, max, min }) => (
             <Cell
               key={date}
               className="flex flex-col items-center gap-4 px-2.5 py-4"
             >
               <span className="text-base">{formatWeekdayShort(date)}</span>
-              <WeatherIconImage
-                code={daily.weather_code[i]}
-                className="size-15"
-              />
+              <WeatherIconImage code={code} className="size-15" />
               <div className="flex w-full justify-between">
                 <UnitValue
-                  value={formatTemperature(
-                    toTemperature(daily.temperature_2m_max[i], units),
-                  )}
+                  value={formatTemperature(toTemperature(max, units))}
                 />
                 <UnitValue
                   className="text-(--subtle-text)"
-                  value={formatTemperature(
-                    toTemperature(daily.temperature_2m_min[i], units),
-                  )}
+                  value={formatTemperature(toTemperature(min, units))}
                 />
               </div>
             </Cell>
