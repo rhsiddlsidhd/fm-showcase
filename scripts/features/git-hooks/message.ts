@@ -24,7 +24,8 @@ function trailers(text: string): string[] {
     .trim()
     .split(/\n\s*\n/);
   if (paragraphs.length < 2) return [];
-  const last = paragraphs[paragraphs.length - 1].split("\n");
+  // 위에서 문단이 둘 이상임을 확인했으므로 ?? []에는 닿지 않는다.
+  const last = paragraphs.at(-1)?.split("\n") ?? [];
   return last.every((line) => TRAILER_LINE.test(line)) ? last : [];
 }
 
@@ -59,7 +60,8 @@ export function validateCommitMessage(text: string): string | null {
   if (!match?.groups) {
     return `제목은 "{prefix}: {message}" 또는 "{prefix}({scope}): {message}" 형식이어야 한다(prefix: ${PREFIXES.join(", ")}): ${subject}`;
   }
-  const { scope, message } = match.groups;
+  // message 그룹은 선택이 아니라 매치되면 항상 값이 있다. 빈 메시지는 ""다.
+  const { scope, message = "" } = match.groups;
   if (scope !== undefined && !KEBAB_ONLY.test(scope))
     return `scope 는 소문자 kebab-case 여야 한다: (${scope})`;
   if (message === "") return "콜론 뒤에 메시지가 있어야 한다";

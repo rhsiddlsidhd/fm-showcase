@@ -122,7 +122,9 @@ const selectCandidate = async (user: User, name: string) => {
 };
 
 // 대역이 응답을 돌려준 뒤 앱이 응답을 처리할 시간을 준다.
-const settle = async (served: Promise<void>) => {
+// 응답 기록이 없으면 기다릴 것이 없어 조용히 넘어가므로, 기록이 있는지부터 확인한다.
+const settle = async (served: Promise<void> | undefined) => {
+  expect(served, "대역이 응답한 기록이 있다").toBeDefined();
   await served;
   await act(() => new Promise((resolve) => setTimeout(resolve, 50)));
 };

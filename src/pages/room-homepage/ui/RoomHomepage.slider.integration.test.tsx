@@ -63,6 +63,7 @@ afterEach(() => {
 
 const expectSlide = (index: number) => {
   const slide = slides[index];
+  if (!slide) throw new Error(`슬라이드 ${index}가 없다`);
 
   expect(
     screen.getByRole("heading", { level: 1, name: slide.title }),
@@ -156,7 +157,7 @@ describe("Room 홈페이지 슬라이드 탐색", () => {
       await user.click(screen.getByRole("button", { name: "다음 슬라이드" }));
 
       expect(screen.getByRole("status")).toBe(status);
-      expect(status).toHaveTextContent(slides[index].title);
+      expect(status).toHaveTextContent(slides[index]!.title);
       expect(status).toHaveTextContent(new RegExp(`\\b${index + 1}\\b`));
       expect(status).toHaveTextContent(/\b3\b/);
     }
@@ -164,7 +165,7 @@ describe("Room 홈페이지 슬라이드 탐색", () => {
     await user.click(screen.getByRole("button", { name: "이전 슬라이드" }));
 
     expect(screen.getByRole("status")).toBe(status);
-    expect(status).toHaveTextContent(slides[2].title);
+    expect(status).toHaveTextContent(slides[2]!.title);
     expect(status).toHaveTextContent(/\b3\b/);
   });
 });

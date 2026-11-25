@@ -64,9 +64,9 @@ describe("reportDailyClose", () => {
     await report();
 
     expect(sent).toHaveLength(1);
-    expect(sent[0].content).toContain("하루마감 · 2026-11-05 KST");
-    expect(sent[0].content).toContain("🔄 진행 중");
-    expect(sent[0].content).toContain("Issue 브랜치 없음");
+    expect(sent[0]!.content).toContain("하루마감 · 2026-11-05 KST");
+    expect(sent[0]!.content).toContain("🔄 진행 중");
+    expect(sent[0]!.content).toContain("Issue 브랜치 없음");
   });
 
   it("날짜를 받으면 그 날짜의 마감을 보낸다", async () => {
@@ -74,7 +74,7 @@ describe("reportDailyClose", () => {
 
     await report("2026-11-03");
 
-    expect(sent[0].content).toContain("하루마감 · 2026-11-03 KST");
+    expect(sent[0]!.content).toContain("하루마감 · 2026-11-03 KST");
   });
 
   it("날짜가 잘못되면 보내지 않고 실패한다", async () => {

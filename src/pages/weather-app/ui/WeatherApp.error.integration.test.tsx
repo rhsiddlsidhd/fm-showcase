@@ -156,7 +156,9 @@ const search = (user: User, query: string) =>
   user.type(getSearchInput(), `${query}{Enter}`);
 
 // 대역이 응답을 돌려준 뒤 앱이 응답을 처리할 시간을 준다.
-const settle = async (served: Promise<void>) => {
+// 응답 기록이 없으면 기다릴 것이 없어 조용히 넘어가므로, 기록이 있는지부터 확인한다.
+const settle = async (served: Promise<void> | undefined) => {
+  expect(served, "대역이 응답한 기록이 있다").toBeDefined();
   await served;
   await act(() => new Promise((resolve) => setTimeout(resolve, 50)));
 };
@@ -380,8 +382,8 @@ describe("최초 진입 실패", () => {
     expect(await screen.findByText("Berlin, Germany")).toBeInTheDocument();
     expect(queryErrorTitle()).not.toBeInTheDocument();
     expect(forecastRequests).toHaveLength(2);
-    expect(forecastRequests[1].searchParams.get("latitude")).toBe("52.52437");
-    expect(forecastRequests[1].searchParams.get("longitude")).toBe("13.41053");
+    expect(forecastRequests[1]!.searchParams.get("latitude")).toBe("52.52437");
+    expect(forecastRequests[1]!.searchParams.get("longitude")).toBe("13.41053");
   });
 });
 
@@ -450,8 +452,8 @@ describe("오류 중 진행 중이던 다른 요청", () => {
       geocodingRequests.map((url) => url.searchParams.get("name")),
     ).toEqual(["Berlin", "Berlin"]);
     expect(forecastRequests).toHaveLength(2);
-    expect(forecastRequests[1].searchParams.get("latitude")).toBe("52.52437");
-    expect(forecastRequests[1].searchParams.get("longitude")).toBe("13.41053");
+    expect(forecastRequests[1]!.searchParams.get("latitude")).toBe("52.52437");
+    expect(forecastRequests[1]!.searchParams.get("longitude")).toBe("13.41053");
   });
 });
 

@@ -33,7 +33,8 @@ const HourlyContent = ({
   forecast: Forecast;
   units: Units;
 }) => {
-  const [date, setDate] = useState(forecast.daily.time[0]);
+  // 처음에는 오늘을 보여준다. 오늘은 dayHourlyRows와 같은 기준(현재 시각의 날짜)으로 정한다.
+  const [date, setDate] = useState(forecast.current.time.slice(0, 10));
 
   return (
     <>

@@ -34,6 +34,10 @@ switch (hook) {
     for (const line of readFileSync(0, "utf8").split("\n")) {
       if (line.trim() === "") continue;
       const [localRef, localSha, remoteRef, remoteSha] = line.split(" ");
+      if (!localRef || !localSha || !remoteRef || !remoteSha) {
+        errors.push(`입력 형식이 아니다: ${line}`);
+        continue;
+      }
       const reason = validatePushRef(localRef, localSha, remoteRef, remoteSha);
       if (reason) errors.push(`${remoteRef}: ${reason}`);
     }

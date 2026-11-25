@@ -6,11 +6,11 @@ function formatUtc(
   isoDate: string,
   options: Intl.DateTimeFormatOptions,
 ): string {
-  const [year, month, day] = isoDate.slice(0, 10).split("-").map(Number);
+  // YYYY-MM-DD만 있는 문자열은 UTC 자정으로 해석된다.
   return new Intl.DateTimeFormat("en-US", {
     ...options,
     timeZone: "UTC",
-  }).format(new Date(Date.UTC(year, month - 1, day)));
+  }).format(new Date(isoDate.slice(0, 10)));
 }
 
 export function formatWeekdayShort(isoDate: string): string {

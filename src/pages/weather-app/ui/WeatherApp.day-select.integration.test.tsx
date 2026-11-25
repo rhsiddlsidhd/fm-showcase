@@ -170,7 +170,7 @@ describe("다른 요일 선택", () => {
     for (const [hour, temperature, iconName] of expected) {
       const row = getHourlyRow(hourLabel(hour), temperature);
       expect(
-        within(row).getByRole("img", { name: iconName }),
+        within(row!).getByRole("img", { name: iconName }),
       ).toBeInTheDocument();
     }
   });

@@ -81,6 +81,9 @@ export async function reportClosedIssue({
   webhookUrl,
 }: ReportInput) {
   const [owner, name] = repository.split("/");
+  if (!owner || !name) {
+    throw new Error(`저장소 이름 형식이 아니다: ${repository}`);
+  }
   const { repository: found } = await queryGitHub<ClosedIssueData>(
     githubToken,
     CLOSED_ISSUE_QUERY,

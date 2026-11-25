@@ -109,6 +109,9 @@ test.describe("화면 폭 1023px", () => {
     const [feelsLike, humidity, wind, precipitation] = await Promise.all(
       metricLabels.map((label) => box(text(page, label))),
     );
+    if (!feelsLike || !humidity || !wind || !precipitation) {
+      throw new Error("지표 4개를 모두 찾지 못했다");
+    }
     expect(
       sameRow(feelsLike, humidity),
       "Feels Like와 Humidity가 같은 행이다",
@@ -125,16 +128,18 @@ test.describe("화면 폭 1023px", () => {
     const cells = await Promise.all(
       dailyAbbreviations.map((day) => box(text(page, day))),
     );
-    expect(sameRow(cells[0], cells[1]), "Daily 1·2번째 칸이 같은 행이다").toBe(
-      true,
-    );
-    expect(sameRow(cells[0], cells[2]), "Daily 1·3번째 칸이 같은 행이다").toBe(
-      true,
-    );
     expect(
-      cells[3].y,
+      sameRow(cells[0]!, cells[1]!),
+      "Daily 1·2번째 칸이 같은 행이다",
+    ).toBe(true);
+    expect(
+      sameRow(cells[0]!, cells[2]!),
+      "Daily 1·3번째 칸이 같은 행이다",
+    ).toBe(true);
+    expect(
+      cells[3]!.y,
       "Daily 4번째 칸이 첫 행 아래에 있다",
-    ).toBeGreaterThanOrEqual(bottom(cells[0]));
+    ).toBeGreaterThanOrEqual(bottom(cells[0]!));
   });
 });
 
@@ -158,7 +163,7 @@ test.describe("화면 폭 1024px", () => {
     );
     otherMetrics.forEach((other, index) => {
       expect(
-        sameRow(firstMetric, other),
+        sameRow(firstMetric!, other),
         `지표 ${metricLabels[index + 1]}이(가) Feels Like와 같은 행이다`,
       ).toBe(true);
     });
@@ -168,7 +173,7 @@ test.describe("화면 폭 1024px", () => {
     );
     otherDays.forEach((other, index) => {
       expect(
-        sameRow(firstDay, other),
+        sameRow(firstDay!, other),
         `Daily ${dailyAbbreviations[index + 1]} 칸이 첫 칸과 같은 행이다`,
       ).toBe(true);
     });

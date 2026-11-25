@@ -4,7 +4,7 @@ const titles = [
   "Discover innovative ways to decorate",
   "We are available all across the globe",
   "Manufactured with the best materials",
-];
+] as const;
 const widths = [320, 375, 767, 768, 1440];
 const hero = (page: Page) => page.locator('img[src*="-image-hero-"]');
 const darkPhoto = (page: Page) =>
@@ -89,6 +89,18 @@ for (const width of widths) {
       ).toBeLessThanOrEqual(width);
     }
     const [image, title, body, action, dark, about, aboutBody, light] = bounds;
+    if (
+      !image ||
+      !title ||
+      !body ||
+      !action ||
+      !dark ||
+      !about ||
+      !aboutBody ||
+      !light
+    ) {
+      throw new Error("배치를 잴 요소 8개를 모두 찾지 못했다");
+    }
     expect(body.y, "제목과 본문이 겹치지 않는다").toBeGreaterThanOrEqual(
       bottom(title),
     );
@@ -277,7 +289,7 @@ test("투명도 줄이기 설정에서는 열린 메뉴 아래 가림막이 불�
       drawing.fillStyle = getComputedStyle(surface).backgroundColor;
       drawing.fillRect(0, 0, 1, 1);
       return (
-        (drawing.getImageData(0, 0, 1, 1).data[3] / 255) *
+        (drawing.getImageData(0, 0, 1, 1).data[3]! / 255) *
         Number(getComputedStyle(surface).opacity)
       );
     });

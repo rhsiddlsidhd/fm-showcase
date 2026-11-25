@@ -66,9 +66,11 @@ export const SearchBox = ({ retry, searching, onEvent, onSelect }: Props) => {
       setActive((index) => Math.max(index - 1, 0));
     } else if (event.key === "Escape") {
       close();
-    } else if (event.key === "Enter" && active >= 0) {
+    } else if (event.key === "Enter") {
+      const candidate = candidates[active];
+      if (candidate === undefined) return;
       event.preventDefault();
-      choose(candidates[active]);
+      choose(candidate);
     }
   };
 
