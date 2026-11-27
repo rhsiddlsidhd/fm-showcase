@@ -45,7 +45,7 @@ FSD가 정의한 레이어는 **7개**다. 공식 문서 원문:
 
 ## 설정과 문서
 
-[ADR 0003](../../adr/0003-criteria-config-and-verification-code-first.md)의 결정과 [`docs/README.md`](../README.md#용어)의 구분을 따른다.
+[ADR 0006](../../adr/0006-criteria-config-and-verification-code-at-exits.md)의 결정과 [`docs/README.md`](../README.md#용어)의 구분을 따른다.
 
 설정으로 판정되는 규칙은 `steiger.config.js`와 `eslint.config.js`가 정한다. 여기에 다시 쓰지 않는다. 아래는 설정으로 판정되지 않고 문서에만 있는 기준이다. 리뷰가 확인한다.
 
