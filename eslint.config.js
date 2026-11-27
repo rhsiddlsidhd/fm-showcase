@@ -30,6 +30,238 @@ const assetConstantsImport = {
   regex: "(^|/)assets$",
   message: "Verify asset paths as strings instead of importing ui/assets.",
 };
+// Styles enter a slice only through ui/theme.css and @fontsource, both
+// imported by the slice index. Any other CSS bypasses theme.css. Packages
+// that export CSS under a path without .css (swiper/css) match only when the
+// path has a css segment.
+const cssSpecifier = "(\\.(css|scss|sass|less|styl|pcss)(\\?.*)?|/css(/.*)?)$";
+const sliceIndexCssImport = {
+  regex: `^(?!@fontsource(-variable)?/)(?!\\./ui/theme\\.css$).*${cssSpecifier}`,
+  message: "A slice imports only ./ui/theme.css and @fontsource CSS.",
+};
+const segmentCssImport = {
+  regex: `^@fontsource|^(?!.*(^|/)theme\\.css$).*${cssSpecifier}`,
+  message: "Style with utilities; the slice index imports theme.css and fonts.",
+};
+
+// Colors work with dark mode and contrast checks only as theme.css tokens.
+// CSS named colors, without transparent and currentcolor, which follow tokens.
+const cssColorNames = [
+  "aliceblue",
+  "antiquewhite",
+  "aqua",
+  "aquamarine",
+  "azure",
+  "beige",
+  "bisque",
+  "black",
+  "blanchedalmond",
+  "blue",
+  "blueviolet",
+  "brown",
+  "burlywood",
+  "cadetblue",
+  "chartreuse",
+  "chocolate",
+  "coral",
+  "cornflowerblue",
+  "cornsilk",
+  "crimson",
+  "cyan",
+  "darkblue",
+  "darkcyan",
+  "darkgoldenrod",
+  "darkgray",
+  "darkgreen",
+  "darkgrey",
+  "darkkhaki",
+  "darkmagenta",
+  "darkolivegreen",
+  "darkorange",
+  "darkorchid",
+  "darkred",
+  "darksalmon",
+  "darkseagreen",
+  "darkslateblue",
+  "darkslategray",
+  "darkslategrey",
+  "darkturquoise",
+  "darkviolet",
+  "deeppink",
+  "deepskyblue",
+  "dimgray",
+  "dimgrey",
+  "dodgerblue",
+  "firebrick",
+  "floralwhite",
+  "forestgreen",
+  "fuchsia",
+  "gainsboro",
+  "ghostwhite",
+  "gold",
+  "goldenrod",
+  "gray",
+  "green",
+  "greenyellow",
+  "grey",
+  "honeydew",
+  "hotpink",
+  "indianred",
+  "indigo",
+  "ivory",
+  "khaki",
+  "lavender",
+  "lavenderblush",
+  "lawngreen",
+  "lemonchiffon",
+  "lightblue",
+  "lightcoral",
+  "lightcyan",
+  "lightgoldenrodyellow",
+  "lightgray",
+  "lightgreen",
+  "lightgrey",
+  "lightpink",
+  "lightsalmon",
+  "lightseagreen",
+  "lightskyblue",
+  "lightslategray",
+  "lightslategrey",
+  "lightsteelblue",
+  "lightyellow",
+  "lime",
+  "limegreen",
+  "linen",
+  "magenta",
+  "maroon",
+  "mediumaquamarine",
+  "mediumblue",
+  "mediumorchid",
+  "mediumpurple",
+  "mediumseagreen",
+  "mediumslateblue",
+  "mediumspringgreen",
+  "mediumturquoise",
+  "mediumvioletred",
+  "midnightblue",
+  "mintcream",
+  "mistyrose",
+  "moccasin",
+  "navajowhite",
+  "navy",
+  "oldlace",
+  "olive",
+  "olivedrab",
+  "orange",
+  "orangered",
+  "orchid",
+  "palegoldenrod",
+  "palegreen",
+  "paleturquoise",
+  "palevioletred",
+  "papayawhip",
+  "peachpuff",
+  "peru",
+  "pink",
+  "plum",
+  "powderblue",
+  "purple",
+  "rebeccapurple",
+  "red",
+  "rosybrown",
+  "royalblue",
+  "saddlebrown",
+  "salmon",
+  "sandybrown",
+  "seagreen",
+  "seashell",
+  "sienna",
+  "silver",
+  "skyblue",
+  "slateblue",
+  "slategray",
+  "slategrey",
+  "snow",
+  "springgreen",
+  "steelblue",
+  "tan",
+  "teal",
+  "thistle",
+  "tomato",
+  "turquoise",
+  "violet",
+  "wheat",
+  "white",
+  "whitesmoke",
+  "yellow",
+  "yellowgreen",
+].join("|");
+const colorFunction =
+  "\\b(rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\\((?!\\s*var\\()";
+// A color literal inside an arbitrary value or property. A url fragment
+// (url(/a.svg#add)) and a function over a token (rgb(var(--c))) are not.
+const arbitraryColor = `(^|:)!?([a-z-]+-)?\\[[^\\]]*((?<![a-zA-Z0-9/.])#[0-9a-fA-F]{3,8}\\b|${colorFunction}|(?<=[\\[:_,(])(${cssColorNames})(?=[\\]_,)]))`;
+const paletteColor =
+  "(^|:)!?([a-z-]+-(slate|gray|zinc|neutral|stone|mauve|olive|mist|taupe|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(50|[1-9]00|950)|(bg|text|border(-[xytrblse])?|ring|ring-offset|outline|fill|stroke|from|via|to|shadow|inset-shadow|drop-shadow|text-shadow|decoration|divide|accent|caret|placeholder)-(white|black))(/.+)?!?$";
+// A hex or color function in any string, wherever a value is kept (motion
+// constants included). Named colors are words in ordinary text, so only DOM
+// color attributes check them.
+const stringColor = `(^|[\\s,(])#[0-9a-fA-F]{3,8}\\b|${colorFunction}`;
+const cssImportSource = `/${cssSpecifier.replaceAll("/", "\\/")}/`;
+
+// Element styles go through utilities, so values enter through theme.css.
+// The style attribute, <style> elements, writes to element.style and dynamic
+// CSS imports skip both. A write through a variable (const s = el.style) and
+// a color in a template literal are not traced.
+const styleOutsideUtilities = [
+  {
+    selector: "JSXAttribute[name.name='style']",
+    message: "Style with utilities, not the style attribute.",
+  },
+  {
+    selector: "JSXOpeningElement[name.name='style']",
+    message: "Style with utilities, not a <style> element.",
+  },
+  {
+    selector:
+      "CallExpression[callee.property.name='setAttribute'][arguments.0.value='style']",
+    message: "Style with utilities, not a style attribute.",
+  },
+  {
+    selector:
+      "CallExpression[callee.object.name='Object'][callee.property.name='assign'][arguments.0.property.name='style']",
+    message: "Style with utilities, not element.style.",
+  },
+  {
+    selector: `ImportExpression > Literal[value=${cssImportSource}]`,
+    message: "A slice imports only ./ui/theme.css and @fontsource CSS.",
+  },
+  {
+    selector:
+      "AssignmentExpression > MemberExpression.left[property.name='style']",
+    message: "Style with utilities, not element.style.",
+  },
+  {
+    selector:
+      "AssignmentExpression > MemberExpression.left > MemberExpression.object[property.name='style']",
+    message: "Style with utilities, not element.style.",
+  },
+  {
+    selector:
+      "CallExpression > MemberExpression.callee[property.name='setProperty'] > MemberExpression.object[property.name='style']",
+    message: "Style with utilities, not element.style.setProperty.",
+  },
+  {
+    // DOM elements only: a component's color prop (color="primary") is not CSS.
+    selector: `JSXOpeningElement[name.name=/^[a-z]/] > JSXAttribute[name.name=/^(fill|stroke|color|stopColor|floodColor|lightingColor)$/] Literal[value=/^(${cssColorNames})$/i]`,
+    message: "Put colors in theme.css and read them as tokens.",
+  },
+  {
+    // Class strings are checked by better-tailwindcss.
+    selector: `Literal:not(JSXAttribute[name.name='className'] > Literal)[value=/${stringColor}/i]`,
+    message: "Put colors in theme.css and read them as tokens.",
+  },
+];
 
 export default defineConfig(
   {
@@ -78,7 +310,7 @@ export default defineConfig(
     },
   },
   {
-    files: ["src/pages/*/*/**/*.{ts,tsx}"],
+    files: ["src/{pages,widgets,features,entities}/*/*/**/*.{ts,tsx}"],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -86,11 +318,32 @@ export default defineConfig(
           patterns: [
             sharedModuleImport,
             sliceThemeImport,
+            segmentCssImport,
             crossImportPublicApi,
           ],
         },
       ],
     },
+  },
+  {
+    files: ["src/{pages,widgets,features,entities}/*/index.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            sharedModuleImport,
+            sliceIndexCssImport,
+            crossImportPublicApi,
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/{pages,widgets,features,entities}/**/*.{ts,tsx}"],
+    ignores: ["src/**/*.test.{ts,tsx}"],
+    rules: { "no-restricted-syntax": ["error", ...styleOutsideUtilities] },
   },
   {
     files: ["src/{pages,widgets,features,entities}/**/*.tsx"],
@@ -123,6 +376,14 @@ export default defineConfig(
               pattern: "(^|:)dark:",
               message:
                 "Change colors by redefining tokens in theme.css, not with dark:.",
+            },
+            {
+              pattern: arbitraryColor,
+              message: "Put colors in theme.css and read them as tokens.",
+            },
+            {
+              pattern: paletteColor,
+              message: "Put colors in theme.css and read them as tokens.",
             },
             {
               pattern:
@@ -223,6 +484,7 @@ export default defineConfig(
             "ExportNamedDeclaration > FunctionDeclaration[id.name!=/Page$/]",
           message: "Export the page as a named <Slice>Page component.",
         },
+        ...styleOutsideUtilities,
       ],
     },
   },
