@@ -206,7 +206,12 @@ const paletteColor =
 // A hex or color function in any string, wherever a value is kept (motion
 // constants included). Named colors are words in ordinary text, so only DOM
 // color attributes check them.
-const stringColor = `(^|[\\s,(])#[0-9a-fA-F]{3,8}\\b|${colorFunction}`;
+// Hex only in valid lengths and not as an id ("#add-item") or url(#id); a
+// color function only with a numeric argument, so "color(s)" in text passes.
+const stringColor =
+  "(^|[\\s,]|(?<!url)\\()#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})(?![\\w-])|\\b(rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\\((?!\\s*var\\()[^)]*\\d";
+const classStringCall =
+  "CallExpression[callee.name=/^(cn|clsx|cva|cx|tv|twMerge|twJoin)$/]";
 const cssImportSource = `/${cssSpecifier.replaceAll("/", "\\/")}/`;
 
 // Element styles go through utilities, so values enter through theme.css.
@@ -220,6 +225,11 @@ const styleOutsideUtilities = [
   },
   {
     selector: "JSXOpeningElement[name.name='style']",
+    message: "Style with utilities, not a <style> element.",
+  },
+  {
+    selector:
+      "CallExpression[callee.property.name='createElement'][arguments.0.value='style']",
     message: "Style with utilities, not a <style> element.",
   },
   {
@@ -258,7 +268,7 @@ const styleOutsideUtilities = [
   },
   {
     // Class strings are checked by better-tailwindcss.
-    selector: `Literal:not(JSXAttribute[name.name='className'] > Literal)[value=/${stringColor}/i]`,
+    selector: `Literal:not(JSXAttribute[name.name='className'] Literal):not(${classStringCall} Literal)[value=/${stringColor}/i]`,
     message: "Put colors in theme.css and read them as tokens.",
   },
 ];
