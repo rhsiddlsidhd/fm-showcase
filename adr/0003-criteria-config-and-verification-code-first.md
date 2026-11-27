@@ -2,7 +2,7 @@
 
 ## Status
 
-채택
+대체됨 (0006)
 
 ## Context
 
