@@ -8,7 +8,11 @@
 
 도메인의 값은 전역 스타일에 쓰지 않는다. 그 공통 토큰을 재정의하지 않은 모든 도메인이 바뀐다. `/`도 다른 도메인과 같은 방식을 쓴다. 전역 스타일의 수정은 판정하지 않는다. 모든 도메인에 필요한 계약 변경과 한 도메인의 값이 같은 파일, 같은 문법이라 구별되지 않기 때문이다(예: weather-app 작업에서 스크롤바를 전역으로 숨긴 `58ee726`). 리뷰가 그 변경이 모든 도메인에 필요한지 확인한다.
 
-요소에 스타일을 입히는 통로는 컴포넌트의 유틸리티 하나다(움직임 값은 [애니메이션 규칙](animation.md)). 통로를 고르는 기준은 값을 토큰으로 표현할 수 있는지가 아니라 그 속성을 유틸리티로 적용할 수 있는지다. 요소에 입히는 속성과 상태는 arbitrary value(`bg-size-[…]`), arbitrary property(`[mask-type:luminance]`), arbitrary variant(`[&:is(:hover,:focus-visible)]:`)로 모두 유틸리티로 적용할 수 있어, 유틸리티로 적용할 수 없는 경우를 따로 두지 않는다. `@keyframes`, `@font-face` 같은 at-rule은 요소 스타일이 아니라 이 기준 밖이다. 통로가 하나 더 있으면 값이 `theme.css`를 거치지 않고 들어올 경로도 하나 더 생긴다. 통로 밖의 스타일(`style` 속성, `<style>` 요소, `element.style`, `theme.css`와 `@fontsource` 말고 가져온 CSS)은 `eslint.config.js`가 판정한다. 변수를 거쳐 `element.style`에 쓰는 경우(`const s = el.style`)와 템플릿 리터럴로 조립한 색은 구문으로 추적되지 않아 판정하지 않는다.
+요소에 스타일을 입히는 통로는 컴포넌트의 유틸리티 하나다(움직임 값은 [애니메이션 규칙](animation.md)). 통로를 고르는 기준은 값을 토큰으로 표현할 수 있는지가 아니라 그 속성을 유틸리티로 적용할 수 있는지다. 요소에 입히는 속성과 상태는 arbitrary value(`bg-size-[…]`), arbitrary property(`[mask-type:luminance]`), arbitrary variant(`[&:is(:hover,:focus-visible)]:`)로 모두 유틸리티로 적용할 수 있어, 유틸리티로 적용할 수 없는 경우를 따로 두지 않는다. `@keyframes`, `@font-face` 같은 at-rule은 요소 스타일이 아니라 이 기준 밖이다. 통로가 하나 더 있으면 값이 `theme.css`를 거치지 않고 들어올 경로도 하나 더 생긴다. 유틸리티 밖에서 스타일을 쓰는 경로는 `eslint.config.js`가 판정한다. 다음은 판정하지 않는다.
+
+- 변수를 거친 쓰기(`const s = el.style`)와 템플릿 리터럴로 조립한 색이나 import 경로. 구문으로 값이 추적되지 않는다.
+- `innerHTML`, `dangerouslySetInnerHTML`로 넣는 스타일. 스타일이 아닌 마크업을 넣는 용도와 구별되지 않는다.
+- `className`이 아닌 prop(`containerClassName`)으로 넘긴 클래스 문자열의 색. 클래스 검사는 `className`과 클래스 조합 함수(`cn` 등)만 읽는다.
 
 ### theme.css 작성
 
@@ -34,7 +38,7 @@
 도메인 기준에서 값을 정한 뒤(챌린지는 원본에서 뽑는다) 다음과 같이 둔다.
 
 1. **같은 역할의 공통 토큰이 있으면** `theme.css`에서 그 토큰을 재정의한다. `--spacing`처럼 카테고리 절이 재정의를 막은 토큰은 예외다.
-2. **없으면** 색이거나 반복되는 값만 `theme.css`에 페이지 변수로 새로 정의한다. 색은 한 번만 나와도 둔다. 다크 모드와 명암비 검사가 `theme.css`의 색을 기준으로 하기 때문이다. 슬라이스 코드에 쓴 색(클래스, DOM 요소의 색 속성, 문자열 안의 hex·색 함수)은 `eslint.config.js`가 판정한다. `transparent`, `current`, `inherit`는 토큰을 따라 바뀌므로 색 값으로 보지 않는다. `red` 같은 이름 있는 색은 일반 문장에도 나오는 단어라 클래스와 DOM 색 속성에서만 판정한다.
+2. **없으면** 색이거나 반복되는 값만 `theme.css`에 페이지 변수로 새로 정의한다. 색은 한 번만 나와도 둔다. 다크 모드와 명암비 검사가 `theme.css`의 색을 기준으로 하기 때문이다. 슬라이스 코드에 쓴 색은 `eslint.config.js`가 판정한다. `transparent`, `current`, `inherit`는 토큰을 따라 바뀌므로 색 값으로 보지 않는다. `red` 같은 이름 있는 색은 일반 문장에도 나오는 단어라 클래스와 DOM 색 속성에서만 판정한다. 반대로 hex 형태인 문자열(`"#bad"`, `"Rank #1234"`)은 id나 문구여도 색과 구별되지 않아 걸린다.
 3. **그 밖의 일회성 값**은 컴포넌트가 맡는다. Tailwind 기본 단위에 맞으면 기본 유틸리티(`gap-3`, `grid-cols-7`), 아니면 arbitrary value(`top-[117px]`)로 쓴다.
 
 둘 이상의 도메인이 같은 역할의 페이지 변수를 두면 공통 토큰으로 올린다.
