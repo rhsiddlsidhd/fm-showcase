@@ -16,7 +16,7 @@
 | 페이지 컴포넌트 | [`architecture/layers.md`](architecture/layers.md#pages) |
 | 동작 컴포넌트 | [`architecture/layers.md`](architecture/layers.md#pages) |
 | 시스템 경계 | [`architecture/boundary.md`](architecture/boundary.md) |
-| 디자인 토큰, 공통 토큰, 페이지 변수 | [`ui/theme.md`](ui/theme.md) |
+| 디자인 토큰, 공통 토큰, 페이지 변수, 공통 요소 기본값 | [`ui/theme.md`](ui/theme.md) |
 | 종류 라벨, 상태 라벨 | [`git/issue.md`](git/issue.md#템플릿과-라벨) |
 | Issue 브랜치, 작업 브랜치 | [`git/branch.md`](git/branch.md) |
 
