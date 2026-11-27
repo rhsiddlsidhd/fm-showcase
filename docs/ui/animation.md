@@ -1,8 +1,8 @@
 # 애니메이션 규칙
 
-- 우리가 만드는 애니메이션은 `motion` 라이브러리로만 구현한다. CSS `transition`, `@keyframes`, `tw-animate-css`를 직접 쓰지 않는다. 방식이 섞이면 애니메이션 동작 줄이기 설정을 방식마다 따로 확인해야 한다. 슬라이스 컴포넌트의 전환·애니메이션 유틸리티는 `eslint.config.js`가, 슬라이스 CSS는 `stylelint.config.js`가 판정한다. 인라인 `style`의 `transition`·`animation`은 판정되지 않는다.
+- 우리가 만드는 애니메이션은 `motion` 라이브러리로만 구현한다. CSS `transition`, `@keyframes`, `tw-animate-css`를 직접 쓰지 않는다. 방식이 섞이면 애니메이션 동작 줄이기 설정을 방식마다 따로 확인해야 한다. 슬라이스 컴포넌트의 전환·애니메이션 유틸리티는 `eslint.config.js`가, 슬라이스 CSS는 `stylelint.config.js`가 판정한다.
 - shadcn/ui 부품 안에 들어 있는 효과는 건드리지 않는다. `src/shared/ui/`의 산출물을 고치지 않는다는 [컴포넌트 규칙](component.md)과 같은 이유다.
-- 움직임의 거리, 시간, 이징은 디자인 토큰이 아니다. `motion`은 이 값을 CSS 변수가 아닌 JS 값으로 받는다. 슬라이스 `ui/`의 상수로 두고, 컴포넌트에 숫자를 직접 쓰지 않는다.
+- 움직임의 거리, 시간, 이징은 디자인 토큰이 아니다. `motion`은 이 값을 CSS 변수가 아닌 JS 값으로 받는다. 슬라이스 `ui/`의 상수로 두고, 컴포넌트에 숫자를 직접 쓰지 않는다. 색을 움직이면 값으로 토큰(`var(--card-highlight)`)을 쓴다. 색은 다크 모드와 명암비 검사가 `theme.css`를 기준으로 하기 때문이다.
 
 ## 성능
 
