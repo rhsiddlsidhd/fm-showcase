@@ -10,7 +10,6 @@ import {
   CARD_FLOAT_Y,
   CARD_SHEEN_POSITIONS,
 } from "./card-motion";
-import cardSurface from "./card-surface.module.css";
 
 interface ChallengeCardProps {
   challenge: Challenge;
@@ -37,7 +36,7 @@ export const ChallengeCard = ({ challenge }: ChallengeCardProps) => {
       to={challengePath(challenge.slug)}
       aria-labelledby={titleId}
       // 카드 높이가 포커스 표시 여유를 포함해 화면 높이를 넘지 않도록 폭을 제한한다.
-      className={`${cardSurface.surface} mx-auto flex aspect-(--card-aspect-ratio) w-full max-w-[calc((100dvh-2*(var(--focus-offset)+var(--focus-width)))/var(--card-height-ratio))] scroll-my-(--rail-inset) flex-col gap-(--card-content-gap) overflow-hidden rounded-(--card-radius) p-(--card-padding) text-card-foreground outline-offset-(--focus-offset) outline-ring focus-visible:outline-(length:--focus-width)`}
+      className={`mx-auto flex aspect-(--card-aspect-ratio) w-full max-w-[calc((100dvh-2*(var(--focus-offset)+var(--focus-width)))/var(--card-height-ratio))] scroll-my-(--rail-inset) flex-col gap-(--card-content-gap) overflow-hidden rounded-(--card-radius) border border-(--card-border-color) bg-(--card-surface) bg-(image:--card-texture) bg-size-(--card-texture-size) p-(--card-padding) text-card-foreground shadow-(--card-shadow) outline-offset-(--focus-offset) outline-ring backdrop-filter-(--card-backdrop-filter) focus-visible:outline-(length:--focus-width) [&:is(:hover,:focus-visible)]:bg-(--card-highlight-surface)`}
       animate={
         shouldReduceMotion
           ? { y: 0, backgroundPosition: CARD_SHEEN_POSITIONS[0] }

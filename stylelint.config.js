@@ -50,19 +50,5 @@ export default {
         ],
       },
     },
-    {
-      files: ["src/{pages,widgets,features,entities}/**/*.module.css"],
-      rules: {
-        "at-rule-disallowed-list": [
-          [...sliceAnimationAtRules, "reference", "apply"],
-          {
-            message: (atRule) =>
-              atRule.endsWith("keyframes")
-                ? keyframesMessage
-                : `CSS Modules read tokens with var(); remove ${atRule}.`,
-          },
-        ],
-      },
-    },
   ],
 };
