@@ -46,6 +46,11 @@
     var(--card-sheen-soft) 25%,
     transparent 55%
   );
+  /* 광택 위에 잡음 질감을 겹친다. 두 카드 컴포넌트가 함께 쓴다. */
+  --card-texture:
+    var(--card-sheen),
+    url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxNjAnIGhlaWdodD0nMTYwJz4KPGZpbHRlciBpZD0nbic+CjxmZVR1cmJ1bGVuY2UgdHlwZT0nZnJhY3RhbE5vaXNlJyBiYXNlRnJlcXVlbmN5PScwLjg1JyBudW1PY3RhdmVzPScyJyBzdGl0Y2hUaWxlcz0nc3RpdGNoJyByZXN1bHQ9J3QnLz4KPGZlQ29sb3JNYXRyaXggaW49J3QnIHR5cGU9J3NhdHVyYXRlJyB2YWx1ZXM9JzAnLz4KPGZlQ29tcG9uZW50VHJhbnNmZXI+PGZlRnVuY0EgdHlwZT0nbGluZWFyJyBzbG9wZT0nMC4wNScvPjwvZmVDb21wb25lbnRUcmFuc2Zlcj4KPC9maWx0ZXI+CjxyZWN0IHdpZHRoPScxMDAlJyBoZWlnaHQ9JzEwMCUnIGZpbHRlcj0ndXJsKCNuKScvPgo8L3N2Zz4K");
+  --card-texture-size: 220% 220%, 160px 160px;
   --card-shadow-base:
     0 2px 8px var(--card-shade-near), 0 16px 24px var(--card-shade-far);
   --card-bevel: inset 0 -1px 0 var(--card-bevel-shade);

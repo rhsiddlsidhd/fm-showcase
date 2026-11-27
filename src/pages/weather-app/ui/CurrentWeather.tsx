@@ -1,4 +1,4 @@
-import type { ComponentProps, CSSProperties } from "react";
+import type { ComponentProps } from "react";
 import type { Forecast } from "../api/forecast";
 import { formatCurrentDate, formatTemperature } from "../model/format";
 import {
@@ -7,7 +7,6 @@ import {
   toTemperature,
   type Units,
 } from "../model/units";
-import { BG_TODAY_LARGE, BG_TODAY_SMALL } from "./assets";
 import { Cell } from "./Cell";
 import { LoadingDots } from "./LoadingDots";
 import { UnitValue } from "./UnitValue";
@@ -21,12 +20,6 @@ const TodayCard = ({ className = "", ...props }: ComponentProps<"div">) => (
     {...props}
   />
 );
-
-// Tailwind 클래스에는 TS 상수를 넣을 수 없어, 반응형 배경 이미지를 CSS 변수로 넘긴다.
-const TODAY_BACKGROUND = {
-  "--today-image-small": `url(${BG_TODAY_SMALL})`,
-  "--today-image-large": `url(${BG_TODAY_LARGE})`,
-} as CSSProperties;
 
 export const CurrentWeather = ({
   label,
@@ -57,10 +50,7 @@ export const CurrentWeather = ({
   return (
     <section className="flex flex-col gap-5 lg:gap-8">
       {current ? (
-        <TodayCard
-          style={TODAY_BACKGROUND}
-          className="bg-(--current-card-from) bg-(image:--today-image-small) bg-cover bg-center bg-no-repeat sm:bg-(image:--today-image-large)"
-        >
+        <TodayCard className="bg-(--current-card-from) bg-[url(/weather-app/images/bg-today-small.svg)] bg-cover bg-center bg-no-repeat sm:bg-[url(/weather-app/images/bg-today-large.svg)]">
           <div className="flex flex-col gap-3">
             <p className="text-3xl font-bold">{label}</p>
             <p className="text-(--subtle-text)">
