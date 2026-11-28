@@ -29,11 +29,14 @@ export function isBranchUpdate(localSha: string, remoteRef: string): boolean {
 // 품질 검사는 작업 트리에서 돈다. 작업 트리가 push 하는 커밋과 같을 때만 검사 결과가 그 커밋을 대변한다.
 export function validateCheckTarget(
   dirty: boolean,
-  headSha: string,
+  headSha: string | null,
   updates: { localRef: string; localSha: string }[],
 ): string | null {
   if (dirty) {
     return "작업 트리에 커밋하지 않은 변경이 있다. 품질 검사는 작업 트리에서 돌므로 커밋하거나 stash 한 뒤 push 하라";
+  }
+  if (headSha === null) {
+    return "HEAD 에 커밋이 없다. 품질 검사는 작업 트리에서 돌므로 push 하는 브랜치를 체크아웃한 상태에서 push 하라";
   }
   const other = updates.find((update) => update.localSha !== headSha);
   if (other) {

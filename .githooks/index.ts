@@ -18,13 +18,14 @@ import {
 } from "./push.ts";
 
 // pre-push 가 이 순서로 실행한다. 빌드와 E2E 는 오래 걸려 CI 가 맡는다.
+// 테스트는 바뀐 파일과 관련된 것만 돌린다. 전체 test 는 CI 가 맡는다.
 const QUALITY_SCRIPTS = [
   "typecheck",
   "lint",
   "lint:fsd",
   "lint:css",
   "format:check",
-  "test",
+  "test:changed",
 ];
 
 function reject(hook: string, message: string): never {
@@ -80,7 +81,17 @@ switch (hook) {
         shell: true,
         stdio: ["ignore", "inherit", "inherit"],
       });
-      if (result.status !== 0) reject(hook, `npm run ${script} 실패`);
+      if (result.error) {
+        const error = result.error as NodeJS.ErrnoException;
+        reject(
+          hook,
+          `npm run ${script} 실행 실패: ${error.code ?? error.message}`,
+        );
+      }
+      if (result.status !== 0) {
+        const cause = result.signal ?? `exit ${result.status}`;
+        reject(hook, `npm run ${script} 실패(${cause})`);
+      }
     }
     break;
   }
