@@ -5,17 +5,29 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterAll, afterEach, describe, expect, it } from "vitest";
 
 const HOOKS_PATH = dirname(fileURLToPath(import.meta.url)).replaceAll(
   "\\",
   "/",
 );
 
+// 사용자 전역·시스템 git 설정(push.gpgSign, core.fsmonitor 등)이 끼어들지 않게 한다.
+// 전역 설정은 이 디렉토리 안의 없는 파일을 가리키게 해 빈 설정으로 읽힌다.
+const configDir = mkdtempSync(join(tmpdir(), "githooks-config-"));
+
 // 바깥 git(예: 이 테스트를 부른 훅)이 넘긴 GIT_DIR 같은 값이 임시 저장소를 가리키지 않게 뺀다.
-const env = Object.fromEntries(
-  Object.entries(process.env).filter(([key]) => !key.startsWith("GIT_")),
-);
+const env = {
+  ...Object.fromEntries(
+    Object.entries(process.env).filter(([key]) => !key.startsWith("GIT_")),
+  ),
+  GIT_CONFIG_GLOBAL: join(configDir, "gitconfig"),
+  GIT_CONFIG_NOSYSTEM: "1",
+};
+
+afterAll(() => {
+  rmSync(configDir, { recursive: true, force: true, maxRetries: 3 });
+});
 
 // 테스트마다 git 과 node 를 여러 번 띄운다. Windows 에서는 프로세스 생성이 느려 기본 5초를 넘는다.
 const SLOW = { timeout: 60_000 };
@@ -24,7 +36,11 @@ const tempDirs: string[] = [];
 
 afterEach(() => {
   for (const dir of tempDirs.splice(0)) {
-    rmSync(dir, { recursive: true, force: true, maxRetries: 3 });
+    try {
+      rmSync(dir, { recursive: true, force: true, maxRetries: 3 });
+    } catch (error) {
+      console.warn(`임시 디렉토리를 지우지 못했다: ${dir}`, error);
+    }
   }
 });
 
@@ -95,7 +111,9 @@ describe("pre-commit 훅 연결", SLOW, () => {
     const result = commit(work, "chore: add foo");
 
     expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain("[pre-commit] 거부한다:");
+    expect(result.stderr).toContain(
+      "[pre-commit] 거부한다: main 에 직접 커밋하지 않는다",
+    );
     expect(commitCount(work)).toBe("1");
   });
 
@@ -104,6 +122,8 @@ describe("pre-commit 훅 연결", SLOW, () => {
     gitOk(work, "switch", "-c", "feat/x");
     enableHooks(work);
 
+    // 트레일러를 붙여 두면 commit-msg 의 트레일러 규칙과 상관없이 pre-commit 연결만 본다.
+    // 트레일러 강제를 없앤 뒤에는 트레일러가 있어도 무시된다는 확인을 겸한다.
     const result = commit(
       work,
       "chore: add foo",
@@ -124,7 +144,9 @@ describe("commit-msg 훅 연결", SLOW, () => {
     const result = commit(work, "Add foo.");
 
     expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain("[commit-msg] 거부한다:");
+    expect(result.stderr).toMatch(
+      /\[commit-msg\] 거부한다: 제목은 .*형식이어야 한다/,
+    );
     expect(commitCount(work)).toBe("1");
   });
 
@@ -150,7 +172,9 @@ describe("pre-push 훅 연결", SLOW, () => {
     const result = push(work, "main");
 
     expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain("[pre-push] 거부한다:");
+    expect(result.stderr).toMatch(
+      /\[pre-push\] 거부한다: .*main 에 직접 push 하거나 삭제하지 않는다/,
+    );
     expect(remoteRef(work, "main")).toBe(before);
   });
 
