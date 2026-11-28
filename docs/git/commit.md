@@ -14,10 +14,6 @@ chore: add foo
 Co-Authored-By: 이름 <이메일>
 ```
 
-## 이유
-
-[증거](../evidence.md) 표는 "AI와 사람의 기여가 구분된다"를 커밋 트레일러로 받친다. 표기가 없으면 사람 단독인지 누락인지 구별되지 않으므로, 둘 중 하나를 반드시 쓰게 한다.
-
 ## 판정
 
 `scripts/features/git-hooks`의 `commit-msg` 훅이 훅을 설정한 로컬 커밋에서 검사한다.
