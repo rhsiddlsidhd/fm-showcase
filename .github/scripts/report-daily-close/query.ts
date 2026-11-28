@@ -1,5 +1,5 @@
-import { DEFAULT_BRANCH } from "../../shared/constants/git.ts";
-import { queryGitHub } from "../../shared/services/github.ts";
+import { DEFAULT_BRANCH } from "../../../.githooks/rules.ts";
+import { queryGitHub } from "../github.ts";
 import type { DayRange } from "./range.ts";
 
 const DAILY_QUERY = `

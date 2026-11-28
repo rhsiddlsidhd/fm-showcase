@@ -1,4 +1,4 @@
-import { MAX_LENGTH, TITLE_PREFIX } from "../../shared/constants/message.ts";
+import { MAX_LENGTH, TITLE_PREFIX } from "../message.ts";
 
 export type ClosedIssue = {
   number: number;

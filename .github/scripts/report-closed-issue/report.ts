@@ -1,5 +1,5 @@
-import { sendToDiscord } from "../../shared/services/discord.ts";
-import { queryGitHub } from "../../shared/services/github.ts";
+import { sendToDiscord } from "../discord.ts";
+import { queryGitHub } from "../github.ts";
 import {
   buildClosedMessage,
   type ClosedIssue,

@@ -1,5 +1,5 @@
-import { IN_PROGRESS, SELECTED } from "../../shared/constants/labels.ts";
-import { MAX_LENGTH, TITLE_PREFIX } from "../../shared/constants/message.ts";
+import { IN_PROGRESS, SELECTED } from "../labels.ts";
+import { MAX_LENGTH, TITLE_PREFIX } from "../message.ts";
 import type { AttentionItem } from "./attention.ts";
 import type { DailyData, WorkItem } from "./query.ts";
 

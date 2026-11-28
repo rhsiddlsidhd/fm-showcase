@@ -1,4 +1,4 @@
-import { IN_PROGRESS, SELECTED } from "../../shared/constants/labels.ts";
+import { IN_PROGRESS, SELECTED } from "../labels.ts";
 import type { OpenIssue } from "./query.ts";
 
 export type AttentionItem = {

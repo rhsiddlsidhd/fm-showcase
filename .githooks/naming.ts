@@ -1,8 +1,4 @@
-import {
-  KEBAB_PATTERN,
-  PREFIXES,
-  PREFIX_PATTERN,
-} from "../../shared/constants/git.ts";
+import { KEBAB_PATTERN, PREFIXES, PREFIX_PATTERN } from "./rules.ts";
 
 const BRANCH = new RegExp(`^(?:${PREFIX_PATTERN})/${KEBAB_PATTERN}$`);
 
