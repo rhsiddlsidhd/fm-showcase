@@ -35,7 +35,7 @@ Frontend Mentor 챌린지 구현물을 모은 단일 페이지 쇼케이스. 챌
 git clone https://github.com/rhsiddlsidhd/fm-showcase.git
 cd fm-showcase
 npm ci
-git config core.hooksPath scripts/features/git-hooks
+git config core.hooksPath .githooks
 ```
 
 마지막 줄은 로컬 git 훅을 켠다. 훅은 커밋 메시지·브랜치 이름 규칙과 AI 관여 선언을 검사하고, `main`에 직접 커밋·push하는 것을 막는다. 훅은 조기 피드백용이며, 최종 판정은 CI가 한다.

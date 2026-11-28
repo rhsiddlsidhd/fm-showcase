@@ -32,4 +32,4 @@
 ## 비밀값
 
 - 브라우저에서 실행되는 코드에는 비밀값을 두지 않는다. 빌드 산출물은 누구나 내려받아 읽을 수 있다.
-- 개발 자동화(`scripts/`, `.github/workflows/`)의 비밀값은 GitHub Actions secrets에만 둔다. 개발 자동화는 앱의 경계 밖이다.
+- 개발 자동화(`.githooks/`, `.github/scripts/`, `.github/workflows/`)의 비밀값은 GitHub Actions secrets에만 둔다. 개발 자동화는 앱의 경계 밖이다.
