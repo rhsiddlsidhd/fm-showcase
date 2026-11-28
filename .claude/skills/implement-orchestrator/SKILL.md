@@ -159,7 +159,7 @@ Playwright가 만드는 `test-results/`·`playwright-report/`는 기존 설정�
 **④ 테스트 커밋**
 
 - `git add -- <경로>`로 ①에서 구한 경로만 하나씩 스테이징한다. `git add .`는 쓰지 않는다. `git diff --cached --stat`으로 테스트 경로만 있는지 확인한다.
-- 메시지: `test: add failing tests for <동작>`. 테스트를 다시 고친 경우는 `test: fix tests for <동작>`이다. 제목은 소문자 영어 명령형, 72자 이하로 쓰고 요구사항 ID를 넣지 않는다. 본문 없이 마지막 문단에 `Co-Authored-By:` 트레일러만 둔다(`docs/git/commit.md`).
+- 메시지: `test: add failing tests for <동작>`. 테스트를 다시 고친 경우는 `test: fix tests for <동작>`이다. 제목은 소문자 영어 명령형, 72자 이하로 쓰고 요구사항 ID를 넣지 않는다. 본문은 쓰지 않는다.
 - 훅을 우회하지 않는다(`--no-verify` 금지). 훅이 막으면 멈추고 보고한다.
 
 **⑤ executor 호출**
