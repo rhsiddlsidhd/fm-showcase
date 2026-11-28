@@ -1,5 +1,5 @@
 // `.github/workflows/report-daily-close.yml`이 호출한다.
-import { requireEnv } from "../../shared/utils/env.ts";
+import { requireEnv } from "../env.ts";
 import { reportDailyClose } from "./report.ts";
 
 await reportDailyClose({

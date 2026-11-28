@@ -1,5 +1,5 @@
-import { IN_PROGRESS, SELECTED } from "../../shared/constants/labels.ts";
-import { queryGitHub } from "../../shared/services/github.ts";
+import { IN_PROGRESS, SELECTED } from "../labels.ts";
+import { queryGitHub } from "../github.ts";
 
 const OPEN_ISSUES_QUERY = `
   query ($owner: String!, $name: String!) {

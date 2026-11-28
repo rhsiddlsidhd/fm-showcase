@@ -1,4 +1,4 @@
-import { DEFAULT_BRANCH } from "../../shared/constants/git.ts";
+import { DEFAULT_BRANCH } from "./rules.ts";
 import { validateBranchName } from "./naming.ts";
 
 const isZero = (sha: string) => /^0+$/.test(sha);

@@ -529,7 +529,11 @@ export default defineConfig(
   {
     // A test with no assertion, or a focused or skipped test, passes CI
     // without checking anything (docs/testing/test-policy.md).
-    files: ["src/**/*.test.{ts,tsx}", "scripts/**/*.test.ts"],
+    files: [
+      "src/**/*.test.{ts,tsx}",
+      ".githooks/**/*.test.ts",
+      ".github/scripts/**/*.test.ts",
+    ],
     plugins: { vitest },
     rules: {
       "vitest/no-focused-tests": "error",
@@ -556,7 +560,7 @@ export default defineConfig(
     },
   },
   {
-    files: ["scripts/**/*.ts"],
+    files: [".githooks/**/*.ts", ".github/scripts/**/*.ts"],
     rules: { "@typescript-eslint/no-explicit-any": "off" },
   },
 );

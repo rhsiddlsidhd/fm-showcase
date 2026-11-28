@@ -1,4 +1,4 @@
-import { PREFIX_PATTERN } from "./git.ts";
+import { PREFIX_PATTERN } from "../../.githooks/rules.ts";
 
 // Discord가 한 메시지에 허용하는 길이다.
 export const MAX_LENGTH = 2000;
