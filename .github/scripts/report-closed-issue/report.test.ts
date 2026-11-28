@@ -34,20 +34,16 @@ const closingPullRequest = {
   headRefName: "chore/issue-branch",
 };
 
-const mergedChildren = {
-  data: {
-    repository: {
-      pullRequests: {
-        nodes: [
-          {
-            number: 44,
-            title: "chore: 하위 작업",
-            url: "https://github.com/o/r/pull/44",
-          },
-        ],
-      },
+// base 브랜치별로 merge된 PR 목록. 목록에 없는 브랜치는 빈 목록이다.
+const mergedByBase: Record<string, unknown[]> = {
+  "chore/issue-branch": [
+    {
+      number: 44,
+      title: "chore: 하위 작업",
+      url: "https://github.com/o/r/pull/44",
+      headRefName: "chore/work-a",
     },
-  },
+  ],
 };
 
 const server = setupServer();
@@ -57,10 +53,17 @@ const waits: (string | null)[] = [];
 function respondWith(issueBody: unknown) {
   server.use(
     http.post(GRAPHQL_URL, async ({ request }) => {
-      const { query } = (await request.json()) as { query: string };
-      return HttpResponse.json(
-        query.includes("baseRefName") ? mergedChildren : (issueBody as object),
-      );
+      const { query, variables } = (await request.json()) as {
+        query: string;
+        variables: { branch?: string };
+      };
+      if (!query.includes("baseRefName")) {
+        return HttpResponse.json(issueBody as object);
+      }
+      const nodes = mergedByBase[variables.branch ?? ""] ?? [];
+      return HttpResponse.json({
+        data: { repository: { pullRequests: { nodes } } },
+      });
     }),
     http.post(WEBHOOK_URL, async ({ request }) => {
       sent.push((await request.json()) as Record<string, unknown>);
@@ -81,6 +84,7 @@ const report = () =>
 beforeAll(() => server.listen({ onUnhandledFrame: "error" }));
 afterEach(() => {
   server.resetHandlers();
+  delete mergedByBase["chore/work-a"];
   sent.length = 0;
   waits.length = 0;
 });
@@ -96,6 +100,26 @@ describe("reportClosedIssue", () => {
     expect(sent[0]!.content).toContain("**작업 완료 기록**");
     expect(sent[0]!.content).toContain("[#44]");
     expect(sent[0]!.content).toContain("[#60]");
+  });
+
+  it("작업 브랜치 아래 작업 브랜치로 merge된 PR도 함께 보낸다", async () => {
+    mergedByBase["chore/work-a"] = [
+      {
+        number: 45,
+        title: "chore: 하위 작업의 하위 작업",
+        url: "https://github.com/o/r/pull/45",
+        headRefName: "chore/work-b",
+      },
+    ];
+    respondWith(closedIssue("COMPLETED", closingPullRequest));
+
+    await report();
+
+    expect(sent).toHaveLength(1);
+    expect(sent[0]!.content).toContain("[#60]");
+    expect(sent[0]!.content).toContain("[#44]");
+    expect(sent[0]!.content).toContain("[#45]");
+    expect(sent[0]!.content).not.toContain("chore/work-");
   });
 
   it("PR 없이 닫힌 Issue도 보낸다", async () => {
