@@ -1,5 +1,5 @@
 // git 훅(commit-msg, pre-commit, pre-push)이 호출한다. 사용법: index.ts <훅 이름> [훅 인자...]
-// ~/.codex/docs/GIT.md 의 규칙 중 기계가 판정할 수 있는 것만 강제한다.
+// ~/.codex/docs/GIT.md 와 docs/git/ 의 규칙 중 기계가 판정할 수 있는 것만 강제한다.
 import { readFileSync } from "node:fs";
 import { validateCommitBranch } from "./branch.ts";
 import { currentBranch, hasCommits, isMerging } from "./git.ts";
