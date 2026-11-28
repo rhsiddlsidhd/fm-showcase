@@ -1,7 +1,13 @@
 // git 이 .githooks 의 sh 래퍼를 실행하고, 래퍼가 node index.ts 를 거쳐 거부할 때
 // 커밋과 push 가 실제로 중단되는지 본다. 판정 규칙 자체는 각 *.test.ts(Unit)가 검증한다.
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, rmSync } from "node:fs";
+import {
+  existsSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -97,6 +103,41 @@ function push(work: string, branch: string) {
   return git(work, "push", "origin", branch);
 }
 
+// pre-push 가 실행하는 품질 검사 scripts. 실행 순서는 훅이 정한 순서다.
+const QUALITY_SCRIPTS = [
+  "typecheck",
+  "lint",
+  "lint:fsd",
+  "lint:css",
+  "format:check",
+  "test",
+];
+
+// 작업 저장소 바깥(임시 루트)에 둔다. 작업 트리 안에 쓰면 dirty 판정에 걸린다.
+const markerPath = (work: string) => join(work, "..", "ran.log");
+
+// 각 script 가 자기 이름을 표식 파일에 남기고, failing 으로 고른 script 만 실패하는 package.json 을 커밋한다.
+// 훅을 켜기 전에 부른다. 표식으로 scripts 가 실제로 어떤 순서로 실행됐는지 확인한다.
+function commitPackageJson(work: string, failing?: string) {
+  const scripts = Object.fromEntries(
+    QUALITY_SCRIPTS.map((name) => [
+      name,
+      `node -e "require('fs').appendFileSync('../ran.log','${name} ');process.exit(${name === failing ? 1 : 0})"`,
+    ]),
+  );
+  writeFileSync(
+    join(work, "package.json"),
+    JSON.stringify({ name: "fixture", private: true, scripts }, null, 2),
+  );
+  gitOk(work, "add", "package.json");
+  gitOk(work, "commit", "-m", "chore: add package json");
+}
+
+const ranScripts = (work: string) =>
+  existsSync(markerPath(work))
+    ? readFileSync(markerPath(work), "utf8").trim()
+    : "";
+
 const commitCount = (work: string) =>
   gitOk(work, "rev-list", "--count", "HEAD");
 
@@ -178,15 +219,74 @@ describe("pre-push 훅 연결", SLOW, () => {
     expect(remoteRef(work, "main")).toBe(before);
   });
 
-  it("작업 브랜치 push 는 원격에 반영된다", () => {
+  it("품질 검사가 모두 통과하면 차례로 실행한 뒤 작업 브랜치 push 가 원격에 반영된다", () => {
     const work = createRepo();
     gitOk(work, "switch", "-c", "feat/x");
-    gitOk(work, "commit", "--allow-empty", "-m", "chore: add foo");
+    commitPackageJson(work);
     enableHooks(work);
 
     const result = push(work, "feat/x");
 
     expect(result.status, result.stderr).toBe(0);
+    expect(ranScripts(work)).toBe(QUALITY_SCRIPTS.join(" "));
     expect(remoteRef(work, "feat/x")).not.toBe("");
+  });
+
+  it("품질 검사 하나가 실패하면 그 자리에서 멈추고 push 가 원격에 반영되지 않는다", () => {
+    const work = createRepo();
+    gitOk(work, "switch", "-c", "feat/x");
+    commitPackageJson(work, "lint");
+    enableHooks(work);
+
+    const result = push(work, "feat/x");
+
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain("[pre-push] 거부한다: npm run lint 실패");
+    expect(ranScripts(work)).toBe("typecheck lint");
+    expect(remoteRef(work, "feat/x")).toBe("");
+  });
+
+  it("작업 트리에 커밋하지 않은 파일이 있으면 품질 검사 없이 push 가 거부된다", () => {
+    const work = createRepo();
+    gitOk(work, "switch", "-c", "feat/x");
+    commitPackageJson(work);
+    writeFileSync(join(work, "draft.txt"), "draft");
+    enableHooks(work);
+
+    const result = push(work, "feat/x");
+
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toMatch(/\[pre-push\] 거부한다: .*stash/);
+    expect(ranScripts(work)).toBe("");
+    expect(remoteRef(work, "feat/x")).toBe("");
+  });
+
+  it("push 하는 브랜치를 체크아웃하지 않았으면 품질 검사 없이 push 가 거부된다", () => {
+    const work = createRepo();
+    gitOk(work, "switch", "-c", "feat/x");
+    commitPackageJson(work);
+    gitOk(work, "switch", "main");
+    enableHooks(work);
+
+    const result = push(work, "feat/x");
+
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toMatch(/\[pre-push\] 거부한다: .*체크아웃/);
+    expect(ranScripts(work)).toBe("");
+    expect(remoteRef(work, "feat/x")).toBe("");
+  });
+
+  it("원격 작업 브랜치 삭제는 품질 검사 없이 반영된다", () => {
+    const work = createRepo();
+    gitOk(work, "switch", "-c", "feat/x");
+    commitPackageJson(work, "typecheck");
+    gitOk(work, "push", "origin", "feat/x");
+    enableHooks(work);
+
+    const result = git(work, "push", "origin", "--delete", "feat/x");
+
+    expect(result.status, result.stderr).toBe(0);
+    expect(ranScripts(work)).toBe("");
+    expect(remoteRef(work, "feat/x")).toBe("");
   });
 });
