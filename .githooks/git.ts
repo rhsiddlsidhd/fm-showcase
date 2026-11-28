@@ -27,3 +27,12 @@ export function isMerging(): boolean {
     return false;
   }
 }
+
+export function headSha(): string {
+  return git("rev-parse", "HEAD");
+}
+
+// 추적 파일의 변경과 ignore 되지 않은 새 파일을 모두 센다.
+export function hasUncommittedChanges(): boolean {
+  return git("status", "--porcelain") !== "";
+}
