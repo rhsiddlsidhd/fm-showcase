@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { validatePushRef } from "./push.ts";
+import {
+  isBranchUpdate,
+  validateCheckTarget,
+  validatePushRef,
+} from "./push.ts";
 
 const ZERO = "0000000000000000000000000000000000000000";
 const SHA_A = "a".repeat(40);
@@ -69,5 +73,66 @@ describe("validatePushRef", () => {
     expect(
       validatePushRef("refs/tags/v1", SHA_A, "refs/tags/v1", ZERO),
     ).toBeNull();
+  });
+});
+
+describe("isBranchUpdate", () => {
+  it("원격 브랜치에 커밋을 올리는 push는 품질 검사 대상이다", () => {
+    expect(isBranchUpdate(SHA_A, "refs/heads/feat/x")).toBe(true);
+  });
+
+  it("원격에 새로 만드는 브랜치도 품질 검사 대상이다", () => {
+    expect(isBranchUpdate(SHA_A, "refs/heads/main")).toBe(true);
+  });
+
+  it("원격 브랜치 삭제는 품질 검사 대상이 아니다", () => {
+    expect(isBranchUpdate(ZERO, "refs/heads/feat/x")).toBe(false);
+  });
+
+  it("태그 push는 품질 검사 대상이 아니다", () => {
+    expect(isBranchUpdate(SHA_A, "refs/tags/v1")).toBe(false);
+  });
+});
+
+describe("validateCheckTarget", () => {
+  it("작업 트리가 깨끗하고 push하는 커밋이 HEAD면 받아들인다", () => {
+    expect(
+      validateCheckTarget(false, SHA_A, [
+        { localRef: "refs/heads/feat/x", localSha: SHA_A },
+      ]),
+    ).toBeNull();
+  });
+
+  it("작업 트리에 커밋하지 않은 변경이 있으면 커밋하거나 stash하라며 거부한다", () => {
+    const reason = validateCheckTarget(true, SHA_A, [
+      { localRef: "refs/heads/feat/x", localSha: SHA_A },
+    ]);
+    expect(reason).toMatch(/커밋/);
+    expect(reason).toMatch(/stash/);
+  });
+
+  it("push하는 브랜치가 HEAD와 다르면 그 브랜치를 체크아웃하라며 거부한다", () => {
+    const reason = validateCheckTarget(false, SHA_A, [
+      { localRef: "refs/heads/feat/y", localSha: SHA_B },
+    ]);
+    expect(reason).toContain("refs/heads/feat/y");
+    expect(reason).toMatch(/체크아웃/);
+  });
+
+  it("HEAD에 커밋이 없으면 push하는 브랜치를 체크아웃하라며 거부한다", () => {
+    const reason = validateCheckTarget(false, null, [
+      { localRef: "refs/heads/feat/x", localSha: SHA_A },
+    ]);
+    expect(reason).toMatch(/HEAD 에 커밋이 없다/);
+    expect(reason).toMatch(/체크아웃/);
+  });
+
+  it("여러 브랜치 중 하나라도 HEAD와 다르면 거부한다", () => {
+    expect(
+      validateCheckTarget(false, SHA_A, [
+        { localRef: "refs/heads/feat/x", localSha: SHA_A },
+        { localRef: "refs/heads/feat/y", localSha: SHA_B },
+      ]),
+    ).toContain("refs/heads/feat/y");
   });
 });

@@ -44,6 +44,15 @@ export default defineConfig(({ mode }) => ({
     environment: "jsdom",
     // E2E는 Playwright가 실행한다.
     exclude: [...configDefaults.exclude, "e2e/**"],
+    // 이 경로가 바뀌면 --changed 가 관련 테스트 대신 전체를 돌린다. import 로 추적되지 않는
+    // 의존이라서다. 패턴은 절대 경로와 대조하므로 **/ 로 시작한다(docs/git/hooks.md).
+    forceRerunTriggers: [
+      ...configDefaults.forceRerunTriggers,
+      "**/.githooks/**",
+      "**/public/**",
+      "**/src/shared/test/fixtures/**",
+      "**/package-lock.json",
+    ],
     globals: true,
     setupFiles: ["./src/shared/test/setup.ts"],
   },

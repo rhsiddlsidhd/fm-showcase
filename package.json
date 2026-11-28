@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "test": "vitest run",
+    "test:changed": "vitest run --changed refs/remotes/origin/main",
     "test:e2e": "playwright test",
     "typecheck": "tsc -p tsconfig.app.json && tsc -p tsconfig.node.json",
     "dev": "vite",
