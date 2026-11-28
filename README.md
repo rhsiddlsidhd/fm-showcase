@@ -38,7 +38,7 @@ npm ci
 git config core.hooksPath .githooks
 ```
 
-마지막 줄은 로컬 git 훅을 켠다. 훅은 커밋 메시지·브랜치 이름 규칙을 검사하고, `main`에 직접 커밋·push하는 것을 막는다. 이 규칙은 로컬 훅에서만 검사하고, 코드 검사는 CI가 merge 전에 한다.
+마지막 줄은 로컬 git 훅을 켠다. 훅은 커밋 메시지·브랜치 이름 규칙을 검사하고, `main`에 직접 커밋·push하는 것을 막는다. push 전에는 타입·린트·포맷·단위 테스트 검사를 돌려 실패하면 push를 막는다. 빌드와 E2E는 CI가 merge 전에 한다. 단계별 책임과 이유는 [`docs/git/hooks.md`](docs/git/hooks.md)에 있다.
 
 ### 개발 서버 실행
 
@@ -103,7 +103,7 @@ npx playwright install chromium
 ## 기여 방법
 
 1. 브랜치를 만든다. 이름과 구조(Issue 브랜치, 작업 브랜치)는 [`docs/git/branch.md`](docs/git/branch.md)를, 커밋·PR 규칙은 [`docs/git/README.md`](docs/git/README.md)를 따른다.
-2. push 전에 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)의 검사 단계를 로컬에서 차례로 실행한다. 같은 검사를 CI가 다시 돌려 merge 여부를 판정한다.
+2. push한다. pre-push 훅이 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)의 검사 중 빌드·E2E를 뺀 단계를 로컬에서 대신 실행한다. CI가 빌드·E2E까지 포함한 전체 검사를 다시 돌려 merge 여부를 판정한다.
 3. PR을 연다. 본문은 [PR 템플릿](.github/pull_request_template.md)을 따른다.
 4. `main`은 보호된다. PR과 CI(`verify`) 통과가 필수이고, merge commit으로만 합친다.
 
