@@ -43,16 +43,16 @@ const MERGED_PULL_REQUESTS_QUERY = `
           number
           title
           url
+          headRefName
         }
       }
     }
   }
 `;
 
-type Closer = MergedPullRequest & {
-  __typename: string;
-  headRefName: string;
-};
+type BranchPullRequest = MergedPullRequest & { headRefName: string };
+
+type Closer = BranchPullRequest & { __typename: string };
 
 type ClosedIssueData = {
   repository: {
@@ -64,7 +64,7 @@ type ClosedIssueData = {
 };
 
 type MergedPullRequestsData = {
-  repository: { pullRequests: { nodes: MergedPullRequest[] } };
+  repository: { pullRequests: { nodes: BranchPullRequest[] } };
 };
 
 type ReportInput = {
@@ -93,14 +93,27 @@ export async function reportClosedIssue({
   if (issue.stateReason !== "COMPLETED") return;
 
   const closer = issue.timelineItems.nodes[0]?.closer;
-  const pullRequests: MergedPullRequest[] = [];
+  const pullRequests: BranchPullRequest[] = [];
   if (closer?.__typename === "PullRequest") {
-    const merged = await queryGitHub<MergedPullRequestsData>(
-      githubToken,
-      MERGED_PULL_REQUESTS_QUERY,
-      { owner, name, branch: closer.headRefName },
-    );
-    pullRequests.push(closer, ...merged.repository.pullRequests.nodes);
+    pullRequests.push(closer);
+    // 작업 브랜치 아래 작업 브랜치로 merge된 PR까지 찾으려고 head 브랜치를 base로 다시 조회한다.
+    // main 은 미리 넣는다. head 가 main 인 동기화 PR 때문에 main 을 base 로 조회하면 무관한 PR 이 섞인다.
+    const visited = new Set(["main", closer.headRefName]);
+    const queue = [closer.headRefName];
+    for (const branch of queue) {
+      const merged = await queryGitHub<MergedPullRequestsData>(
+        githubToken,
+        MERGED_PULL_REQUESTS_QUERY,
+        { owner, name, branch },
+      );
+      for (const pullRequest of merged.repository.pullRequests.nodes) {
+        pullRequests.push(pullRequest);
+        if (!visited.has(pullRequest.headRefName)) {
+          visited.add(pullRequest.headRefName);
+          queue.push(pullRequest.headRefName);
+        }
+      }
+    }
   }
 
   await sendToDiscord(
