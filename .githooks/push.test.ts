@@ -119,6 +119,14 @@ describe("validateCheckTarget", () => {
     expect(reason).toMatch(/체크아웃/);
   });
 
+  it("HEAD에 커밋이 없으면 push하는 브랜치를 체크아웃하라며 거부한다", () => {
+    const reason = validateCheckTarget(false, null, [
+      { localRef: "refs/heads/feat/x", localSha: SHA_A },
+    ]);
+    expect(reason).toMatch(/HEAD 에 커밋이 없다/);
+    expect(reason).toMatch(/체크아웃/);
+  });
+
   it("여러 브랜치 중 하나라도 HEAD와 다르면 거부한다", () => {
     expect(
       validateCheckTarget(false, SHA_A, [

@@ -37,6 +37,8 @@ afterAll(() => {
 
 // 테스트마다 git 과 node 를 여러 번 띄운다. Windows 에서는 프로세스 생성이 느려 기본 5초를 넘는다.
 const SLOW = { timeout: 60_000 };
+// git 호출 하나가 멈추면 SLOW 보다 먼저 끝내, 어느 명령이 멈췄는지 결과로 드러나게 한다.
+const SPAWN_TIMEOUT = 50_000;
 
 const tempDirs: string[] = [];
 
@@ -51,7 +53,12 @@ afterEach(() => {
 });
 
 function git(cwd: string, ...args: string[]) {
-  const result = spawnSync("git", args, { cwd, env, encoding: "utf8" });
+  const result = spawnSync("git", args, {
+    cwd,
+    env,
+    encoding: "utf8",
+    timeout: SPAWN_TIMEOUT,
+  });
   return {
     status: result.status,
     stdout: result.stdout.trim(),
@@ -110,7 +117,7 @@ const QUALITY_SCRIPTS = [
   "lint:fsd",
   "lint:css",
   "format:check",
-  "test",
+  "test:changed",
 ];
 
 // 작업 저장소 바깥(임시 루트)에 둔다. 작업 트리 안에 쓰면 dirty 판정에 걸린다.
@@ -241,7 +248,9 @@ describe("pre-push 훅 연결", SLOW, () => {
     const result = push(work, "feat/x");
 
     expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain("[pre-push] 거부한다: npm run lint 실패");
+    expect(result.stderr).toContain(
+      "[pre-push] 거부한다: npm run lint 실패(exit 1)",
+    );
     expect(ranScripts(work)).toBe("typecheck lint");
     expect(remoteRef(work, "feat/x")).toBe("");
   });
