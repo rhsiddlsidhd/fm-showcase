@@ -49,6 +49,9 @@ const mergedByBase: Record<string, unknown[]> = {
 const server = setupServer();
 const sent: Record<string, unknown>[] = [];
 const waits: (string | null)[] = [];
+// 병합 PR 조회의 base 브랜치를 차례로 담는다. 순환 방지가 깨지면 무한 조회가 되므로 상한을 넘으면 오류로 끊는다.
+const queriedBases: string[] = [];
+const MAX_QUERIES = 20;
 
 function respondWith(issueBody: unknown) {
   server.use(
@@ -59,6 +62,13 @@ function respondWith(issueBody: unknown) {
       };
       if (!query.includes("baseRefName")) {
         return HttpResponse.json(issueBody as object);
+      }
+      queriedBases.push(variables.branch ?? "");
+      if (queriedBases.length > MAX_QUERIES) {
+        return HttpResponse.json(
+          { errors: [{ message: "병합 PR 조회가 상한을 넘었다" }] },
+          { status: 500 },
+        );
       }
       const nodes = mergedByBase[variables.branch ?? ""] ?? [];
       return HttpResponse.json({
@@ -86,6 +96,7 @@ afterEach(() => {
   server.resetHandlers();
   delete mergedByBase["chore/work-a"];
   delete mergedByBase["main"];
+  queriedBases.length = 0;
   sent.length = 0;
   waits.length = 0;
 });
@@ -162,9 +173,10 @@ describe("reportClosedIssue", () => {
 
     await report();
 
+    expect(queriedBases).toEqual(["chore/issue-branch", "chore/work-a"]);
     expect(sent).toHaveLength(1);
     expect(sent[0]!.content).toContain("[#47]");
-  }, 3000);
+  });
 
   it("PR 없이 닫힌 Issue도 보낸다", async () => {
     respondWith(closedIssue("COMPLETED", null));
