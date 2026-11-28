@@ -85,6 +85,7 @@ beforeAll(() => server.listen({ onUnhandledFrame: "error" }));
 afterEach(() => {
   server.resetHandlers();
   delete mergedByBase["chore/work-a"];
+  delete mergedByBase["main"];
   sent.length = 0;
   waits.length = 0;
 });
@@ -121,6 +122,49 @@ describe("reportClosedIssue", () => {
     expect(sent[0]!.content).toContain("[#45]");
     expect(sent[0]!.content).not.toContain("chore/work-");
   });
+
+  it("main 동기화 PR이 있어도 main으로 merge된 무관한 PR은 보내지 않는다", async () => {
+    mergedByBase["chore/work-a"] = [
+      {
+        number: 46,
+        title: "chore: main 동기화",
+        url: "https://github.com/o/r/pull/46",
+        headRefName: "main",
+      },
+    ];
+    mergedByBase["main"] = [
+      {
+        number: 99,
+        title: "feat: 무관한 작업",
+        url: "https://github.com/o/r/pull/99",
+        headRefName: "feat/unrelated",
+      },
+    ];
+    respondWith(closedIssue("COMPLETED", closingPullRequest));
+
+    await report();
+
+    expect(sent).toHaveLength(1);
+    expect(sent[0]!.content).toContain("[#46]");
+    expect(sent[0]!.content).not.toContain("[#99]");
+  });
+
+  it("작업 브랜치의 PR이 Issue 브랜치를 head로 가져도 조회가 끝난다", async () => {
+    mergedByBase["chore/work-a"] = [
+      {
+        number: 47,
+        title: "chore: 순환",
+        url: "https://github.com/o/r/pull/47",
+        headRefName: "chore/issue-branch",
+      },
+    ];
+    respondWith(closedIssue("COMPLETED", closingPullRequest));
+
+    await report();
+
+    expect(sent).toHaveLength(1);
+    expect(sent[0]!.content).toContain("[#47]");
+  }, 3000);
 
   it("PR 없이 닫힌 Issue도 보낸다", async () => {
     respondWith(closedIssue("COMPLETED", null));
