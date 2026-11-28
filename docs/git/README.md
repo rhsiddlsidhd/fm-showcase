@@ -13,4 +13,4 @@
 | [`pullRequest.md`](./pullRequest.md) | PR 제목·본문을 작성하거나 PR을 만들 때 | PR 제목·본문의 언어, 내용 범위, 작성 방식 |
 | [`merge.md`](./merge.md) | PR을 merge하거나 merge 방식을 설정할 때 | 작업 브랜치 PR의 merge 방식과 이유 |
 | [`issue.md`](./issue.md) | Issue를 만들거나 고칠 때. Issue 사이 관계를 걸 때 | Issue 템플릿·라벨 선택 기준, 제목, 본문 범위, 관계 표현 방식 |
-| [`hooks.md`](./hooks.md) | git 훅이나 CI가 판정하는 범위를 바꿀 때. 훅이 커밋이나 push를 거부한 이유를 판단할 때 | 훅 단계별 책임, pre-push가 품질을 맡는 이유, 작업 트리를 검사 대상과 맞추는 이유 |
+| [`hooks.md`](./hooks.md) | git 훅이나 CI가 판정하는 범위를 바꿀 때. 훅이 커밋이나 push를 거부한 이유를 판단할 때 | 훅 단계별 책임, pre-push가 품질을 맡는 이유, pre-push가 변경 관련 테스트만 돌리는 이유와 승격 기준·한계, CI의 한계, 훅의 신뢰 범위, 작업 트리를 검사 대상과 맞추는 이유 |
