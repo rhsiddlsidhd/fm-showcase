@@ -30,10 +30,10 @@
 
 ### 전체 테스트로 승격하는 기준
 
-- 테스트가 import 그래프로 추적되지 않는 방식으로 파일에 의존하면, 그 파일이 바뀌어도 관련 테스트가 0개로 나온다. 서브프로세스로 실행하는 코드, fs로 읽는 파일, 파일 목록만 쓰는 `import.meta.glob`, 의존성 잠금 파일이 그렇다. 이런 경로가 바뀌면 전체 테스트로 승격한다.
+- 테스트가 import 그래프로 추적되지 않는 방식으로 파일에 의존하면, 그 파일이 바뀌어도 관련 테스트가 0개로 나온다. 의존성 잠금 파일도 import로 보이지 않는다. 이런 경로가 바뀌면 전체 테스트로 승격한다.
 - 승격 목록은 [`vite.config.ts`](../../vite.config.ts)의 `test.forceRerunTriggers`에 있다. 훅에는 경로를 판정하는 코드를 따로 두지 않는다.
 - 패턴은 바뀐 파일의 절대 경로와 대조되므로 `**/`로 시작해야 한다. 접두가 없으면 오류 없이 승격이 꺼진다. 목록은 vitest 기본값을 펼친 뒤 더한다. 펼치지 않으면 기본값(`package.json`, vite·vitest 설정)이 빠진다.
-- 새 테스트를 쓸 때 목록에 더할지는 [작성 규칙](../testing/test-policy.md#작성-규칙)으로 판단한다.
+- 어떤 의존이 추적되지 않는지와 새 테스트를 쓸 때 목록에 더할지는 [작성 규칙](../testing/test-policy.md#작성-규칙)으로 판단한다.
 
 ### 한계
 
@@ -47,7 +47,7 @@
 ## CI의 한계
 
 - CI 실행은 건너뛸 수 없다. `main` 보호가 CI 통과를 필수로 요구한다.
-- 하지만 검사 정의는 같은 PR이 바꿀 수 있다. [`ci.yml`](../../.github/workflows/ci.yml), [`package.json`](../../package.json) scripts, `vite.config.ts`의 `test` 설정, [`.githooks/`](../../.githooks)가 그렇다. 이 파일을 바꾸는 PR은 리뷰가 검사를 약화하지 않는지 확인한다.
+- 하지만 검사 정의는 같은 PR이 바꿀 수 있다. 검사 정의는 검사를 실행하는 명령과 검사 규칙을 정하는 설정 전부다. 예: [`ci.yml`](../../.github/workflows/ci.yml), [`package.json`](../../package.json) scripts, `vite.config.ts`의 `test` 설정과 테스트 setup, 린트·포맷·타입·FSD·E2E 설정, [`.githooks/`](../../.githooks). 이런 파일을 바꾸는 PR은 리뷰가 검사를 약화하지 않는지 확인한다.
 
 ## 신뢰 범위
 

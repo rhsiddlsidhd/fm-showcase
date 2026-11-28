@@ -74,20 +74,20 @@ npx playwright install chromium
 
 ### 스크립트
 
-| 명령                   | 용도                                                                      |
-| ---------------------- | ------------------------------------------------------------------------- |
-| `npm run dev`          | 개발 서버                                                                 |
-| `npm run build`        | 타입 검사 후 프로덕션 빌드                                                |
-| `npm run preview`      | 빌드 결과 미리 보기                                                       |
-| `npm run test`         | 테스트를 한 번 실행                                                       |
-| `npm run test:changed` | `origin/main` 이후 바뀐 파일에 관련된 테스트만 실행 (pre-push가 쓴다)     |
-| `npm run test:e2e`     | 빌드한 앱을 띄워 Playwright E2E 테스트를 실행                             |
-| `npm run typecheck`    | 앱과 스크립트의 타입 검사                                                 |
-| `npm run lint`         | ESLint                                                                    |
-| `npm run lint:fsd`     | Steiger. FSD 디렉토리 구조 검사 ([아키텍처](docs/architecture/README.md)) |
-| `npm run lint:css`     | Stylelint. 슬라이스의 CSS 파일 검사                                       |
-| `npm run format`       | Prettier로 파일을 고친다                                                  |
-| `npm run format:check` | Prettier 검사. 파일을 고치지 않는다 (CI가 쓴다)                           |
+| 명령                   | 용도                                                                                                  |
+| ---------------------- | ----------------------------------------------------------------------------------------------------- |
+| `npm run dev`          | 개발 서버                                                                                             |
+| `npm run build`        | 타입 검사 후 프로덕션 빌드                                                                            |
+| `npm run preview`      | 빌드 결과 미리 보기                                                                                   |
+| `npm run test`         | 테스트를 한 번 실행                                                                                   |
+| `npm run test:changed` | `origin/main`에서 갈라진 뒤 바뀐 파일에 관련된 테스트 실행. 승격 경로가 바뀌면 전체 (pre-push가 쓴다) |
+| `npm run test:e2e`     | 빌드한 앱을 띄워 Playwright E2E 테스트를 실행                                                         |
+| `npm run typecheck`    | 앱과 스크립트의 타입 검사                                                                             |
+| `npm run lint`         | ESLint                                                                                                |
+| `npm run lint:fsd`     | Steiger. FSD 디렉토리 구조 검사 ([아키텍처](docs/architecture/README.md))                             |
+| `npm run lint:css`     | Stylelint. 슬라이스의 CSS 파일 검사                                                                   |
+| `npm run format`       | Prettier로 파일을 고친다                                                                              |
+| `npm run format:check` | Prettier 검사. 파일을 고치지 않는다 (CI가 쓴다)                                                       |
 
 ## 환경 변수
 

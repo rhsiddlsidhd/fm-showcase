@@ -23,6 +23,8 @@ describe("package.json 품질 검사 scripts", () => {
         "format:check",
         "test",
         "test:changed",
+        "build",
+        "test:e2e",
       ]),
     );
   });
