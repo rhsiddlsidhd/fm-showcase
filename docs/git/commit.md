@@ -2,25 +2,6 @@
 
 전역 `GIT.md`의 Commit 규칙에 아래 항목을 더한다.
 
-## AI 관여 선언
-
-- 모든 커밋은 마지막 문단에 AI 관여 여부를 트레일러로 선언한다.
-- AI가 관여했으면 `Co-Authored-By: 이름 <이메일>`을 쓴다. 이름과 이메일은 에이전트가 정하는 대로 쓰고, 모델이나 도구를 가리지 않는다.
-- 사람 단독이면 `AI-Assisted: none`을 쓴다.
-
-```
-chore: add foo
-
-Co-Authored-By: 이름 <이메일>
-```
-
-## 판정
-
-`.githooks`의 `commit-msg` 훅이 훅을 설정한 로컬 커밋에서 검사한다.
-
-- 한계: 자기 선언이라 위조를 막지 못한다. AI가 관여했는데 `AI-Assisted: none`을 쓴 경우도 잡지 못한다.
-- GitHub에서 만드는 merge commit은 로컬 훅이 돌지 않아 검사하지 않는다.
-
 ## Issue 닫기
 
 - 커밋 메시지에 Issue를 닫는 키워드를 쓰지 않는다. 작업 브랜치 커밋은 merge commit으로 기본 브랜치에 그대로 들어가므로, 완료 조건을 다 채우기 전에 Issue가 닫힐 수 있다. Issue는 [`branch.md`](./branch.md)의 Issue 브랜치로 닫는다.
