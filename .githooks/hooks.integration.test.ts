@@ -36,10 +36,11 @@ afterAll(() => {
 });
 
 // 테스트마다 git 과 node 를 여러 번 띄운다. Windows 에서는 프로세스 생성이 느려 기본 5초를 넘는다.
-const SLOW = { timeout: 60_000 };
+// pre-push 안에서 전체 테스트와 병렬로 돌면 품질 검사 통과 케이스(npm 6번)가 단독 실행(약 27초)의 두 배를 넘는다.
+const SLOW = { timeout: 150_000 };
 // spawnSync 는 이벤트 루프를 막아 SLOW 의 테스트 timeout 이 발동하지 못한다. git 호출이 멈추면 이 값으로 끝낸다.
-// Windows 에서는 git 만 끝나고 훅이 띄운 node·npm 은 남을 수 있다.
-const SPAWN_TIMEOUT = 50_000;
+// SLOW 보다 짧아야 멈춘 명령이 테스트 실패로 드러난다. Windows 에서는 git 만 끝나고 훅이 띄운 node·npm 은 남을 수 있다.
+const SPAWN_TIMEOUT = 120_000;
 
 const tempDirs: string[] = [];
 
